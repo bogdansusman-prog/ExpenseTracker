@@ -1,6 +1,17 @@
-@ExpenseTracker.Api_HostAddress = http://localhost:5112
+@ExpenseTracker_Api_HostAddress = https://localhost:7007
 
-GET {{ExpenseTracker.Api_HostAddress}}/weatherforecast/
+### Obține toate categoriile
+
+GET {{ExpenseTracker_Api_HostAddress}}/api/categories
 Accept: application/json
 
 ###
+
+### Adaugă o categorie
+
+POST {{ExpenseTracker_Api_HostAddress}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Transport"
+}
