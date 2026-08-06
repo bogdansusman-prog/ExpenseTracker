@@ -258,3 +258,72 @@ th {
     grid-column: auto;
   }
 }
+.category-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.category-name-field {
+  flex: 1;
+}
+
+.category-save-button,
+.cancel-button {
+  min-height: 41px;
+  padding: 10px 16px;
+}
+
+.cancel-button,
+.edit-button {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  color: #f5f7fa;
+  background: #555b66;
+}
+
+.category-management-list {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: #1a1c20;
+  border: 1px solid #30343b;
+  border-radius: 10px;
+}
+
+.category-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button {
+  padding: 8px 12px;
+  color: #bac8ff;
+  background: #252e4a;
+}
+
+@media (max-width: 650px) {
+  .category-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .category-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
