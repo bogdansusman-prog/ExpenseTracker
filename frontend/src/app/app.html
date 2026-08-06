@@ -56,6 +56,99 @@
         </strong>
       </article>
     </section>
+    <section class="card">
+  <div class="section-header">
+    <h2>Gestionare categorii</h2>
+
+    <span>
+      {{ categories().length }} categorii
+    </span>
+  </div>
+
+  <form
+    class="category-form"
+    [formGroup]="categoryForm"
+    (ngSubmit)="saveCategory()"
+  >
+    <div class="form-field category-name-field">
+      <label for="category-name">
+        Numele categoriei
+      </label>
+
+      <input
+        id="category-name"
+        type="text"
+        formControlName="name"
+        placeholder="Exemplu: Chirie"
+      />
+
+      @if (
+        categoryForm.controls.name.touched &&
+        categoryForm.controls.name.invalid
+      ) {
+        <small>
+          Numele categoriei este obligatoriu.
+        </small>
+      }
+    </div>
+
+    <button
+      class="primary-button category-save-button"
+      type="submit"
+      [disabled]="categorySaving()"
+    >
+      @if (editingCategoryId() === null) {
+        {{ categorySaving()
+          ? 'Se salvează...'
+          : 'Adaugă categoria' }}
+      } @else {
+        {{ categorySaving()
+          ? 'Se salvează...'
+          : 'Salvează modificarea' }}
+      }
+    </button>
+
+    @if (editingCategoryId() !== null) {
+      <button
+        class="cancel-button"
+        type="button"
+        (click)="cancelCategoryEdit()"
+      >
+        Anulează
+      </button>
+    }
+  </form>
+
+  @if (categories().length === 0) {
+    <p>Nu există categorii.</p>
+  } @else {
+    <div class="category-management-list">
+      @for (category of categories(); track category.id) {
+        <article class="category-item">
+          <strong>{{ category.name }}</strong>
+
+          <div class="category-actions">
+            <button
+              class="edit-button"
+              type="button"
+              (click)="startCategoryEdit(category)"
+            >
+              Editează
+            </button>
+
+            <button
+              class="delete-button"
+              type="button"
+              (click)="deleteCategory(category)"
+            >
+              Șterge
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
 
     <section class="card">
       <h2>Adaugă tranzacție</h2>
