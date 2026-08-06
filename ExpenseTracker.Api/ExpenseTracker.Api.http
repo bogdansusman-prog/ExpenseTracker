@@ -1,5 +1,9 @@
 @ExpenseTracker_Api_HostAddress = https://localhost:7007
 
+##################################################
+# CATEGORIES
+##################################################
+
 ### Obține toate categoriile
 
 GET {{ExpenseTracker_Api_HostAddress}}/api/categories
@@ -7,7 +11,25 @@ Accept: application/json
 
 ###
 
-### Adaugă o categorie
+### Obține categoria cu ID 1
+
+GET {{ExpenseTracker_Api_HostAddress}}/api/categories/1
+Accept: application/json
+
+###
+
+### Adaugă categoria Mancare
+
+POST {{ExpenseTracker_Api_HostAddress}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Mancare"
+}
+
+###
+
+### Adaugă categoria Transport
 
 POST {{ExpenseTracker_Api_HostAddress}}/api/categories
 Content-Type: application/json
@@ -15,3 +37,91 @@ Content-Type: application/json
 {
   "name": "Transport"
 }
+
+###
+
+### Modifică categoria cu ID 1
+
+PUT {{ExpenseTracker_Api_HostAddress}}/api/categories/1
+Content-Type: application/json
+
+{
+  "name": "Alimente"
+}
+
+###
+
+### Șterge categoria cu ID 2
+
+DELETE {{ExpenseTracker_Api_HostAddress}}/api/categories/2
+
+
+##################################################
+# TRANSACTIONS
+##################################################
+
+### Obține toate tranzacțiile
+
+GET {{ExpenseTracker_Api_HostAddress}}/api/transactions
+Accept: application/json
+
+###
+
+### Obține tranzacția cu ID 1
+
+GET {{ExpenseTracker_Api_HostAddress}}/api/transactions/1
+Accept: application/json
+
+###
+
+### Adaugă o cheltuială
+
+POST {{ExpenseTracker_Api_HostAddress}}/api/transactions
+Content-Type: application/json
+
+{
+  "title": "Cumparaturi supermarket",
+  "amount": 125.50,
+  "date": "2026-08-05T12:00:00Z",
+  "type": 2,
+  "categoryId": 1,
+  "description": "Cumparaturi saptamanale"
+}
+
+###
+
+### Adaugă un venit
+
+POST {{ExpenseTracker_Api_HostAddress}}/api/transactions
+Content-Type: application/json
+
+{
+  "title": "Salariu",
+  "amount": 4500,
+  "date": "2026-08-05T08:00:00Z",
+  "type": 1,
+  "categoryId": 1,
+  "description": "Salariul lunar"
+}
+
+###
+
+### Modifică tranzacția cu ID 1
+
+PUT {{ExpenseTracker_Api_HostAddress}}/api/transactions/1
+Content-Type: application/json
+
+{
+  "title": "Cumparaturi supermarket actualizate",
+  "amount": 150,
+  "date": "2026-08-05T12:00:00Z",
+  "type": 2,
+  "categoryId": 1,
+  "description": "Produse alimentare si produse pentru casa"
+}
+
+###
+
+### Șterge tranzacția cu ID 1
+
+DELETE {{ExpenseTracker_Api_HostAddress}}/api/transactions/1

@@ -1,0 +1,254 @@
+<header class="header">
+  <div>
+    <h1>Expense Tracker</h1>
+    <p>Venituri și cheltuieli personale</p>
+  </div>
+
+  <button
+    class="secondary-button"
+    type="button"
+    (click)="loadData()"
+  >
+    Reîncarcă
+  </button>
+</header>
+
+<main class="container">
+  @if (errorMessage()) {
+    <div class="alert error-alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert success-alert">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="card">
+      <p>Se încarcă datele...</p>
+    </section>
+  } @else {
+    <section class="summary-grid">
+      <article class="summary-card">
+        <span>Venituri</span>
+        <strong class="income">
+          {{ formatMoney(totalIncome()) }} lei
+        </strong>
+      </article>
+
+      <article class="summary-card">
+        <span>Cheltuieli</span>
+        <strong class="expense">
+          {{ formatMoney(totalExpenses()) }} lei
+        </strong>
+      </article>
+
+      <article class="summary-card">
+        <span>Sold</span>
+        <strong
+          [class.income]="balance() >= 0"
+          [class.expense]="balance() < 0"
+        >
+          {{ formatMoney(balance()) }} lei
+        </strong>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Adaugă tranzacție</h2>
+
+      @if (categories().length === 0) {
+        <p>
+          Creează mai întâi cel puțin o categorie.
+        </p>
+      } @else {
+        <form
+          class="transaction-form"
+          [formGroup]="transactionForm"
+          (ngSubmit)="createTransaction()"
+        >
+          <div class="form-field title-field">
+            <label for="title">Titlu</label>
+
+            <input
+              id="title"
+              type="text"
+              formControlName="title"
+              placeholder="Exemplu: Cumpărături"
+            />
+
+            @if (
+              transactionForm.controls.title.touched &&
+              transactionForm.controls.title.invalid
+            ) {
+              <small>Titlul este obligatoriu.</small>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="amount">Sumă</label>
+
+            <input
+              id="amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              formControlName="amount"
+            />
+
+            @if (
+              transactionForm.controls.amount.touched &&
+              transactionForm.controls.amount.invalid
+            ) {
+              <small>Suma trebuie să fie mai mare decât zero.</small>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="type">Tip</label>
+
+            <select
+              id="type"
+              formControlName="type"
+            >
+              <option value="1">Venit</option>
+              <option value="2">Cheltuială</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="category">Categorie</label>
+
+            <select
+              id="category"
+              formControlName="categoryId"
+            >
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">
+                  {{ category.name }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="date">Dată</label>
+
+            <input
+              id="date"
+              type="date"
+              formControlName="date"
+            />
+          </div>
+
+          <div class="form-field description-field">
+            <label for="description">Descriere</label>
+
+            <textarea
+              id="description"
+              rows="3"
+              formControlName="description"
+              placeholder="Opțional"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button
+              class="primary-button"
+              type="submit"
+              [disabled]="saving()"
+            >
+              {{ saving() ? 'Se salvează...' : 'Adaugă tranzacția' }}
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h2>Tranzacții</h2>
+
+        <span>
+          {{ transactions().length }} înregistrări
+        </span>
+      </div>
+
+      @if (transactions().length === 0) {
+        <p>Nu există tranzacții.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Titlu</th>
+                <th>Categorie</th>
+                <th>Tip</th>
+                <th>Sumă</th>
+                <th>Dată</th>
+                <th>Acțiuni</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (
+                transaction of transactions();
+                track transaction.id
+              ) {
+                <tr>
+                  <td>
+                    <strong>{{ transaction.title }}</strong>
+
+                    @if (transaction.description) {
+                      <small class="description">
+                        {{ transaction.description }}
+                      </small>
+                    }
+                  </td>
+
+                  <td>{{ transaction.categoryName }}</td>
+
+                  <td>
+                    @if (transaction.type === 1) {
+                      <span class="badge income-badge">
+                        Venit
+                      </span>
+                    } @else {
+                      <span class="badge expense-badge">
+                        Cheltuială
+                      </span>
+                    }
+                  </td>
+
+                  <td
+                    [class.income]="transaction.type === 1"
+                    [class.expense]="transaction.type === 2"
+                  >
+                    {{ formatMoney(transaction.amount) }} lei
+                  </td>
+
+                  <td>
+                    {{ transaction.date.slice(0, 10) }}
+                  </td>
+
+                  <td>
+                    <button
+                      class="delete-button"
+                      type="button"
+                      (click)="deleteTransaction(transaction.id)"
+                    >
+                      Șterge
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+</main>
