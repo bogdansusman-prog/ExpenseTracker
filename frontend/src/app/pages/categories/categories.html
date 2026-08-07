@@ -1,0 +1,313 @@
+<div class="page-header">
+
+  <div>
+
+    <h2>
+      Categorii
+    </h2>
+
+    <p>
+      Gestioneaza categoriile folosite pentru tranzactii
+    </p>
+
+  </div>
+
+
+  <button
+    class="secondary-button"
+    type="button"
+    (click)="loadData()"
+  >
+    Reincarca
+  </button>
+
+</div>
+
+
+@if (errorMessage()) {
+
+  <div class="alert error-alert">
+    {{ errorMessage() }}
+  </div>
+
+}
+
+
+@if (successMessage()) {
+
+  <div class="alert success-alert">
+    {{ successMessage() }}
+  </div>
+
+}
+
+
+@if (loading()) {
+
+  <section class="card">
+    Se incarca datele...
+  </section>
+
+} @else {
+
+  <!-- SUMMARY -->
+
+  <section class="summary-grid">
+
+    <article class="summary-card">
+
+      <span>
+        Total categorii
+      </span>
+
+      <strong>
+        {{ totalCategories() }}
+      </strong>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Categorii utilizate
+      </span>
+
+      <strong class="used">
+        {{ usedCategories() }}
+      </strong>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Categorii neutilizate
+      </span>
+
+      <strong class="unused">
+        {{ unusedCategories() }}
+      </strong>
+
+    </article>
+
+  </section>
+
+
+  <!-- FORM -->
+
+  <section class="card">
+
+    <h3>
+
+      @if (
+        editingCategoryId() === null
+      ) {
+
+        Adauga categorie
+
+      } @else {
+
+        Editeaza categoria
+
+      }
+
+    </h3>
+
+
+    <form
+      class="category-form"
+      [formGroup]="categoryForm"
+      (ngSubmit)="saveCategory()"
+    >
+
+      <div class="form-field">
+
+        <label
+          for="category-name"
+        >
+          Numele categoriei
+        </label>
+
+        <input
+          id="category-name"
+          type="text"
+          formControlName="name"
+          placeholder="Exemplu: Transport"
+        />
+
+
+        @if (
+          categoryForm.controls
+            .name.touched &&
+          categoryForm.controls
+            .name.invalid
+        ) {
+
+          <small>
+            Numele categoriei este obligatoriu.
+          </small>
+
+        }
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          class="primary-button"
+          type="submit"
+          [disabled]="saving()"
+        >
+
+          @if (saving()) {
+
+            Se salveaza...
+
+          } @else if (
+            editingCategoryId() === null
+          ) {
+
+            Adauga categoria
+
+          } @else {
+
+            Salveaza modificarea
+
+          }
+
+        </button>
+
+
+        @if (
+          editingCategoryId() !== null
+        ) {
+
+          <button
+            class="secondary-button"
+            type="button"
+            (click)="cancelEdit()"
+          >
+            Anuleaza
+          </button>
+
+        }
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <!-- CATEGORY LIST -->
+
+  <section class="card">
+
+    <div class="section-header">
+
+      <h3>
+        Lista categorii
+      </h3>
+
+      <span>
+        {{ categories().length }}
+        categorii
+      </span>
+
+    </div>
+
+
+    @if (
+      categories().length === 0
+    ) {
+
+      <p>
+        Nu exista categorii.
+      </p>
+
+    } @else {
+
+      <div class="category-grid">
+
+        @for (
+          category of categories();
+          track category.id
+        ) {
+
+          <article
+            class="category-item"
+          >
+
+            <div
+              class="category-info"
+            >
+
+              <strong>
+                {{ category.name }}
+              </strong>
+
+              <span>
+
+                {{
+                  getTransactionCount(
+                    category.id
+                  )
+                }}
+
+                tranzactii
+
+              </span>
+
+            </div>
+
+
+            <div
+              class="category-actions"
+            >
+
+              <button
+                class="edit-button"
+                type="button"
+                (click)="
+                  startEdit(
+                    category
+                  )
+                "
+              >
+                Editeaza
+              </button>
+
+
+              <button
+                class="delete-button"
+                type="button"
+                [disabled]="
+                  getTransactionCount(
+                    category.id
+                  ) > 0
+                "
+                (click)="
+                  deleteCategory(
+                    category
+                  )
+                "
+              >
+                Sterge
+              </button>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+}
