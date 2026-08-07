@@ -36,23 +36,43 @@ export class App implements OnInit {
   private readonly apiService = inject(ExpenseApiService);
   private readonly formBuilder = inject(FormBuilder);
 
+  // DATA
+
   readonly categories = signal<Category[]>([]);
   readonly transactions = signal<FinancialTransaction[]>([]);
+
+  // STATE
 
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly categorySaving = signal(false);
 
-  readonly editingCategoryId = signal<number | null>(null);
+  readonly editingCategoryId =
+    signal<number | null>(null);
 
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
+
+  // FILTERS
+
+  readonly filterCategoryId = signal(0);
+  readonly filterType = signal(0);
+  readonly filterDateFrom = signal('');
+  readonly filterDateTo = signal('');
+
+  // SELECTION
+
+  readonly selectedTransactionIds =
+    signal<Set<number>>(new Set<number>());
+
+  // DASHBOARD
 
   readonly totalIncome = computed(() =>
     this.transactions()
       .filter(transaction => transaction.type === 1)
       .reduce(
-        (total, transaction) => total + transaction.amount,
+        (total, transaction) =>
+          total + transaction.amount,
         0
       )
   );
@@ -61,99 +81,227 @@ export class App implements OnInit {
     this.transactions()
       .filter(transaction => transaction.type === 2)
       .reduce(
-        (total, transaction) => total + transaction.amount,
+        (total, transaction) =>
+          total + transaction.amount,
         0
       )
   );
 
   readonly balance = computed(
-    () => this.totalIncome() - this.totalExpenses()
+    () =>
+      this.totalIncome() -
+      this.totalExpenses()
   );
 
-  readonly categoryForm = this.formBuilder.nonNullable.group({
-    name: [
-      '',
-      [
-        Validators.required,
-        Validators.maxLength(100)
-      ]
-    ]
+  // ONLY CATEGORIES THAT HAVE TRANSACTIONS
+
+  readonly transactionCategories = computed(() => {
+    const usedCategoryIds = new Set(
+      this.transactions().map(
+        transaction => transaction.categoryId
+      )
+    );
+
+    return this.categories().filter(
+      category =>
+        usedCategoryIds.has(category.id)
+    );
   });
 
-  readonly transactionForm = this.formBuilder.nonNullable.group({
-    title: [
-      '',
-      [
-        Validators.required,
-        Validators.maxLength(150)
-      ]
-    ],
-    amount: [
-      0,
-      [
-        Validators.required,
-        Validators.min(0.01)
-      ]
-    ],
-    date: [
-      new Date().toISOString().slice(0, 10),
-      Validators.required
-    ],
-    type: [
-      2 as TransactionType,
-      Validators.required
-    ],
-    categoryId: [
-      0,
-      [
-        Validators.required,
-        Validators.min(1)
-      ]
-    ],
-    description: [
-      '',
-      Validators.maxLength(500)
-    ]
+  // FILTERED TRANSACTIONS
+
+  readonly filteredTransactions = computed(() => {
+    const categoryId =
+      this.filterCategoryId();
+
+    const type =
+      this.filterType();
+
+    const dateFrom =
+      this.filterDateFrom();
+
+    const dateTo =
+      this.filterDateTo();
+
+    return this.transactions().filter(
+      transaction => {
+        const transactionDate =
+          transaction.date.slice(0, 10);
+
+        const matchesCategory =
+          categoryId === 0 ||
+          transaction.categoryId === categoryId;
+
+        const matchesType =
+          type === 0 ||
+          transaction.type === type;
+
+        const matchesDateFrom =
+          !dateFrom ||
+          transactionDate >= dateFrom;
+
+        const matchesDateTo =
+          !dateTo ||
+          transactionDate <= dateTo;
+
+        return (
+          matchesCategory &&
+          matchesType &&
+          matchesDateFrom &&
+          matchesDateTo
+        );
+      }
+    );
   });
+
+  // SELECTION COMPUTED VALUES
+
+  readonly selectedCount = computed(
+    () =>
+      this.selectedTransactionIds().size
+  );
+
+  readonly selectedVisibleCount = computed(() => {
+    const selectedIds =
+      this.selectedTransactionIds();
+
+    return this.filteredTransactions()
+      .filter(transaction =>
+        selectedIds.has(transaction.id)
+      )
+      .length;
+  });
+
+  readonly allVisibleTransactionsSelected =
+    computed(() => {
+      const visibleTransactions =
+        this.filteredTransactions();
+
+      if (visibleTransactions.length === 0) {
+        return false;
+      }
+
+      const selectedIds =
+        this.selectedTransactionIds();
+
+      return visibleTransactions.every(
+        transaction =>
+          selectedIds.has(transaction.id)
+      );
+    });
+
+  // CATEGORY FORM
+
+  readonly categoryForm =
+    this.formBuilder.nonNullable.group({
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100)
+        ]
+      ]
+    });
+
+  // TRANSACTION FORM
+
+  readonly transactionForm =
+    this.formBuilder.nonNullable.group({
+      categoryId: [
+        0,
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
+      ],
+
+      amount: [
+        0,
+        [
+          Validators.required,
+          Validators.min(0.01)
+        ]
+      ],
+
+      type: [
+        2 as TransactionType,
+        Validators.required
+      ],
+
+      date: [
+        new Date()
+          .toISOString()
+          .slice(0, 10),
+
+        Validators.required
+      ],
+
+      description: [
+        '',
+        Validators.maxLength(500)
+      ]
+    });
 
   ngOnInit(): void {
     this.loadData();
   }
+
+  // LOAD DATA
 
   loadData(): void {
     this.loading.set(true);
     this.errorMessage.set('');
 
     forkJoin({
-      categories: this.apiService.getCategories(),
-      transactions: this.apiService.getTransactions()
+      categories:
+        this.apiService.getCategories(),
+
+      transactions:
+        this.apiService.getTransactions()
     }).subscribe({
       next: result => {
-        this.categories.set(result.categories);
-        this.transactions.set(result.transactions);
+        this.categories.set(
+          result.categories
+        );
+
+        this.transactions.set(
+          result.transactions
+        );
+
+        this.clearTransactionSelection();
 
         if (
           result.categories.length > 0 &&
-          this.transactionForm.controls.categoryId.value === 0
+          this.transactionForm.controls
+            .categoryId.value === 0
         ) {
           this.transactionForm.patchValue({
-            categoryId: result.categories[0].id
+            categoryId:
+              result.categories[0].id
           });
         }
 
+        this.ensureValidCategoryFilter();
+
         this.loading.set(false);
       },
+
       error: error => {
-        console.error('API error:', error);
+        console.error(
+          'API error:',
+          error
+        );
 
         this.errorMessage.set(
-          'Nu s-au putut încărca datele din backend.'
+          'Nu s-au putut incarca datele din backend.'
         );
 
         this.loading.set(false);
       }
     });
   }
+
+  // CATEGORY MANAGEMENT
 
   saveCategory(): void {
     this.clearMessages();
@@ -163,17 +311,25 @@ export class App implements OnInit {
       return;
     }
 
-    const name = this.categoryForm.controls.name.value.trim();
+    const name =
+      this.categoryForm.controls
+        .name.value.trim();
 
     if (!name) {
-      this.categoryForm.controls.name.setErrors({
-        required: true
-      });
+      this.categoryForm.controls
+        .name.setErrors({
+          required: true
+        });
+
       return;
     }
 
-    const request: CategoryRequest = { name };
-    const categoryId = this.editingCategoryId();
+    const request: CategoryRequest = {
+      name
+    };
+
+    const categoryId =
+      this.editingCategoryId();
 
     this.categorySaving.set(true);
 
@@ -182,66 +338,25 @@ export class App implements OnInit {
       return;
     }
 
-    this.updateCategory(categoryId, request);
+    this.updateCategory(
+      categoryId,
+      request
+    );
   }
 
-  private createCategory(request: CategoryRequest): void {
-    this.apiService.createCategory(request).subscribe({
-      next: createdCategory => {
-        this.categories.update(categories =>
-          [...categories, createdCategory].sort(
-            (first, second) =>
-              first.name.localeCompare(second.name, 'ro')
-          )
-        );
-
-        if (
-          this.transactionForm.controls.categoryId.value === 0
-        ) {
-          this.transactionForm.patchValue({
-            categoryId: createdCategory.id
-          });
-        }
-
-        this.categoryForm.reset({
-          name: ''
-        });
-
-        this.successMessage.set(
-          'Categoria a fost adăugată.'
-        );
-
-        this.categorySaving.set(false);
-      },
-      error: error => {
-        this.handleCategoryError(
-          error,
-          'Categoria nu a putut fi adăugată.',
-          'Există deja o categorie cu acest nume.'
-        );
-      }
-    });
-  }
-
-  private updateCategory(
-    categoryId: number,
+  private createCategory(
     request: CategoryRequest
   ): void {
     this.apiService
-      .updateCategory(categoryId, request)
+      .createCategory(request)
       .subscribe({
-        next: () => {
-          this.categories.update(categories =>
-            categories
-              .map(category =>
-                category.id === categoryId
-                  ? {
-                      ...category,
-                      name: request.name
-                    }
-                  : category
-              )
-              .sort(
+        next: createdCategory => {
+          this.categories.update(
+            categories =>
+              [
+                ...categories,
+                createdCategory
+              ].sort(
                 (first, second) =>
                   first.name.localeCompare(
                     second.name,
@@ -250,40 +365,110 @@ export class App implements OnInit {
               )
           );
 
-          // Actualizează numele și în tabelul tranzacțiilor.
-          this.transactions.update(transactions =>
-            transactions.map(transaction =>
-              transaction.categoryId === categoryId
-                ? {
-                    ...transaction,
-                    categoryName: request.name
-                  }
-                : transaction
-            )
-          );
+          if (
+            this.transactionForm.controls
+              .categoryId.value === 0
+          ) {
+            this.transactionForm.patchValue({
+              categoryId:
+                createdCategory.id
+            });
+          }
 
-          this.cancelCategoryEdit();
+          this.categoryForm.reset({
+            name: ''
+          });
 
           this.successMessage.set(
-            'Categoria a fost modificată.'
+            'Categoria a fost adaugata.'
           );
 
           this.categorySaving.set(false);
         },
+
         error: error => {
           this.handleCategoryError(
             error,
-            'Categoria nu a putut fi modificată.',
-            'Există deja o categorie cu acest nume.'
+            'Categoria nu a putut fi adaugata.',
+            'Exista deja o categorie cu acest nume.'
           );
         }
       });
   }
 
-  startCategoryEdit(category: Category): void {
+  private updateCategory(
+    categoryId: number,
+    request: CategoryRequest
+  ): void {
+    this.apiService
+      .updateCategory(
+        categoryId,
+        request
+      )
+      .subscribe({
+        next: () => {
+          this.categories.update(
+            categories =>
+              categories
+                .map(category =>
+                  category.id === categoryId
+                    ? {
+                        ...category,
+                        name: request.name
+                      }
+                    : category
+                )
+                .sort(
+                  (first, second) =>
+                    first.name.localeCompare(
+                      second.name,
+                      'ro'
+                    )
+                )
+          );
+
+          this.transactions.update(
+            transactions =>
+              transactions.map(
+                transaction =>
+                  transaction.categoryId ===
+                  categoryId
+                    ? {
+                        ...transaction,
+                        categoryName:
+                          request.name
+                      }
+                    : transaction
+              )
+          );
+
+          this.cancelCategoryEdit();
+
+          this.successMessage.set(
+            'Categoria a fost modificata.'
+          );
+
+          this.categorySaving.set(false);
+        },
+
+        error: error => {
+          this.handleCategoryError(
+            error,
+            'Categoria nu a putut fi modificata.',
+            'Exista deja o categorie cu acest nume.'
+          );
+        }
+      });
+  }
+
+  startCategoryEdit(
+    category: Category
+  ): void {
     this.clearMessages();
 
-    this.editingCategoryId.set(category.id);
+    this.editingCategoryId.set(
+      category.id
+    );
 
     this.categoryForm.setValue({
       name: category.name
@@ -298,61 +483,83 @@ export class App implements OnInit {
     });
   }
 
-  deleteCategory(category: Category): void {
+  deleteCategory(
+    category: Category
+  ): void {
     this.clearMessages();
 
-    const confirmed = window.confirm(
-      `Sigur vrei să ștergi categoria „${category.name}”?`
-    );
+    const confirmed =
+      window.confirm(
+        `Sigur vrei sa stergi categoria "${category.name}"?`
+      );
 
     if (!confirmed) {
       return;
     }
 
-    this.apiService.deleteCategory(category.id).subscribe({
-      next: () => {
-        const remainingCategories = this.categories()
-          .filter(existingCategory =>
-            existingCategory.id !== category.id
+    this.apiService
+      .deleteCategory(category.id)
+      .subscribe({
+        next: () => {
+          const remainingCategories =
+            this.categories().filter(
+              existingCategory =>
+                existingCategory.id !==
+                category.id
+            );
+
+          this.categories.set(
+            remainingCategories
           );
 
-        this.categories.set(remainingCategories);
+          if (
+            this.transactionForm.controls
+              .categoryId.value ===
+            category.id
+          ) {
+            this.transactionForm.patchValue({
+              categoryId:
+                remainingCategories[0]?.id ??
+                0
+            });
+          }
 
-        if (
-          this.transactionForm.controls.categoryId.value ===
-          category.id
-        ) {
-          this.transactionForm.patchValue({
-            categoryId:
-              remainingCategories[0]?.id ?? 0
-          });
-        }
+          if (
+            this.editingCategoryId() ===
+            category.id
+          ) {
+            this.cancelCategoryEdit();
+          }
 
-        if (
-          this.editingCategoryId() === category.id
-        ) {
-          this.cancelCategoryEdit();
-        }
+          this.ensureValidCategoryFilter();
 
-        this.successMessage.set(
-          'Categoria a fost ștearsă.'
-        );
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Delete category error:', error);
-
-        if (error.status === 409) {
-          this.errorMessage.set(
-            'Categoria nu poate fi ștearsă deoarece are tranzacții asociate.'
+          this.successMessage.set(
+            'Categoria a fost stearsa.'
           );
-        } else {
-          this.errorMessage.set(
-            'Categoria nu a putut fi ștearsă.'
+        },
+
+        error: (
+          error: HttpErrorResponse
+        ) => {
+          console.error(
+            'Delete category error:',
+            error
           );
+
+          if (error.status === 409) {
+            this.errorMessage.set(
+              'Categoria nu poate fi stearsa deoarece are tranzactii asociate.'
+            );
+          } else {
+            this.errorMessage.set(
+              'Categoria nu a putut fi stearsa.'
+            );
+          }
         }
-      }
-    });
+      });
   }
+
+  // TRANSACTION MANAGEMENT
 
   createTransaction(): void {
     this.clearMessages();
@@ -365,101 +572,381 @@ export class App implements OnInit {
     const formValue =
       this.transactionForm.getRawValue();
 
-    const request: FinancialTransactionRequest = {
-      title: formValue.title.trim(),
-      amount: Number(formValue.amount),
-      date: new Date(
-        `${formValue.date}T12:00:00`
-      ).toISOString(),
-      type: Number(
-        formValue.type
-      ) as TransactionType,
-      categoryId: Number(formValue.categoryId),
-      description:
-        formValue.description.trim() || null
-    };
+    const request:
+      FinancialTransactionRequest = {
+        categoryId:
+          Number(
+            formValue.categoryId
+          ),
+
+        amount:
+          Number(
+            formValue.amount
+          ),
+
+        type:
+          Number(
+            formValue.type
+          ) as TransactionType,
+
+        date: new Date(
+          `${formValue.date}T12:00:00`
+        ).toISOString(),
+
+        description:
+          formValue.description.trim() ||
+          null
+      };
 
     this.saving.set(true);
 
-    this.apiService.createTransaction(request).subscribe({
-      next: createdTransaction => {
-        this.transactions.update(transactions => [
-          createdTransaction,
-          ...transactions
-        ]);
+    this.apiService
+      .createTransaction(request)
+      .subscribe({
+        next: createdTransaction => {
+          this.transactions.update(
+            transactions => [
+              createdTransaction,
+              ...transactions
+            ]
+          );
 
-        this.transactionForm.reset({
-          title: '',
-          amount: 0,
-          date: new Date().toISOString().slice(0, 10),
-          type: 2,
-          categoryId:
-            this.categories()[0]?.id ?? 0,
-          description: ''
-        });
+          this.transactionForm.reset({
+            categoryId:
+              this.categories()[0]?.id ??
+              0,
 
-        this.successMessage.set(
-          'Tranzacția a fost adăugată.'
-        );
+            amount: 0,
 
-        this.saving.set(false);
-      },
-      error: error => {
-        console.error(
-          'Create transaction error:',
-          error
-        );
+            type: 2,
 
-        this.errorMessage.set(
-          'Tranzacția nu a putut fi adăugată.'
-        );
+            date: new Date()
+              .toISOString()
+              .slice(0, 10),
 
-        this.saving.set(false);
-      }
-    });
+            description: ''
+          });
+
+          this.successMessage.set(
+            'Tranzactia a fost adaugata.'
+          );
+
+          this.saving.set(false);
+        },
+
+        error: error => {
+          console.error(
+            'Create transaction error:',
+            error
+          );
+
+          this.errorMessage.set(
+            'Tranzactia nu a putut fi adaugata.'
+          );
+
+          this.saving.set(false);
+        }
+      });
   }
 
-  deleteTransaction(id: number): void {
+  deleteTransaction(
+    id: number
+  ): void {
     this.clearMessages();
 
-    const confirmed = window.confirm(
-      'Sigur vrei să ștergi această tranzacție?'
-    );
+    const confirmed =
+      window.confirm(
+        'Sigur vrei sa stergi aceasta tranzactie?'
+      );
 
     if (!confirmed) {
       return;
     }
 
-    this.apiService.deleteTransaction(id).subscribe({
-      next: () => {
-        this.transactions.update(transactions =>
-          transactions.filter(
-            transaction => transaction.id !== id
+    this.apiService
+      .deleteTransaction(id)
+      .subscribe({
+        next: () => {
+          this.transactions.update(
+            transactions =>
+              transactions.filter(
+                transaction =>
+                  transaction.id !== id
+              )
+          );
+
+          const selectedIds =
+            new Set(
+              this.selectedTransactionIds()
+            );
+
+          selectedIds.delete(id);
+
+          this.selectedTransactionIds.set(
+            selectedIds
+          );
+
+          this.ensureValidCategoryFilter();
+
+          this.successMessage.set(
+            'Tranzactia a fost stearsa.'
+          );
+        },
+
+        error: error => {
+          console.error(
+            'Delete transaction error:',
+            error
+          );
+
+          this.errorMessage.set(
+            'Tranzactia nu a putut fi stearsa.'
+          );
+        }
+      });
+  }
+
+  // TRANSACTION SELECTION
+
+  toggleTransactionSelection(
+    transactionId: number
+  ): void {
+    const selectedIds =
+      new Set(
+        this.selectedTransactionIds()
+      );
+
+    if (
+      selectedIds.has(transactionId)
+    ) {
+      selectedIds.delete(transactionId);
+    } else {
+      selectedIds.add(transactionId);
+    }
+
+    this.selectedTransactionIds.set(
+      selectedIds
+    );
+  }
+
+  toggleSelectAllVisible(): void {
+    const selectedIds =
+      new Set(
+        this.selectedTransactionIds()
+      );
+
+    const visibleTransactions =
+      this.filteredTransactions();
+
+    if (
+      this.allVisibleTransactionsSelected()
+    ) {
+      visibleTransactions.forEach(
+        transaction =>
+          selectedIds.delete(
+            transaction.id
           )
+      );
+    } else {
+      visibleTransactions.forEach(
+        transaction =>
+          selectedIds.add(
+            transaction.id
+          )
+      );
+    }
+
+    this.selectedTransactionIds.set(
+      selectedIds
+    );
+  }
+
+  clearTransactionSelection(): void {
+    this.selectedTransactionIds.set(
+      new Set<number>()
+    );
+  }
+
+  deleteSelectedTransactions(): void {
+    const selectedIds = [
+      ...this.selectedTransactionIds()
+    ];
+
+    if (selectedIds.length === 0) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Sigur vrei sa stergi ${selectedIds.length} tranzactii?`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.clearMessages();
+
+    const requests =
+      selectedIds.map(
+        id =>
+          this.apiService
+            .deleteTransaction(id)
+      );
+
+    forkJoin(requests).subscribe({
+      next: () => {
+        const selectedIdSet =
+          new Set(selectedIds);
+
+        this.transactions.update(
+          transactions =>
+            transactions.filter(
+              transaction =>
+                !selectedIdSet.has(
+                  transaction.id
+                )
+            )
         );
 
+        this.clearTransactionSelection();
+
+        this.ensureValidCategoryFilter();
+
         this.successMessage.set(
-          'Tranzacția a fost ștearsă.'
+          `${selectedIds.length} tranzactii au fost sterse.`
         );
       },
+
       error: error => {
         console.error(
-          'Delete transaction error:',
+          'Delete selected transactions error:',
           error
         );
 
         this.errorMessage.set(
-          'Tranzacția nu a putut fi ștearsă.'
+          'Tranzactiile selectate nu au putut fi sterse.'
         );
+
+        // Resync in case some deletes succeeded
+        // before another request failed.
+        this.loadData();
       }
     });
   }
 
-  formatMoney(value: number): string {
-    return value.toLocaleString('ro-RO', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+  // FILTERS
+
+  setCategoryFilter(
+    event: Event
+  ): void {
+    const value =
+      Number(
+        (
+          event.target as
+            HTMLSelectElement
+        ).value
+      );
+
+    this.filterCategoryId.set(
+      value
+    );
+
+    this.clearTransactionSelection();
+  }
+
+  setTypeFilter(
+    event: Event
+  ): void {
+    const value =
+      Number(
+        (
+          event.target as
+            HTMLSelectElement
+        ).value
+      );
+
+    this.filterType.set(
+      value
+    );
+
+    this.clearTransactionSelection();
+  }
+
+  setDateFromFilter(
+    event: Event
+  ): void {
+    const value =
+      (
+        event.target as
+          HTMLInputElement
+      ).value;
+
+    this.filterDateFrom.set(
+      value
+    );
+
+    this.clearTransactionSelection();
+  }
+
+  setDateToFilter(
+    event: Event
+  ): void {
+    const value =
+      (
+        event.target as
+          HTMLInputElement
+      ).value;
+
+    this.filterDateTo.set(
+      value
+    );
+
+    this.clearTransactionSelection();
+  }
+
+  resetTransactionFilters(): void {
+    this.filterCategoryId.set(0);
+    this.filterType.set(0);
+    this.filterDateFrom.set('');
+    this.filterDateTo.set('');
+
+    this.clearTransactionSelection();
+  }
+
+  private ensureValidCategoryFilter(): void {
+    if (
+      this.filterCategoryId() === 0
+    ) {
+      return;
+    }
+
+    const selectedCategoryStillExists =
+      this.transactionCategories().some(
+        category =>
+          category.id ===
+          this.filterCategoryId()
+      );
+
+    if (
+      !selectedCategoryStillExists
+    ) {
+      this.filterCategoryId.set(0);
+    }
+  }
+
+  // HELPERS
+
+  formatMoney(
+    value: number
+  ): string {
+    return value.toLocaleString(
+      'ro-RO',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    );
   }
 
   private clearMessages(): void {
@@ -472,7 +959,10 @@ export class App implements OnInit {
     fallbackMessage: string,
     conflictMessage: string
   ): void {
-    console.error('Category error:', error);
+    console.error(
+      'Category error:',
+      error
+    );
 
     this.errorMessage.set(
       error.status === 409

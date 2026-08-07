@@ -7,10 +7,6 @@ public class FinancialTransaction
 {
     public int Id { get; set; }
 
-    [Required]
-    [MaxLength(150)]
-    public string Title { get; set; } = string.Empty;
-
     [Column(TypeName = "decimal(18,2)")]
     public decimal Amount { get; set; }
 
