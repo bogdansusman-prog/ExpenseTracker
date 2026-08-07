@@ -1,7 +1,7 @@
 <header class="header">
   <div>
     <h1>Expense Tracker</h1>
-    <p>Venituri și cheltuieli personale</p>
+    <p>Venituri si cheltuieli personale</p>
   </div>
 
   <button
@@ -9,11 +9,13 @@
     type="button"
     (click)="loadData()"
   >
-    Reîncarcă
+    Reincarca
   </button>
 </header>
 
+
 <main class="container">
+
   @if (errorMessage()) {
     <div class="alert error-alert">
       {{ errorMessage() }}
@@ -26,28 +28,40 @@
     </div>
   }
 
+
   @if (loading()) {
+
     <section class="card">
-      <p>Se încarcă datele...</p>
+      <p>Se incarca datele...</p>
     </section>
+
   } @else {
+
+    <!-- DASHBOARD -->
+
     <section class="summary-grid">
+
       <article class="summary-card">
         <span>Venituri</span>
+
         <strong class="income">
           {{ formatMoney(totalIncome()) }} lei
         </strong>
       </article>
 
+
       <article class="summary-card">
         <span>Cheltuieli</span>
+
         <strong class="expense">
           {{ formatMoney(totalExpenses()) }} lei
         </strong>
       </article>
 
+
       <article class="summary-card">
         <span>Sold</span>
+
         <strong
           [class.income]="balance() >= 0"
           [class.expense]="balance() < 0"
@@ -55,134 +69,240 @@
           {{ formatMoney(balance()) }} lei
         </strong>
       </article>
+
     </section>
+
+
+    <!-- CATEGORY MANAGEMENT -->
+
     <section class="card">
-  <div class="section-header">
-    <h2>Gestionare categorii</h2>
 
-    <span>
-      {{ categories().length }} categorii
-    </span>
-  </div>
+      <div class="section-header">
 
-  <form
-    class="category-form"
-    [formGroup]="categoryForm"
-    (ngSubmit)="saveCategory()"
-  >
-    <div class="form-field category-name-field">
-      <label for="category-name">
-        Numele categoriei
-      </label>
+        <h2>Gestionare categorii</h2>
 
-      <input
-        id="category-name"
-        type="text"
-        formControlName="name"
-        placeholder="Exemplu: Chirie"
-      />
+        <span>
+          {{ categories().length }}
+          categorii
+        </span>
+
+      </div>
+
+
+      <form
+        class="category-form"
+        [formGroup]="categoryForm"
+        (ngSubmit)="saveCategory()"
+      >
+
+        <div
+          class="form-field category-name-field"
+        >
+
+          <label for="category-name">
+            Numele categoriei
+          </label>
+
+          <input
+            id="category-name"
+            type="text"
+            formControlName="name"
+            placeholder="Exemplu: Chirie"
+          />
+
+          @if (
+            categoryForm.controls.name.touched &&
+            categoryForm.controls.name.invalid
+          ) {
+
+            <small>
+              Numele categoriei este obligatoriu.
+            </small>
+
+          }
+
+        </div>
+
+
+        <button
+          class="primary-button category-save-button"
+          type="submit"
+          [disabled]="categorySaving()"
+        >
+
+          @if (
+            editingCategoryId() === null
+          ) {
+
+            {{
+              categorySaving()
+                ? 'Se salveaza...'
+                : 'Adauga categoria'
+            }}
+
+          } @else {
+
+            {{
+              categorySaving()
+                ? 'Se salveaza...'
+                : 'Salveaza modificarea'
+            }}
+
+          }
+
+        </button>
+
+
+        @if (
+          editingCategoryId() !== null
+        ) {
+
+          <button
+            class="cancel-button"
+            type="button"
+            (click)="cancelCategoryEdit()"
+          >
+            Anuleaza
+          </button>
+
+        }
+
+      </form>
+
 
       @if (
-        categoryForm.controls.name.touched &&
-        categoryForm.controls.name.invalid
+        categories().length === 0
       ) {
-        <small>
-          Numele categoriei este obligatoriu.
-        </small>
-      }
-    </div>
 
-    <button
-      class="primary-button category-save-button"
-      type="submit"
-      [disabled]="categorySaving()"
-    >
-      @if (editingCategoryId() === null) {
-        {{ categorySaving()
-          ? 'Se salvează...'
-          : 'Adaugă categoria' }}
+        <p>
+          Nu exista categorii.
+        </p>
+
       } @else {
-        {{ categorySaving()
-          ? 'Se salvează...'
-          : 'Salvează modificarea' }}
-      }
-    </button>
 
-    @if (editingCategoryId() !== null) {
-      <button
-        class="cancel-button"
-        type="button"
-        (click)="cancelCategoryEdit()"
-      >
-        Anulează
-      </button>
-    }
-  </form>
+        <div
+          class="category-management-list"
+        >
 
-  @if (categories().length === 0) {
-    <p>Nu există categorii.</p>
-  } @else {
-    <div class="category-management-list">
-      @for (category of categories(); track category.id) {
-        <article class="category-item">
-          <strong>{{ category.name }}</strong>
+          @for (
+            category of categories();
+            track category.id
+          ) {
 
-          <div class="category-actions">
-            <button
-              class="edit-button"
-              type="button"
-              (click)="startCategoryEdit(category)"
+            <article
+              class="category-item"
             >
-              Editează
-            </button>
 
-            <button
-              class="delete-button"
-              type="button"
-              (click)="deleteCategory(category)"
-            >
-              Șterge
-            </button>
-          </div>
-        </article>
+              <strong>
+                {{ category.name }}
+              </strong>
+
+
+              <div
+                class="category-actions"
+              >
+
+                <button
+                  class="edit-button"
+                  type="button"
+                  (click)="
+                    startCategoryEdit(
+                      category
+                    )
+                  "
+                >
+                  Editeaza
+                </button>
+
+
+                <button
+                  class="delete-button"
+                  type="button"
+                  (click)="
+                    deleteCategory(
+                      category
+                    )
+                  "
+                >
+                  Sterge
+                </button>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
       }
-    </div>
-  }
-</section>
+
+    </section>
+
+
+    <!-- ADD TRANSACTION -->
 
     <section class="card">
-      <h2>Adaugă tranzacție</h2>
 
-      @if (categories().length === 0) {
+      <h2>
+        Adauga tranzactie
+      </h2>
+
+
+      @if (
+        categories().length === 0
+      ) {
+
         <p>
-          Creează mai întâi cel puțin o categorie.
+          Creeaza mai intai cel putin o categorie.
         </p>
+
       } @else {
+
         <form
           class="transaction-form"
           [formGroup]="transactionForm"
           (ngSubmit)="createTransaction()"
         >
-          <div class="form-field title-field">
-            <label for="title">Titlu</label>
 
-            <input
-              id="title"
-              type="text"
-              formControlName="title"
-              placeholder="Exemplu: Cumpărături"
-            />
-
-            @if (
-              transactionForm.controls.title.touched &&
-              transactionForm.controls.title.invalid
-            ) {
-              <small>Titlul este obligatoriu.</small>
-            }
-          </div>
+          <!-- CATEGORY -->
 
           <div class="form-field">
-            <label for="amount">Sumă</label>
+
+            <label for="category">
+              Categorie
+            </label>
+
+            <select
+              id="category"
+              formControlName="categoryId"
+            >
+
+              @for (
+                category of categories();
+                track category.id
+              ) {
+
+                <option
+                  [value]="category.id"
+                >
+                  {{ category.name }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+
+          <!-- AMOUNT -->
+
+          <div class="form-field">
+
+            <label for="amount">
+              Suma
+            </label>
 
             <input
               id="amount"
@@ -192,156 +312,566 @@
               formControlName="amount"
             />
 
+
             @if (
-              transactionForm.controls.amount.touched &&
-              transactionForm.controls.amount.invalid
+              transactionForm.controls
+                .amount.touched &&
+              transactionForm.controls
+                .amount.invalid
             ) {
-              <small>Suma trebuie să fie mai mare decât zero.</small>
+
+              <small>
+                Suma trebuie sa fie mai mare decat zero.
+              </small>
+
             }
+
           </div>
 
+
+          <!-- TYPE -->
+
           <div class="form-field">
-            <label for="type">Tip</label>
+
+            <label for="type">
+              Tip
+            </label>
 
             <select
               id="type"
               formControlName="type"
             >
-              <option value="1">Venit</option>
-              <option value="2">Cheltuială</option>
+
+              <option value="1">
+                Venit
+              </option>
+
+              <option value="2">
+                Cheltuiala
+              </option>
+
             </select>
+
           </div>
 
-          <div class="form-field">
-            <label for="category">Categorie</label>
 
-            <select
-              id="category"
-              formControlName="categoryId"
-            >
-              @for (category of categories(); track category.id) {
-                <option [value]="category.id">
-                  {{ category.name }}
-                </option>
-              }
-            </select>
-          </div>
+          <!-- DATE -->
 
           <div class="form-field">
-            <label for="date">Dată</label>
+
+            <label for="date">
+              Data
+            </label>
 
             <input
               id="date"
               type="date"
               formControlName="date"
             />
+
           </div>
 
-          <div class="form-field description-field">
-            <label for="description">Descriere</label>
+
+          <!-- DESCRIPTION -->
+
+          <div
+            class="form-field description-field"
+          >
+
+            <label for="description">
+              Descriere
+            </label>
 
             <textarea
               id="description"
               rows="3"
               formControlName="description"
-              placeholder="Opțional"
+              placeholder="Optional"
             ></textarea>
+
           </div>
 
+
           <div class="form-actions">
+
             <button
               class="primary-button"
               type="submit"
               [disabled]="saving()"
             >
-              {{ saving() ? 'Se salvează...' : 'Adaugă tranzacția' }}
+              {{
+                saving()
+                  ? 'Se salveaza...'
+                  : 'Adauga tranzactia'
+              }}
             </button>
+
           </div>
+
         </form>
+
       }
+
     </section>
 
+
+    <!-- TRANSACTIONS -->
+
     <section class="card">
+
       <div class="section-header">
-        <h2>Tranzacții</h2>
+
+        <h2>
+          Tranzactii
+        </h2>
 
         <span>
-          {{ transactions().length }} înregistrări
+          {{ filteredTransactions().length }}
+          din
+          {{ transactions().length }}
+          inregistrari
         </span>
+
       </div>
 
-      @if (transactions().length === 0) {
-        <p>Nu există tranzacții.</p>
+
+      <!-- FILTERS -->
+
+      <div
+        class="transaction-filters"
+      >
+
+        <!-- CATEGORY FILTER -->
+
+        <div class="form-field">
+
+          <label
+            for="filter-category"
+          >
+            Categorie
+          </label>
+
+          <select
+            id="filter-category"
+            [value]="filterCategoryId()"
+            (change)="
+              setCategoryFilter($event)
+            "
+          >
+
+            <option value="0">
+              Toate categoriile
+            </option>
+
+
+            @for (
+              category of
+                transactionCategories();
+              track category.id
+            ) {
+
+              <option
+                [value]="category.id"
+              >
+                {{ category.name }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+
+        <!-- TYPE FILTER -->
+
+        <div class="form-field">
+
+          <label for="filter-type">
+            Tip
+          </label>
+
+          <select
+            id="filter-type"
+            [value]="filterType()"
+            (change)="
+              setTypeFilter($event)
+            "
+          >
+
+            <option value="0">
+              Toate
+            </option>
+
+            <option value="1">
+              Venit
+            </option>
+
+            <option value="2">
+              Cheltuiala
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- DATE FROM -->
+
+        <div class="form-field">
+
+          <label
+            for="filter-date-from"
+          >
+            De la
+          </label>
+
+          <input
+            id="filter-date-from"
+            type="date"
+            [value]="filterDateFrom()"
+            (change)="
+              setDateFromFilter($event)
+            "
+          />
+
+        </div>
+
+
+        <!-- DATE TO -->
+
+        <div class="form-field">
+
+          <label
+            for="filter-date-to"
+          >
+            Pana la
+          </label>
+
+          <input
+            id="filter-date-to"
+            type="date"
+            [value]="filterDateTo()"
+            (change)="
+              setDateToFilter($event)
+            "
+          />
+
+        </div>
+
+
+        <button
+          class="secondary-button filter-reset-button"
+          type="button"
+          (click)="
+            resetTransactionFilters()
+          "
+        >
+          Reset filtre
+        </button>
+
+      </div>
+
+
+      <!-- SELECTION TOOLBAR -->
+
+      @if (
+        selectedCount() > 0
+      ) {
+
+        <div
+          class="selection-toolbar"
+        >
+
+          <span>
+            {{ selectedCount() }}
+            tranzactii selectate
+          </span>
+
+
+          <div
+            class="selection-actions"
+          >
+
+            <button
+              class="secondary-button"
+              type="button"
+              (click)="
+                clearTransactionSelection()
+              "
+            >
+              Deselecteaza
+            </button>
+
+
+            <button
+              class="delete-button bulk-delete-button"
+              type="button"
+              (click)="
+                deleteSelectedTransactions()
+              "
+            >
+              Sterge selectate
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- EMPTY STATES -->
+
+      @if (
+        transactions().length === 0
+      ) {
+
+        <p>
+          Nu exista tranzactii.
+        </p>
+
+      } @else if (
+        filteredTransactions().length === 0
+      ) {
+
+        <p class="no-results">
+          Nu exista tranzactii pentru filtrele selectate.
+        </p>
+
       } @else {
+
+        <!-- TABLE -->
+
         <div class="table-wrapper">
+
           <table>
+
             <thead>
+
               <tr>
-                <th>Titlu</th>
-                <th>Categorie</th>
-                <th>Tip</th>
-                <th>Sumă</th>
-                <th>Dată</th>
-                <th>Acțiuni</th>
+
+                <!-- SELECT ALL -->
+
+                <th class="checkbox-column">
+
+                  <input
+                    type="checkbox"
+                    [checked]="
+                      allVisibleTransactionsSelected()
+                    "
+                    [indeterminate]="
+                      selectedVisibleCount() > 0 &&
+                      !allVisibleTransactionsSelected()
+                    "
+                    (change)="
+                      toggleSelectAllVisible()
+                    "
+                    aria-label="Selecteaza toate tranzactiile vizibile"
+                  />
+
+                </th>
+
+
+                <th>
+                  Categorie
+                </th>
+
+                <th>
+                  Tip
+                </th>
+
+                <th>
+                  Suma
+                </th>
+
+                <th>
+                  Data
+                </th>
+
+                <th>
+                  Descriere
+                </th>
+
+                <th>
+                  Actiuni
+                </th>
+
               </tr>
+
             </thead>
 
+
             <tbody>
+
               @for (
-                transaction of transactions();
+                transaction of
+                  filteredTransactions();
                 track transaction.id
               ) {
+
                 <tr>
-                  <td>
-                    <strong>{{ transaction.title }}</strong>
 
-                    @if (transaction.description) {
-                      <small class="description">
-                        {{ transaction.description }}
-                      </small>
-                    }
-                  </td>
-
-                  <td>{{ transaction.categoryName }}</td>
-
-                  <td>
-                    @if (transaction.type === 1) {
-                      <span class="badge income-badge">
-                        Venit
-                      </span>
-                    } @else {
-                      <span class="badge expense-badge">
-                        Cheltuială
-                      </span>
-                    }
-                  </td>
+                  <!-- CHECKBOX -->
 
                   <td
-                    [class.income]="transaction.type === 1"
-                    [class.expense]="transaction.type === 2"
+                    class="checkbox-column"
                   >
-                    {{ formatMoney(transaction.amount) }} lei
+
+                    <input
+                      type="checkbox"
+                      [checked]="
+                        selectedTransactionIds()
+                          .has(
+                            transaction.id
+                          )
+                      "
+                      (change)="
+                        toggleTransactionSelection(
+                          transaction.id
+                        )
+                      "
+                      [attr.aria-label]="
+                        'Selecteaza tranzactia ' +
+                        transaction.id
+                      "
+                    />
+
                   </td>
 
-                  <td>
-                    {{ transaction.date.slice(0, 10) }}
-                  </td>
+
+                  <!-- CATEGORY -->
 
                   <td>
+
+                    <strong>
+                      {{
+                        transaction.categoryName
+                      }}
+                    </strong>
+
+                  </td>
+
+
+                  <!-- TYPE -->
+
+                  <td>
+
+                    @if (
+                      transaction.type === 1
+                    ) {
+
+                      <span
+                        class="badge income-badge"
+                      >
+                        Venit
+                      </span>
+
+                    } @else {
+
+                      <span
+                        class="badge expense-badge"
+                      >
+                        Cheltuiala
+                      </span>
+
+                    }
+
+                  </td>
+
+
+                  <!-- AMOUNT -->
+
+                  <td
+                    [class.income]="
+                      transaction.type === 1
+                    "
+                    [class.expense]="
+                      transaction.type === 2
+                    "
+                  >
+
+                    {{
+                      formatMoney(
+                        transaction.amount
+                      )
+                    }}
+                    lei
+
+                  </td>
+
+
+                  <!-- DATE -->
+
+                  <td>
+                    {{
+                      transaction.date
+                        .slice(0, 10)
+                    }}
+                  </td>
+
+
+                  <!-- DESCRIPTION -->
+
+                  <td>
+
+                    @if (
+                      transaction.description
+                    ) {
+
+                      <span
+                        class="description"
+                      >
+                        {{
+                          transaction.description
+                        }}
+                      </span>
+
+                    } @else {
+
+                      <span
+                        class="description"
+                      >
+                        -
+                      </span>
+
+                    }
+
+                  </td>
+
+
+                  <!-- ACTIONS -->
+
+                  <td>
+
                     <button
                       class="delete-button"
                       type="button"
-                      (click)="deleteTransaction(transaction.id)"
+                      (click)="
+                        deleteTransaction(
+                          transaction.id
+                        )
+                      "
                     >
-                      Șterge
+                      Sterge
                     </button>
+
                   </td>
+
                 </tr>
+
               }
+
             </tbody>
+
           </table>
+
         </div>
+
       }
+
     </section>
+
   }
+
 </main>
