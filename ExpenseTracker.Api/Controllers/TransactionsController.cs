@@ -19,7 +19,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
             .Select(transaction => new FinancialTransactionResponseDto
             {
                 Id = transaction.Id,
-                Title = transaction.Title,
                 Amount = transaction.Amount,
                 Date = transaction.Date,
                 Type = transaction.Type,
@@ -41,7 +40,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
             .Select(transaction => new FinancialTransactionResponseDto
             {
                 Id = transaction.Id,
-                Title = transaction.Title,
                 Amount = transaction.Amount,
                 Date = transaction.Date,
                 Type = transaction.Type,
@@ -63,12 +61,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
     public async Task<ActionResult<FinancialTransactionResponseDto>> Create(
         FinancialTransactionRequestDto dto)
     {
-        var title = dto.Title.Trim();
-
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            return BadRequest("Transaction title is required.");
-        }
 
         if (dto.Amount <= 0)
         {
@@ -89,7 +81,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
 
         var transaction = new FinancialTransaction
         {
-            Title = title,
             Amount = dto.Amount,
             Date = dto.Date?.UtcDateTime ?? DateTime.UtcNow,
             Type = dto.Type,
@@ -103,7 +94,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
         var response = new FinancialTransactionResponseDto
         {
             Id = transaction.Id,
-            Title = transaction.Title,
             Amount = transaction.Amount,
             Date = transaction.Date,
             Type = transaction.Type,
@@ -130,13 +120,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
             return NotFound();
         }
 
-        var title = dto.Title.Trim();
-
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            return BadRequest("Transaction title is required.");
-        }
-
         if (dto.Amount <= 0)
         {
             return BadRequest("Amount must be greater than zero.");
@@ -155,7 +138,6 @@ public class TransactionsController(AppDbContext context) : ControllerBase
             return BadRequest("The selected category does not exist.");
         }
 
-        transaction.Title = title;
         transaction.Amount = dto.Amount;
         transaction.Type = dto.Type;
         transaction.CategoryId = dto.CategoryId;

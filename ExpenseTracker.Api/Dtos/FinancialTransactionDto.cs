@@ -5,10 +5,6 @@ namespace ExpenseTracker.Api.Dtos;
 
 public class FinancialTransactionRequestDto
 {
-    [Required]
-    [MaxLength(150)]
-    public string Title { get; set; } = string.Empty;
-
     public decimal Amount { get; set; }
 
     public DateTimeOffset? Date { get; set; }
@@ -24,8 +20,6 @@ public class FinancialTransactionRequestDto
 public class FinancialTransactionResponseDto
 {
     public int Id { get; set; }
-
-    public string Title { get; set; } = string.Empty;
 
     public decimal Amount { get; set; }
 
