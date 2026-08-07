@@ -1,0 +1,185 @@
+<div class="page-header">
+  <div>
+    <h2>Dashboard</h2>
+    <p>
+      Sumarul situatiei financiare
+    </p>
+  </div>
+
+  <button
+    class="reload-button"
+    type="button"
+    (click)="loadData()"
+  >
+    Reincarca
+  </button>
+</div>
+
+
+@if (errorMessage()) {
+  <div class="error-message">
+    {{ errorMessage() }}
+  </div>
+}
+
+
+@if (loading()) {
+
+  <div class="card">
+    Se incarca datele...
+  </div>
+
+} @else {
+
+  <section class="summary-grid">
+
+    <article class="summary-card">
+
+      <span>
+        Venituri
+      </span>
+
+      <strong class="income">
+        {{ formatMoney(totalIncome()) }}
+        lei
+      </strong>
+
+      <small>
+        {{ incomeCount() }}
+        tranzactii
+      </small>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Cheltuieli
+      </span>
+
+      <strong class="expense">
+        {{ formatMoney(totalExpenses()) }}
+        lei
+      </strong>
+
+      <small>
+        {{ expenseCount() }}
+        tranzactii
+      </small>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Sold
+      </span>
+
+      <strong
+        [class.income]="balance() >= 0"
+        [class.expense]="balance() < 0"
+      >
+        {{ formatMoney(balance()) }}
+        lei
+      </strong>
+
+      <small>
+        Venituri - Cheltuieli
+      </small>
+
+    </article>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="card-header">
+      <div>
+        <h3>Total tranzactii</h3>
+
+        <p>
+          Numarul tuturor tranzactiilor
+          inregistrate
+        </p>
+      </div>
+
+      <strong class="transaction-count">
+        {{ transactionCount() }}
+      </strong>
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <h3>Ultimele tranzactii</h3>
+
+    @if (transactions().length === 0) {
+
+      <p>
+        Nu exista tranzactii.
+      </p>
+
+    } @else {
+
+      <div class="transaction-list">
+
+        @for (
+          transaction of
+            transactions().slice(0, 5);
+          track transaction.id
+        ) {
+
+          <div class="transaction-item">
+
+            <div>
+
+              <strong>
+                {{ transaction.categoryName }}
+              </strong>
+
+              <small>
+                {{ transaction.date.slice(0, 10) }}
+              </small>
+
+            </div>
+
+            <span
+              [class.income]="
+                transaction.type === 1
+              "
+              [class.expense]="
+                transaction.type === 2
+              "
+            >
+              @if (
+                transaction.type === 1
+              ) {
+                +
+              } @else {
+                -
+              }
+
+              {{
+                formatMoney(
+                  transaction.amount
+                )
+              }}
+              lei
+            </span>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+}

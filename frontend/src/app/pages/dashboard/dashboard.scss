@@ -1,0 +1,161 @@
+:host {
+  display: block;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #9da5b1;
+  }
+}
+
+.reload-button {
+  padding: 10px 16px;
+
+  color: white;
+  background: #555b66;
+
+  border: 0;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 22px;
+
+  background: #101113;
+
+  border: 1px solid #2a2d33;
+  border-radius: 14px;
+
+  span {
+    color: #b9c0ca;
+  }
+
+  strong {
+    font-size: 27px;
+  }
+
+  small {
+    color: #818997;
+  }
+}
+
+.card {
+  margin-bottom: 22px;
+  padding: 24px;
+
+  background: #101113;
+
+  border: 1px solid #292c32;
+  border-radius: 14px;
+
+  h3 {
+    margin-top: 0;
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  p {
+    margin-bottom: 0;
+    color: #9da5b1;
+  }
+}
+
+.transaction-count {
+  font-size: 36px;
+  color: #748ffc;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 15px 0;
+
+  border-bottom: 1px solid #292c32;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  small {
+    color: #8c939e;
+  }
+
+  > span {
+    font-weight: 700;
+  }
+}
+
+.income {
+  color: #51cf66;
+}
+
+.expense {
+  color: #ff6b6b;
+}
+
+.error-message {
+  margin-bottom: 18px;
+  padding: 14px;
+
+  color: #ff8787;
+  background: #3a1d20;
+
+  border-radius: 8px;
+}
+
+@media (max-width: 800px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+}
