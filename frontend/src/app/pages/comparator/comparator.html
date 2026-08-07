@@ -1,2 +1,172 @@
-<h2>Comparator</h2>
-<p>Comparator page works.</p>
+<div class="page-header">
+
+  <div>
+    <h2>Comparator</h2>
+
+    <p>
+      Compara veniturile si cheltuielile
+      folosind datele existente
+    </p>
+  </div>
+
+  <button
+    class="secondary-button"
+    type="button"
+    (click)="loadData()"
+  >
+    Reincarca
+  </button>
+
+</div>
+
+
+@if (errorMessage()) {
+
+  <div class="error-message">
+    {{ errorMessage() }}
+  </div>
+
+}
+
+
+@if (loading()) {
+
+  <section class="card">
+    Se incarca datele...
+  </section>
+
+} @else {
+
+  <!-- SUMMARY -->
+
+  <section class="summary-grid">
+
+    <article class="summary-card">
+
+      <span>
+        Total venituri
+      </span>
+
+      <strong class="income">
+        {{ formatMoney(totalIncome()) }}
+        lei
+      </strong>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Total cheltuieli
+      </span>
+
+      <strong class="expense">
+        {{ formatMoney(totalExpenses()) }}
+        lei
+      </strong>
+
+    </article>
+
+
+    <article class="summary-card">
+
+      <span>
+        Diferenta
+      </span>
+
+      <strong
+        [class.income]="difference() >= 0"
+        [class.expense]="difference() < 0"
+      >
+        {{ formatMoney(difference()) }}
+        lei
+      </strong>
+
+    </article>
+
+  </section>
+
+
+  @if (
+    transactions().length === 0
+  ) {
+
+    <section class="card">
+
+      <p>
+        Nu exista suficiente date
+        pentru comparatie.
+      </p>
+
+    </section>
+
+  } @else {
+
+    <!-- MONTHLY COMPARISON -->
+
+    <section class="card">
+
+      <div class="chart-header">
+
+        <div>
+          <h3>
+            Venituri vs Cheltuieli
+          </h3>
+
+          <p>
+            Comparatie lunara
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="chart-container">
+
+        <canvas
+          #monthlyChart
+        ></canvas>
+
+      </div>
+
+    </section>
+
+
+    <!-- CATEGORY COMPARISON -->
+
+    <section class="card">
+
+      <div class="chart-header">
+
+        <div>
+
+          <h3>
+            Cheltuieli pe categorii
+          </h3>
+
+          <p>
+            Distributia cheltuielilor
+            intre categorii
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="chart-container category-chart"
+      >
+
+        <canvas
+          #categoryChart
+        ></canvas>
+
+      </div>
+
+    </section>
+
+  }
+
+}
