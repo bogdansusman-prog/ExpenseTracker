@@ -36,14 +36,19 @@ export class App implements OnInit {
   private readonly apiService = inject(ExpenseApiService);
   private readonly formBuilder = inject(FormBuilder);
 
+  // DATA
+
   readonly categories = signal<Category[]>([]);
   readonly transactions = signal<FinancialTransaction[]>([]);
+
+  // STATE
 
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly categorySaving = signal(false);
 
-  readonly editingCategoryId = signal<number | null>(null);
+  readonly editingCategoryId =
+    signal<number | null>(null);
 
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
@@ -54,6 +59,11 @@ export class App implements OnInit {
   readonly filterType = signal(0);
   readonly filterDateFrom = signal('');
   readonly filterDateTo = signal('');
+
+  // SELECTION
+
+  readonly selectedTransactionIds =
+    signal<Set<number>>(new Set<number>());
 
   // DASHBOARD
 
@@ -78,10 +88,12 @@ export class App implements OnInit {
   );
 
   readonly balance = computed(
-    () => this.totalIncome() - this.totalExpenses()
+    () =>
+      this.totalIncome() -
+      this.totalExpenses()
   );
 
-  // CATEGORIES THAT ACTUALLY HAVE TRANSACTIONS
+  // ONLY CATEGORIES THAT HAVE TRANSACTIONS
 
   readonly transactionCategories = computed(() => {
     const usedCategoryIds = new Set(
@@ -99,39 +111,84 @@ export class App implements OnInit {
   // FILTERED TRANSACTIONS
 
   readonly filteredTransactions = computed(() => {
-    const categoryId = this.filterCategoryId();
-    const type = this.filterType();
-    const dateFrom = this.filterDateFrom();
-    const dateTo = this.filterDateTo();
+    const categoryId =
+      this.filterCategoryId();
 
-    return this.transactions().filter(transaction => {
-      const transactionDate =
-        transaction.date.slice(0, 10);
+    const type =
+      this.filterType();
 
-      const matchesCategory =
-        categoryId === 0 ||
-        transaction.categoryId === categoryId;
+    const dateFrom =
+      this.filterDateFrom();
 
-      const matchesType =
-        type === 0 ||
-        transaction.type === type;
+    const dateTo =
+      this.filterDateTo();
 
-      const matchesDateFrom =
-        !dateFrom ||
-        transactionDate >= dateFrom;
+    return this.transactions().filter(
+      transaction => {
+        const transactionDate =
+          transaction.date.slice(0, 10);
 
-      const matchesDateTo =
-        !dateTo ||
-        transactionDate <= dateTo;
+        const matchesCategory =
+          categoryId === 0 ||
+          transaction.categoryId === categoryId;
 
-      return (
-        matchesCategory &&
-        matchesType &&
-        matchesDateFrom &&
-        matchesDateTo
+        const matchesType =
+          type === 0 ||
+          transaction.type === type;
+
+        const matchesDateFrom =
+          !dateFrom ||
+          transactionDate >= dateFrom;
+
+        const matchesDateTo =
+          !dateTo ||
+          transactionDate <= dateTo;
+
+        return (
+          matchesCategory &&
+          matchesType &&
+          matchesDateFrom &&
+          matchesDateTo
+        );
+      }
+    );
+  });
+
+  // SELECTION COMPUTED VALUES
+
+  readonly selectedCount = computed(
+    () =>
+      this.selectedTransactionIds().size
+  );
+
+  readonly selectedVisibleCount = computed(() => {
+    const selectedIds =
+      this.selectedTransactionIds();
+
+    return this.filteredTransactions()
+      .filter(transaction =>
+        selectedIds.has(transaction.id)
+      )
+      .length;
+  });
+
+  readonly allVisibleTransactionsSelected =
+    computed(() => {
+      const visibleTransactions =
+        this.filteredTransactions();
+
+      if (visibleTransactions.length === 0) {
+        return false;
+      }
+
+      const selectedIds =
+        this.selectedTransactionIds();
+
+      return visibleTransactions.every(
+        transaction =>
+          selectedIds.has(transaction.id)
       );
     });
-  });
 
   // CATEGORY FORM
 
@@ -150,6 +207,14 @@ export class App implements OnInit {
 
   readonly transactionForm =
     this.formBuilder.nonNullable.group({
+      categoryId: [
+        0,
+        [
+          Validators.required,
+          Validators.min(1)
+        ]
+      ],
+
       amount: [
         0,
         [
@@ -158,22 +223,17 @@ export class App implements OnInit {
         ]
       ],
 
-      date: [
-        new Date().toISOString().slice(0, 10),
-        Validators.required
-      ],
-
       type: [
         2 as TransactionType,
         Validators.required
       ],
 
-      categoryId: [
-        0,
-        [
-          Validators.required,
-          Validators.min(1)
-        ]
+      date: [
+        new Date()
+          .toISOString()
+          .slice(0, 10),
+
+        Validators.required
       ],
 
       description: [
@@ -193,12 +253,22 @@ export class App implements OnInit {
     this.errorMessage.set('');
 
     forkJoin({
-      categories: this.apiService.getCategories(),
-      transactions: this.apiService.getTransactions()
+      categories:
+        this.apiService.getCategories(),
+
+      transactions:
+        this.apiService.getTransactions()
     }).subscribe({
       next: result => {
-        this.categories.set(result.categories);
-        this.transactions.set(result.transactions);
+        this.categories.set(
+          result.categories
+        );
+
+        this.transactions.set(
+          result.transactions
+        );
+
+        this.clearTransactionSelection();
 
         if (
           result.categories.length > 0 &&
@@ -206,7 +276,8 @@ export class App implements OnInit {
             .categoryId.value === 0
         ) {
           this.transactionForm.patchValue({
-            categoryId: result.categories[0].id
+            categoryId:
+              result.categories[0].id
           });
         }
 
@@ -216,7 +287,10 @@ export class App implements OnInit {
       },
 
       error: error => {
-        console.error('API error:', error);
+        console.error(
+          'API error:',
+          error
+        );
 
         this.errorMessage.set(
           'Nu s-au putut incarca datele din backend.'
@@ -238,12 +312,14 @@ export class App implements OnInit {
     }
 
     const name =
-      this.categoryForm.controls.name.value.trim();
+      this.categoryForm.controls
+        .name.value.trim();
 
     if (!name) {
-      this.categoryForm.controls.name.setErrors({
-        required: true
-      });
+      this.categoryForm.controls
+        .name.setErrors({
+          required: true
+        });
 
       return;
     }
@@ -275,17 +351,18 @@ export class App implements OnInit {
       .createCategory(request)
       .subscribe({
         next: createdCategory => {
-          this.categories.update(categories =>
-            [
-              ...categories,
-              createdCategory
-            ].sort(
-              (first, second) =>
-                first.name.localeCompare(
-                  second.name,
-                  'ro'
-                )
-            )
+          this.categories.update(
+            categories =>
+              [
+                ...categories,
+                createdCategory
+              ].sort(
+                (first, second) =>
+                  first.name.localeCompare(
+                    second.name,
+                    'ro'
+                  )
+              )
           );
 
           if (
@@ -330,35 +407,39 @@ export class App implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.categories.update(categories =>
-            categories
-              .map(category =>
-                category.id === categoryId
-                  ? {
-                      ...category,
-                      name: request.name
-                    }
-                  : category
-              )
-              .sort(
-                (first, second) =>
-                  first.name.localeCompare(
-                    second.name,
-                    'ro'
-                  )
-              )
+          this.categories.update(
+            categories =>
+              categories
+                .map(category =>
+                  category.id === categoryId
+                    ? {
+                        ...category,
+                        name: request.name
+                      }
+                    : category
+                )
+                .sort(
+                  (first, second) =>
+                    first.name.localeCompare(
+                      second.name,
+                      'ro'
+                    )
+                )
           );
 
-          // Update category name in transaction list
-          this.transactions.update(transactions =>
-            transactions.map(transaction =>
-              transaction.categoryId === categoryId
-                ? {
-                    ...transaction,
-                    categoryName: request.name
-                  }
-                : transaction
-            )
+          this.transactions.update(
+            transactions =>
+              transactions.map(
+                transaction =>
+                  transaction.categoryId ===
+                  categoryId
+                    ? {
+                        ...transaction,
+                        categoryName:
+                          request.name
+                      }
+                    : transaction
+              )
           );
 
           this.cancelCategoryEdit();
@@ -407,9 +488,10 @@ export class App implements OnInit {
   ): void {
     this.clearMessages();
 
-    const confirmed = window.confirm(
-      `Sigur vrei sa stergi categoria "${category.name}"?`
-    );
+    const confirmed =
+      window.confirm(
+        `Sigur vrei sa stergi categoria "${category.name}"?`
+      );
 
     if (!confirmed) {
       return;
@@ -492,22 +574,24 @@ export class App implements OnInit {
 
     const request:
       FinancialTransactionRequest = {
-        amount:
-          Number(formValue.amount),
+        categoryId:
+          Number(
+            formValue.categoryId
+          ),
 
-        date: new Date(
-          `${formValue.date}T12:00:00`
-        ).toISOString(),
+        amount:
+          Number(
+            formValue.amount
+          ),
 
         type:
           Number(
             formValue.type
           ) as TransactionType,
 
-        categoryId:
-          Number(
-            formValue.categoryId
-          ),
+        date: new Date(
+          `${formValue.date}T12:00:00`
+        ).toISOString(),
 
         description:
           formValue.description.trim() ||
@@ -528,17 +612,17 @@ export class App implements OnInit {
           );
 
           this.transactionForm.reset({
+            categoryId:
+              this.categories()[0]?.id ??
+              0,
+
             amount: 0,
+
+            type: 2,
 
             date: new Date()
               .toISOString()
               .slice(0, 10),
-
-            type: 2,
-
-            categoryId:
-              this.categories()[0]?.id ??
-              0,
 
             description: ''
           });
@@ -570,9 +654,10 @@ export class App implements OnInit {
   ): void {
     this.clearMessages();
 
-    const confirmed = window.confirm(
-      'Sigur vrei sa stergi aceasta tranzactie?'
-    );
+    const confirmed =
+      window.confirm(
+        'Sigur vrei sa stergi aceasta tranzactie?'
+      );
 
     if (!confirmed) {
       return;
@@ -590,8 +675,17 @@ export class App implements OnInit {
               )
           );
 
-          // If the deleted transaction was the last one
-          // from the selected category, reset the filter.
+          const selectedIds =
+            new Set(
+              this.selectedTransactionIds()
+            );
+
+          selectedIds.delete(id);
+
+          this.selectedTransactionIds.set(
+            selectedIds
+          );
+
           this.ensureValidCategoryFilter();
 
           this.successMessage.set(
@@ -612,30 +706,171 @@ export class App implements OnInit {
       });
   }
 
+  // TRANSACTION SELECTION
+
+  toggleTransactionSelection(
+    transactionId: number
+  ): void {
+    const selectedIds =
+      new Set(
+        this.selectedTransactionIds()
+      );
+
+    if (
+      selectedIds.has(transactionId)
+    ) {
+      selectedIds.delete(transactionId);
+    } else {
+      selectedIds.add(transactionId);
+    }
+
+    this.selectedTransactionIds.set(
+      selectedIds
+    );
+  }
+
+  toggleSelectAllVisible(): void {
+    const selectedIds =
+      new Set(
+        this.selectedTransactionIds()
+      );
+
+    const visibleTransactions =
+      this.filteredTransactions();
+
+    if (
+      this.allVisibleTransactionsSelected()
+    ) {
+      visibleTransactions.forEach(
+        transaction =>
+          selectedIds.delete(
+            transaction.id
+          )
+      );
+    } else {
+      visibleTransactions.forEach(
+        transaction =>
+          selectedIds.add(
+            transaction.id
+          )
+      );
+    }
+
+    this.selectedTransactionIds.set(
+      selectedIds
+    );
+  }
+
+  clearTransactionSelection(): void {
+    this.selectedTransactionIds.set(
+      new Set<number>()
+    );
+  }
+
+  deleteSelectedTransactions(): void {
+    const selectedIds = [
+      ...this.selectedTransactionIds()
+    ];
+
+    if (selectedIds.length === 0) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Sigur vrei sa stergi ${selectedIds.length} tranzactii?`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.clearMessages();
+
+    const requests =
+      selectedIds.map(
+        id =>
+          this.apiService
+            .deleteTransaction(id)
+      );
+
+    forkJoin(requests).subscribe({
+      next: () => {
+        const selectedIdSet =
+          new Set(selectedIds);
+
+        this.transactions.update(
+          transactions =>
+            transactions.filter(
+              transaction =>
+                !selectedIdSet.has(
+                  transaction.id
+                )
+            )
+        );
+
+        this.clearTransactionSelection();
+
+        this.ensureValidCategoryFilter();
+
+        this.successMessage.set(
+          `${selectedIds.length} tranzactii au fost sterse.`
+        );
+      },
+
+      error: error => {
+        console.error(
+          'Delete selected transactions error:',
+          error
+        );
+
+        this.errorMessage.set(
+          'Tranzactiile selectate nu au putut fi sterse.'
+        );
+
+        // Resync in case some deletes succeeded
+        // before another request failed.
+        this.loadData();
+      }
+    });
+  }
+
   // FILTERS
 
   setCategoryFilter(
     event: Event
   ): void {
-    const value = Number(
-      (
-        event.target as HTMLSelectElement
-      ).value
+    const value =
+      Number(
+        (
+          event.target as
+            HTMLSelectElement
+        ).value
+      );
+
+    this.filterCategoryId.set(
+      value
     );
 
-    this.filterCategoryId.set(value);
+    this.clearTransactionSelection();
   }
 
   setTypeFilter(
     event: Event
   ): void {
-    const value = Number(
-      (
-        event.target as HTMLSelectElement
-      ).value
+    const value =
+      Number(
+        (
+          event.target as
+            HTMLSelectElement
+        ).value
+      );
+
+    this.filterType.set(
+      value
     );
 
-    this.filterType.set(value);
+    this.clearTransactionSelection();
   }
 
   setDateFromFilter(
@@ -643,10 +878,15 @@ export class App implements OnInit {
   ): void {
     const value =
       (
-        event.target as HTMLInputElement
+        event.target as
+          HTMLInputElement
       ).value;
 
-    this.filterDateFrom.set(value);
+    this.filterDateFrom.set(
+      value
+    );
+
+    this.clearTransactionSelection();
   }
 
   setDateToFilter(
@@ -654,10 +894,15 @@ export class App implements OnInit {
   ): void {
     const value =
       (
-        event.target as HTMLInputElement
+        event.target as
+          HTMLInputElement
       ).value;
 
-    this.filterDateTo.set(value);
+    this.filterDateTo.set(
+      value
+    );
+
+    this.clearTransactionSelection();
   }
 
   resetTransactionFilters(): void {
@@ -665,6 +910,8 @@ export class App implements OnInit {
     this.filterType.set(0);
     this.filterDateFrom.set('');
     this.filterDateTo.set('');
+
+    this.clearTransactionSelection();
   }
 
   private ensureValidCategoryFilter(): void {
