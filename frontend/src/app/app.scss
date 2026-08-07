@@ -326,4 +326,45 @@ th {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  .transaction-filters {
+  display: grid;
+  grid-template-columns:
+    1.5fr
+    1fr
+    1fr
+    1fr
+    auto;
+  align-items: end;
+  gap: 14px;
+
+  margin-bottom: 22px;
+  padding: 16px;
+
+  background: #1a1c20;
+  border: 1px solid #30343b;
+  border-radius: 10px;
+}
+
+.filter-reset-button {
+  min-height: 41px;
+  white-space: nowrap;
+}
+
+.no-results {
+  padding: 18px 0;
+  color: #9da5b1;
+}
+
+@media (max-width: 900px) {
+  .transaction-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 550px) {
+  .transaction-filters {
+    grid-template-columns: 1fr;
+  }
+}
 }
