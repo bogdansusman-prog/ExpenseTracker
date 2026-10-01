@@ -47,11 +47,12 @@ public class InsightsService(AppDbContext context, AppClock clock)
 
     public async Task<UserSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
     {
-        var settings = await context.Settings.FindAsync([UserSettings.SingletonId], cancellationToken);
+        var settings = await context.Settings.FirstOrDefaultAsync(cancellationToken);
 
         if (settings is null)
         {
-            settings = new UserSettings { Id = UserSettings.SingletonId, Language = "ro" };
+            // UserId is filled in by AppDbContext for the logged-in user.
+            settings = new UserSettings { Language = "ro" };
             context.Settings.Add(settings);
             await context.SaveChangesAsync(cancellationToken);
         }
@@ -98,7 +99,7 @@ public class InsightsService(AppDbContext context, AppClock clock)
 
     public async Task<bool> RateAsync(int transactionId, int score, CancellationToken cancellationToken = default)
     {
-        var transaction = await context.Transactions.FindAsync([transactionId], cancellationToken);
+        var transaction = await context.Transactions.FirstOrDefaultAsync(item => item.Id == transactionId, cancellationToken);
 
         if (transaction is null || transaction.Type != TransactionType.Expense)
         {

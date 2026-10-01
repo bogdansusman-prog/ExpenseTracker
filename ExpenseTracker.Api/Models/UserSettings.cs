@@ -4,13 +4,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ExpenseTracker.Api.Models;
 
 /// <summary>
-/// Application-wide preferences. The app is single-user, so there is exactly one row (Id = 1).
+/// Preferences of one user (one row per user). Row Id = 1 is seeded without a user and is
+/// claimed by the first account that registers.
 /// </summary>
-public class UserSettings
+public class UserSettings : IUserOwned
 {
-    public const int SingletonId = 1;
+    public const int SeedId = 1;
 
     public int Id { get; set; }
+
+    public string? UserId { get; set; }
+
+    public AppUser? User { get; set; }
 
     /// <summary>Net income per hour of work, used to show prices as "hours of work".</summary>
     [Column(TypeName = "decimal(18,2)")]

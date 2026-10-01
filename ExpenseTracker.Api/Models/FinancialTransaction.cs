@@ -3,9 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ExpenseTracker.Api.Models;
 
-public class FinancialTransaction
+public class FinancialTransaction : IUserOwned
 {
     public int Id { get; set; }
+
+    public string? UserId { get; set; }
+
+    public AppUser? User { get; set; }
 
     [Column(TypeName = "decimal(18,2)")]
     public decimal Amount { get; set; }
