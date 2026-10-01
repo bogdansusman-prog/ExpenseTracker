@@ -16,6 +16,21 @@
 </div>
 
 
+<app-quick-add (saved)="loadData()" />
+
+
+@if (pendingRegrets() > 0) {
+  <a class="regret-banner" routerLink="/insights">
+    <span>
+      Ai <strong>{{ pendingRegrets() }}</strong>
+      @if (pendingRegrets() === 1) { cheltuiala } @else { cheltuieli }
+      de evaluat: au meritat banii?
+    </span>
+    <span class="arrow">Evalueaza →</span>
+  </a>
+}
+
+
 @if (errorMessage()) {
   <div class="error-message">
     {{ errorMessage() }}
@@ -144,6 +159,9 @@
 
               <small>
                 {{ transaction.date.slice(0, 10) }}
+                @if (transaction.type === 2 && hoursFor(transaction.amount)) {
+                  · {{ hoursFor(transaction.amount) }}
+                }
               </small>
 
             </div>
