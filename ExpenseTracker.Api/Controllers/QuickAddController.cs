@@ -19,6 +19,6 @@ public class QuickAddController(QuickAddService quickAdd) : ControllerBase
             return BadRequest("Text is required.");
         }
 
-        return Ok(await quickAdd.ParseAsync(dto.Text, dto.UseAi, cancellationToken));
+        return Ok(await quickAdd.ParseAsync(dto.Text, cancellationToken));
     }
 }

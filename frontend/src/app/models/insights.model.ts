@@ -93,7 +93,7 @@ export interface ParsedTransaction {
 
 export interface QuickAddResult {
   draft: ParsedTransaction;
-  source: 'rules' | 'ai';
+  source: 'rules';
   workHours: number | null;
 }
 
@@ -101,6 +101,14 @@ export interface AdvisorAction {
   title: string;
   detail: string;
   estimatedMonthlySavings: number | null;
+}
+
+export interface ScoreComponent {
+  key: string;
+  label: string;
+  points: number;
+  maxPoints: number;
+  explanation: string;
 }
 
 export interface AdvisorReport {
@@ -112,14 +120,15 @@ export interface AdvisorReport {
   concerns: string[];
   actions: AdvisorAction[];
   funFact: string | null;
+  breakdown: ScoreComponent[];
   language: AppLanguage;
   generatedAt: string;
-  model: string;
+  engine: string;
 }
 
 export interface AdvisorStatus {
   configured: boolean;
-  model: string;
+  engine: string;
 }
 
 export interface ChatTurn {

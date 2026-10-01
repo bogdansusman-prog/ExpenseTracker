@@ -40,8 +40,8 @@
     <div class="draft">
       <div class="draft-header">
         <strong>Verifica si confirma</strong>
-        <span class="ui-badge" [class.success]="res.source === 'ai'">
-          @if (res.source === 'ai') { completat cu AI } @else { reguli locale }
+        <span class="ui-badge" [class.success]="res.draft.missingFields.length === 0">
+          @if (res.draft.missingFields.length === 0) { totul a fost recunoscut } @else { completeaza campurile lipsa }
         </span>
       </div>
 

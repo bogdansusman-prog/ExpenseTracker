@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using ExpenseTracker.Api.Services.Ai;
+using ExpenseTracker.Api.Services.Advisor;
 
 namespace ExpenseTracker.Api.Dtos;
 
@@ -23,8 +23,6 @@ public class QuickAddRequestDto
     [Required]
     [MaxLength(300)]
     public string Text { get; set; } = string.Empty;
-
-    public bool UseAi { get; set; } = true;
 }
 
 public class AdvisorChatRequestDto
@@ -38,4 +36,4 @@ public class AdvisorChatRequestDto
 
 public record AdvisorChatResponseDto(string Reply);
 
-public record AdvisorStatusDto(bool Configured, string Model);
+public record AdvisorStatusDto(bool Configured, string Engine);
