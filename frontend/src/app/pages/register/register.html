@@ -1,0 +1,45 @@
+<div class="auth-page">
+  <section class="auth-card">
+    <div class="brand">
+      <h1>Creeaza cont</h1>
+      <p>Fiecare cont isi vede doar tranzactiile lui</p>
+    </div>
+
+    @if (error()) {
+      <div class="ui-alert error">{{ error() }}</div>
+    }
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Nume
+        <input class="ui-input" name="displayName" [(ngModel)]="displayName" autocomplete="name" placeholder="ex: Bogdan" />
+      </label>
+
+      <label>
+        Email
+        <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" />
+      </label>
+
+      <label>
+        Parola
+        <input class="ui-input" type="password" name="password" [(ngModel)]="password" autocomplete="new-password" />
+        @if (passwordHint()) {
+          <small class="hint">{{ passwordHint() }}</small>
+        }
+      </label>
+
+      <label>
+        Confirma parola
+        <input class="ui-input" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password" />
+      </label>
+
+      <button class="ui-btn full" type="submit" [disabled]="loading()">
+        @if (loading()) { Se creeaza contul... } @else { Creeaza cont }
+      </button>
+    </form>
+
+    <p class="switch">
+      Ai deja cont? <a routerLink="/login">Intra in cont</a>
+    </p>
+  </section>
+</div>

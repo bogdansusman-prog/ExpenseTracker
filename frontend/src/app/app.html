@@ -5,6 +5,7 @@
     <p>Personal finance dashboard</p>
   </div>
 
+  @if (auth.isLoggedIn()) {
   <nav class="navigation">
 
     <a
@@ -58,6 +59,13 @@
     </a>
 
   </nav>
+
+  <div class="user-menu">
+    <span class="avatar">{{ (auth.user()?.displayName || '?').slice(0, 1).toUpperCase() }}</span>
+    <span class="user-name">{{ auth.user()?.displayName }}</span>
+    <button type="button" class="logout" (click)="auth.logout()">Iesire</button>
+  </div>
+  }
 
 </header>
 

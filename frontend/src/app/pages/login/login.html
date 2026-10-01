@@ -1,0 +1,36 @@
+<div class="auth-page">
+  <section class="auth-card">
+    <div class="brand">
+      <h1>Expense Tracker</h1>
+      <p>Intra in cont ca sa-ti vezi banii</p>
+    </div>
+
+    @if (expired) {
+      <div class="ui-alert info">Sesiunea a expirat. Autentifica-te din nou.</div>
+    }
+
+    @if (error()) {
+      <div class="ui-alert error">{{ error() }}</div>
+    }
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Email
+        <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" required />
+      </label>
+
+      <label>
+        Parola
+        <input class="ui-input" type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required />
+      </label>
+
+      <button class="ui-btn full" type="submit" [disabled]="loading()">
+        @if (loading()) { Se verifica... } @else { Intra in cont }
+      </button>
+    </form>
+
+    <p class="switch">
+      Nu ai cont? <a routerLink="/register">Creeaza unul</a>
+    </p>
+  </section>
+</div>

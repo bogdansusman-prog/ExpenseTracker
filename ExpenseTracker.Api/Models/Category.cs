@@ -2,9 +2,13 @@
 
 namespace ExpenseTracker.Api.Models;
 
-public class Category
+public class Category : IUserOwned
 {
     public int Id { get; set; }
+
+    public string? UserId { get; set; }
+
+    public AppUser? User { get; set; }
 
     [Required]
     [MaxLength(100)]

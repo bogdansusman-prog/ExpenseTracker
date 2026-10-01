@@ -72,6 +72,40 @@
   margin: 30px auto;
 }
 
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid #2d3548;
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #4c6ef5, #9775fa);
+    border-radius: 50%;
+  }
+
+  .user-name { color: #c4cad5; }
+
+  .logout {
+    padding: 8px 12px;
+    color: #c4cad5;
+    background: transparent;
+    border: 1px solid #373b43;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+
+    &:hover { color: white; border-color: #ff6b6b; }
+  }
+}
+
 @media (max-width: 750px) {
   .app-header {
     align-items: flex-start;
@@ -81,5 +115,11 @@
 
   .navigation {
     flex-wrap: wrap;
+  }
+
+  .user-menu {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
   }
 }
