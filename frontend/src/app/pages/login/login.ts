@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
+import { SplashService } from '../../components/welcome-splash/splash.service';
 
 @Component({
   selector: 'app-login',
@@ -16,12 +17,14 @@ export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly splash = inject(SplashService);
 
   email = '';
   password = '';
 
   readonly loading = signal(false);
   readonly error = signal('');
+  readonly showPassword = signal(false);
   readonly expired = this.route.snapshot.queryParamMap.has('expired');
 
   submit(): void {
@@ -34,7 +37,9 @@ export class Login {
     this.error.set('');
 
     this.auth.login({ email: this.email.trim(), password: this.password }).subscribe({
-      next: () => {
+      next: response => {
+        // The welcome animation plays on top while the dashboard loads behind it.
+        this.splash.play(response.user.displayName);
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
         this.router.navigateByUrl(returnUrl);
       },

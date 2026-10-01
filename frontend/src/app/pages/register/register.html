@@ -1,46 +1,63 @@
 <div class="auth-page">
-  <section class="auth-card">
-    <div class="brand">
-      <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'happy'" [size]="130" />
-      <h1>Creeaza cont</h1>
-      <p>Fiecare cont isi vede doar tranzactiile lui</p>
-    </div>
+  <section class="auth-shell">
+    <aside class="showcase">
+      <img class="logo" src="ax-logo.png" alt="Ax, mascota Ax Tracker" width="190" height="190" />
+      <h1>Ax Tracker</h1>
+      <p class="tagline">Fa-ti cont in 30 de secunde.</p>
+      <ul class="perks">
+        <li><span></span>Datele tale sunt doar ale tale</li>
+        <li><span></span>Fara reclame si fara AI extern</li>
+        <li><span></span>Ax te ajuta din prima zi</li>
+      </ul>
+    </aside>
 
-    @if (error()) {
-      <div class="ui-alert error">{{ error() }}</div>
-    }
+    <div class="panel">
+      <div class="panel-header">
+        <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'happy'" [size]="92" />
+        <div>
+          <h2>Creeaza cont</h2>
+          <p>Fiecare cont isi vede doar tranzactiile lui</p>
+        </div>
+      </div>
 
-    <form (ngSubmit)="submit()">
-      <label>
-        Nume
-        <input class="ui-input" name="displayName" [(ngModel)]="displayName" autocomplete="name" placeholder="ex: Bogdan" />
-      </label>
+      @if (error()) {
+        <div class="ui-alert error">{{ error() }}</div>
+      }
 
-      <label>
-        Email
-        <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" />
-      </label>
+      <form (ngSubmit)="submit()">
+        <label>
+          Nume
+          <input class="ui-input" name="displayName" [(ngModel)]="displayName" autocomplete="name" placeholder="ex: Bogdan" />
+        </label>
 
-      <label>
-        Parola
-        <input class="ui-input" type="password" name="password" [(ngModel)]="password" autocomplete="new-password" />
+        <label>
+          Email
+          <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" placeholder="nume@exemplu.ro" />
+        </label>
+
+        <div class="two">
+          <label>
+            Parola
+            <input class="ui-input" type="password" name="password" [(ngModel)]="password" autocomplete="new-password" />
+          </label>
+
+          <label>
+            Confirma parola
+            <input class="ui-input" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password" />
+          </label>
+        </div>
         @if (passwordHint()) {
           <small class="hint">{{ passwordHint() }}</small>
         }
-      </label>
 
-      <label>
-        Confirma parola
-        <input class="ui-input" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password" />
-      </label>
+        <button class="ui-btn full" type="submit" [disabled]="loading()">
+          @if (loading()) { <span class="spinner"></span> Se creeaza contul... } @else { Creeaza cont }
+        </button>
+      </form>
 
-      <button class="ui-btn full" type="submit" [disabled]="loading()">
-        @if (loading()) { Se creeaza contul... } @else { Creeaza cont }
-      </button>
-    </form>
-
-    <p class="switch">
-      Ai deja cont? <a routerLink="/login">Intra in cont</a>
-    </p>
+      <p class="switch">
+        Ai deja cont? <a routerLink="/login">Intra in cont</a>
+      </p>
+    </div>
   </section>
 </div>

@@ -1,7 +1,8 @@
+@if (!isAuthPage()) {
 <header class="app-header">
 
   <a class="brand" routerLink="/dashboard">
-    <app-ax [size]="54" />
+    <img class="logo" src="ax-logo.png" alt="" width="58" height="58" />
     <div>
       <h1>Ax Tracker</h1>
       <p>Banii tai, pe intelesul tau</p>
@@ -10,68 +11,42 @@
 
   @if (auth.isLoggedIn()) {
   <nav class="navigation">
-
-    <a
-      routerLink="/dashboard"
-      routerLinkActive="active"
-    >
-      Dashboard
-    </a>
-
-    <a
-      routerLink="/transactions"
-      routerLinkActive="active"
-    >
-      Tranzactii
-    </a>
-
-    <a
-      routerLink="/categories"
-      routerLinkActive="active"
-    >
-      Categorii
-    </a>
-
-    <a
-      routerLink="/comparator"
-      routerLinkActive="active"
-    >
-      Comparator
-    </a>
-
-    <a
-      routerLink="/insights"
-      routerLinkActive="active"
-    >
-      Insights
-    </a>
-
-    <a
-      routerLink="/advisor"
-      routerLinkActive="active"
-      class="ai-link"
-    >
-      Intreaba-l pe Ax
-    </a>
-
-    <a
-      routerLink="/settings"
-      routerLinkActive="active"
-    >
-      Setari
-    </a>
-
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/transactions" routerLinkActive="active">Tranzactii</a>
+    <a routerLink="/categories" routerLinkActive="active">Categorii</a>
+    <a routerLink="/comparator" routerLinkActive="active">Comparator</a>
+    <a routerLink="/insights" routerLinkActive="active">Insights</a>
+    <a routerLink="/advisor" routerLinkActive="active" class="ai-link">Intreaba-l pe Ax</a>
+    <a routerLink="/settings" routerLinkActive="active">Setari</a>
+    <a routerLink="/about" routerLinkActive="active">Despre</a>
   </nav>
 
   <div class="user-menu">
-    <span class="avatar">{{ (auth.user()?.displayName || '?').slice(0, 1).toUpperCase() }}</span>
-    <span class="user-name">{{ auth.user()?.displayName }}</span>
+    <a class="profile-link" routerLink="/profile" routerLinkActive="active" title="Profilul meu">
+      @if (auth.user()?.avatarUrl; as avatar) {
+        <img class="avatar" [src]="avatar" alt="" />
+      } @else {
+        <span class="avatar">{{ (auth.user()?.displayName || '?').slice(0, 1).toUpperCase() }}</span>
+      }
+      <span class="user-name">{{ auth.user()?.displayName }}</span>
+    </a>
     <button type="button" class="logout" (click)="auth.logout()">Iesire</button>
   </div>
+  } @else {
+    <a class="login-link" routerLink="/login">Intra in cont</a>
   }
 
 </header>
+}
 
-<main class="page-container">
+<main class="page-container" [class.auth-layout]="isAuthPage()">
   <router-outlet />
 </main>
+
+@if (auth.isLoggedIn() && !isAuthPage()) {
+  <app-ax-companion />
+}
+
+@if (splash.active()) {
+  <app-welcome-splash />
+}

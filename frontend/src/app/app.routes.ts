@@ -3,6 +3,8 @@ import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './auth/auth.guards';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
+import { Profile } from './pages/profile/profile';
+import { About } from './pages/about/about';
 
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Transactions } from './pages/transactions/transactions';
@@ -52,6 +54,15 @@ export const routes: Routes = [
     path: 'settings',
     component: Settings,
     canActivate: [authGuard]
+  },
+  {
+    path: 'profile',
+    component: Profile,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'about',
+    component: About
   },
   {
     path: 'login',

@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
+import { SplashService } from '../../components/welcome-splash/splash.service';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ import { AxMascot } from '../../components/ax-mascot/ax-mascot';
 export class Register {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly splash = inject(SplashService);
 
   displayName = '';
   email = '';
@@ -90,7 +92,10 @@ export class Register {
       email: this.email.trim(),
       password: this.password
     }).subscribe({
-      next: () => this.router.navigateByUrl('/dashboard'),
+      next: response => {
+        this.splash.play(response.user.displayName);
+        this.router.navigateByUrl('/dashboard');
+      },
       error: (error: HttpErrorResponse) => {
         this.error.set(this.describe(error));
         this.loading.set(false);

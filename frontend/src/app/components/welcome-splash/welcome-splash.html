@@ -1,0 +1,48 @@
+<div class="splash" [class.leaving]="leaving()" [class.calm]="reduceMotion" (click)="skip()" role="status" aria-live="polite">
+  <div class="bubbles" aria-hidden="true">
+    @for (bubble of bubbles; track $index) {
+      <span
+        [style.left.%]="bubble.left"
+        [style.width.px]="bubble.size"
+        [style.height.px]="bubble.size"
+        [style.animation-delay.s]="bubble.delay"
+        [style.animation-duration.s]="bubble.duration"
+      ></span>
+    }
+  </div>
+
+  <div class="center">
+    <div class="logo-wrap">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="splash-ring" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f497b8" />
+            <stop offset="0.55" stop-color="#9775fa" />
+            <stop offset="1" stop-color="#4c6ef5" />
+          </linearGradient>
+        </defs>
+        <circle class="track" cx="100" cy="100" r="92" />
+        <circle class="progress" cx="100" cy="100" r="92" stroke="url(#splash-ring)" />
+      </svg>
+      <div class="glow"></div>
+      <img class="logo" src="ax-logo.png" alt="Ax" />
+    </div>
+
+    <h1 class="welcome" [attr.aria-label]="'Bine ai venit, ' + firstName() + '!'">
+      @for (letter of letters(); track $index) {
+        <span [style.animation-delay.ms]="750 + $index * 32">{{ letter }}</span>
+      }
+    </h1>
+
+    <ul class="steps">
+      @for (step of steps; track step; let i = $index) {
+        <li [style.animation-delay.ms]="1300 + i * 380">
+          <span class="dot" [style.animation-delay.ms]="1500 + i * 380"></span>
+          {{ step }}
+        </li>
+      }
+    </ul>
+
+    <small class="hint">apasa oriunde ca sa sari peste</small>
+  </div>
+</div>
