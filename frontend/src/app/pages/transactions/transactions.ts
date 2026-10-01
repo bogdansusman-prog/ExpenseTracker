@@ -23,14 +23,18 @@ import {
 } from '../../models/financial-transaction.model';
 
 import { ExpenseApiService } from '../../services/expense-api.service';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-transactions',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslatePipe],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss'
 })
 export class Transactions implements OnInit {
+  private readonly i18n = inject(I18n);
+
 
   private readonly apiService =
     inject(ExpenseApiService);
@@ -429,7 +433,7 @@ export class Transactions implements OnInit {
 
     const confirmed =
       window.confirm(
-        'Sigur vrei sa stergi aceasta tranzactie?'
+        this.i18n.t('Sigur vrei sa stergi aceasta tranzactie?')
       );
 
     if (!confirmed) {
@@ -572,7 +576,7 @@ export class Transactions implements OnInit {
 
     const confirmed =
       window.confirm(
-        `Sigur vrei sa stergi ${selectedIds.length} tranzactii?`
+        this.i18n.t('Sigur vrei sa stergi {n} tranzactii?', { n: selectedIds.length })
       );
 
     if (!confirmed) {
@@ -613,7 +617,7 @@ export class Transactions implements OnInit {
           this.ensureValidCategoryFilter();
 
           this.successMessage.set(
-            `${selectedIds.length} tranzactii au fost sterse.`
+            this.i18n.t('{n} tranzactii au fost sterse.', { n: selectedIds.length })
           );
         },
 
@@ -754,7 +758,7 @@ export class Transactions implements OnInit {
   ): string {
 
     return value.toLocaleString(
-      'ro-RO',
+      this.i18n.locale(),
       {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2

@@ -148,6 +148,36 @@
   border-radius: 8px;
 }
 
+.regret-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-bottom: 22px;
+  padding: 14px 18px;
+
+  color: #f3d9fa;
+  text-decoration: none;
+
+  background: linear-gradient(90deg, #3b1f4f, #22183a);
+  border: 1px solid #5f3dc4;
+  border-radius: 12px;
+
+  .banner-text {
+    flex: 1;
+  }
+
+  .arrow {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: #9775fa;
+  }
+}
+
 @media (max-width: 800px) {
   .summary-grid {
     grid-template-columns: 1fr;

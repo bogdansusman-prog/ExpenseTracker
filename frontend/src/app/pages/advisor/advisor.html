@@ -1,0 +1,162 @@
+<div class="ui-page-header">
+  <div>
+    <h2>{{ 'Intreaba-l pe Ax' | t }}</h2>
+    <p>{{ 'Ax iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati' | t }}</p>
+  </div>
+
+  <div class="header-actions">
+    <div class="lang-switch" role="group" [aria-label]="'Limba' | t">
+      <button type="button" [class.active]="language() === 'ro'" (click)="setLanguage('ro')">RO</button>
+      <button type="button" [class.active]="language() === 'en'" (click)="setLanguage('en')">EN</button>
+    </div>
+    <button class="ui-btn" type="button" (click)="loadReport()" [disabled]="loadingReport()">
+      {{ 'Recalculeaza' | t }}
+    </button>
+  </div>
+</div>
+
+@if (reportError()) {
+  <div class="ui-alert error">{{ reportError() | t }}</div>
+}
+
+@if (loadingReport() && !report()) {
+  <section class="ui-card thinking">
+    <div class="dot-pulse"></div>
+    {{ 'Ax iti analizeaza tranzactiile, regretele, abonamentele si prognoza...' | t }}
+  </section>
+} @else if (report(); as r) {
+  <section class="report">
+    <div class="ui-card score-card">
+      <div class="score-ring" [style.--score-color]="scoreColor(r.score)" [style.--score]="r.score">
+        <span>{{ r.score }}</span>
+        <small>/ 100</small>
+      </div>
+      <div>
+        <span class="ui-badge" [class.success]="r.verdict === 'good'" [class.danger]="r.verdict === 'bad'">
+          {{ verdictLabel(r.verdict) }}
+        </span>
+        <h3 class="headline">{{ r.headline }}</h3>
+        <p>{{ r.summary }}</p>
+      </div>
+    </div>
+
+    @if (r.breakdown.length > 0) {
+      <div class="ui-card">
+        <h3>{{ 'Cum am calculat scorul' | t }}</h3>
+        <p class="ui-muted">
+          {{ 'Fiecare componenta are un punctaj maxim. Scorul final e suma lor, fara cutii negre.' | t }}
+        </p>
+        <div class="breakdown">
+          @for (component of r.breakdown; track component.key) {
+            <div class="component">
+              <div class="component-header">
+                <strong>{{ component.label }}</strong>
+                <span>{{ component.points }} / {{ component.maxPoints }}</span>
+              </div>
+              <div class="bar">
+                <div
+                  class="fill"
+                  [style.width.%]="componentPercent(component.points, component.maxPoints)"
+                  [style.background]="scoreColor(componentPercent(component.points, component.maxPoints))"
+                ></div>
+              </div>
+              <small>{{ component.explanation }}</small>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="two-columns">
+      <div class="ui-card">
+        <h3 class="ui-income">{{ 'Ce faci bine' | t }}</h3>
+        <ul>
+          @for (item of r.strengths; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </div>
+      <div class="ui-card">
+        <h3 class="ui-expense">{{ 'Ce te costa' | t }}</h3>
+        <ul>
+          @for (item of r.concerns; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </div>
+    </div>
+
+    <div class="ui-card">
+      <h3>{{ '3 pasi concreti' | t }}</h3>
+      <div class="actions">
+        @for (action of r.actions; track $index) {
+          <article class="action">
+            <span class="step">{{ $index + 1 }}</span>
+            <div>
+              <strong>{{ action.title }}</strong>
+              <p>{{ action.detail }}</p>
+              @if (action.estimatedMonthlySavings) {
+                <small class="ui-income">
+                  ~ {{ formatMoney(action.estimatedMonthlySavings) }} {{ 'lei /' | t }} {{ 'luna' | t }}
+                </small>
+              }
+            </div>
+          </article>
+        }
+      </div>
+      @if (r.funFact) {
+        <p class="fun-fact"><strong>{{ 'Stiai ca?' | t }}</strong> {{ r.funFact }}</p>
+      }
+      <p class="meta">
+        {{ r.engine }} · {{ 'calculat local, fara AI extern' | t }}
+      </p>
+    </div>
+  </section>
+}
+
+<!-- ===================== CHAT ===================== -->
+<section class="ui-card chat">
+  <div class="chat-layout">
+  <aside class="ax-corner">
+    <app-ax [mood]="mood()" [size]="190" />
+    <div class="ax-says">{{ greeting() }}</div>
+  </aside>
+
+  <div class="chat-main">
+  <h3>{{ 'Intreaba-l pe Ax' | t }}</h3>
+
+  <div class="chat-log" #chatLog>
+    @if (messages().length === 0) {
+      <div class="suggestions">
+        @for (suggestion of suggestions[language()]; track suggestion) {
+          <button type="button" class="chip" (click)="ask(suggestion)">{{ suggestion }}</button>
+        }
+      </div>
+    }
+
+    @for (message of messages(); track $index) {
+      <!-- kept on one line: the bubble uses white-space: pre-wrap -->
+      <div class="bubble" [class.user]="message.role === 'user'">@if ($index === typingIndex()) {<span>{{ typedText() }}</span><span class="caret"></span>} @else {<span>{{ message.content }}</span>}</div>
+    }
+
+    @if (sending()) {
+      <div class="bubble typing"><span></span><span></span><span></span></div>
+    }
+  </div>
+
+  @if (chatError()) {
+    <div class="ui-alert error">{{ chatError() | t }}</div>
+  }
+
+  <form class="chat-input" (ngSubmit)="ask()">
+    <input
+      class="ui-input"
+      name="question"
+      [ngModel]="question()"
+      (ngModelChange)="question.set($event)"
+      [placeholder]="'Scrie o intrebare despre banii tai...' | t"
+      autocomplete="off"
+    />
+    <button class="ui-btn" type="submit" [disabled]="sending() || !question().trim()">
+      {{ 'Trimite' | t }}
+    </button>
+  </form>
+  </div>
+  </div>
+</section>

@@ -1,0 +1,99 @@
+<section class="hero">
+  <img class="logo" src="ax-logo.png" [alt]="'Ax, mascota Ax Tracker' | t" width="220" height="220" />
+  <div>
+    <span class="eyebrow">{{ 'Despre Ax Tracker' | t }}</span>
+    <h2>{{ 'Salut, sunt' | t }} <span class="name">Bogdan Șușman</span></h2>
+    <p class="pronounce">{{ 'Se pronunță' | t }} <em>Shush-man</em>.</p>
+    <p class="motto">{{ '„Învăț construind: de la tranzistor până la aplicație.”' | t }}</p>    <p class="lead">
+      {{ 'Student la Calculatoare la Universitatea Tehnică din Cluj-Napoca și full-stack developer din Oradea. Scriu aplicații web și mobile cu Angular, Flutter și ASP.NET Core, iar când codul nu-mi ajunge, cobor în hardware și proiectez procesoare în VHDL.' | t }}
+    </p>
+    <div class="links">
+      <a class="ui-btn" [href]="githubUrl" target="_blank" rel="noopener">GitHub</a>
+      <a class="ui-btn ghost" [href]="linkedinUrl" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<section class="ui-card story">
+  <h3>{{ 'De ce am făcut Ax Tracker' | t }}</h3>
+  <p>
+    {{ 'Ca student, banii se duc repede și pe lucruri mărunte: o cafea aici, un Bolt acolo, un abonament uitat. Voiam o aplicație care să nu-mi arate doar' | t }} <em>{{ 'cât' | t }}</em> {{ 'am cheltuit, ci și' | t }} <em>{{ 'de ce' | t }}</em>{{ ': ce am regretat, ce s-a scumpit fără să observ și unde voi fi la sfârșitul lunii.' | t }}
+  </p>
+  <p>
+    {{ 'Dar motivul mai mare a fost să mă testez. Am vrut un proiect pe care să-l construiesc cap-coadă, singur: bază de date, API, securitate, interfață, algoritmi, teste. Să iau decizii ca într-un produs real și să învăț din ele. A pornit ca un simplu tabel cu tranzacții și a crescut pas cu pas: statistici, prognoze Monte Carlo, detectarea abonamentelor, conturi separate și, la final, Ax.' | t }}
+  </p>
+  <p>
+    {{ 'Ax Tracker e felul meu de a arăta ce pot face și, sper, pasul care mă duce mai departe, spre primul meu internship și spre o carieră în software.' | t }}
+  </p>
+</section>
+
+<section class="ui-card">
+  <h3>{{ 'Ce face aplicația' | t }}</h3>
+  <div class="highlights">
+    @for (item of highlights; track item.title) {
+      <article>
+        <strong>{{ item.title | t }}</strong>
+        <p>{{ item.text | t }}</p>
+      </article>
+    }
+  </div>
+
+  <h4>{{ 'Construit cu' | t }}</h4>
+  <div class="chips">
+    @for (tech of stack; track tech) {
+      <span class="chip">{{ tech }}</span>
+    }
+  </div>
+</section>
+
+<section class="ui-card meet-ax">
+  <app-ax mood="happy" [size]="170" />
+  <div>
+    <h3>{{ 'Și cine e Ax?' | t }}</h3>
+    <p>
+      {{ 'Ax e un axolotl cu ochelari rotunzi și papion, consilierul financiar al aplicației. Axolotlii pot să-și regenereze aproape orice parte a corpului, iar asta mi s-a părut potrivit pentru o aplicație care te ajută să-ți refaci finanțele după o lună mai grea.' | t }}
+    </p>
+    <p>
+      {{ 'E desenat de la zero în SVG și animat doar cu CSS: se gândește cât calculează, dă din cap când îți răspunde, se bucură când stai bine și se îngrijorează când riști să ajungi pe minus. Nu folosește niciun AI extern: totul e calculat local, din datele tale.' | t }}
+    </p>
+  </div>
+</section>
+
+<section class="ui-card">
+  <h3>{{ 'Drumul meu' | t }}</h3>
+  <ol class="timeline">
+    @for (step of milestones; track step.period) {
+      <li>
+        <span class="period">{{ step.period | t }}</span>
+        <strong>{{ step.title | t }}</strong>
+        <p>{{ step.detail | t }}</p>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="ui-card">
+  <div class="projects-header">
+    <div>
+      <h3>{{ 'Alte proiecte de-ale mele' | t }}</h3>
+      <p class="ui-muted">{{ 'Software și hardware: tot codul e pe GitHub.' | t }}</p>
+    </div>
+    <a class="ui-btn ghost" [href]="githubUrl" target="_blank" rel="noopener">{{ 'Vezi tot pe GitHub' | t }}</a>
+  </div>
+
+  <div class="projects">
+    @for (project of projects; track project.name) {
+      <a class="project" [class]="project.kind" [href]="project.url" target="_blank" rel="noopener">
+        <strong>{{ project.name | t }}</strong>
+        <p>{{ project.description | t }}</p>
+        <div class="chips small">
+          @for (tech of project.stack; track tech) {
+            <span class="chip">{{ tech }}</span>
+          }
+        </div>
+      </a>
+    }
+  </div>
+</section>
+
+<p class="footer">{{ 'Ax Tracker · făcut de Bogdan Șușman ·' | t }} {{ year }}</p>

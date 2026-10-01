@@ -1,0 +1,74 @@
+:host { display: block; }
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+
+  input { flex: 1; }
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip {
+  padding: 6px 12px;
+  color: #c4cad5;
+  background: #1a1c20;
+  border: 1px dashed #373b43;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+
+  &:hover { color: white; border-color: #748ffc; }
+}
+
+.draft {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #292c32;
+}
+
+.draft-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.draft-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    color: #c5cbd6;
+  }
+
+  .wide { grid-column: 1 / -1; }
+}
+
+.hours {
+  margin: 14px 0 0;
+  color: #fcc419;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 800px) {
+  .draft-grid { grid-template-columns: 1fr 1fr; }
+  .input-row { flex-direction: column; }
+}

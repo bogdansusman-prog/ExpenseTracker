@@ -1,0 +1,216 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.splash {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #0f1013;
+  cursor: pointer;
+  animation: fade-in 0.35s ease-out both;
+
+  &.leaving {
+    animation: leave 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+
+    .logo-wrap { animation: zoom-out 0.65s cubic-bezier(0.7, 0, 0.84, 0) forwards; }
+  }
+}
+
+/* ---------- bubbles rising like in an aquarium ---------- */
+.bubbles span {
+  position: absolute;
+  bottom: -40px;
+  border: 1.5px solid rgba(244, 151, 184, 0.7);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55), rgba(244, 151, 184, 0.18) 60%, rgba(151, 117, 250, 0.08));
+  box-shadow: 0 0 12px rgba(244, 151, 184, 0.25);
+  animation: rise linear infinite;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ---------- logo + progress ring ---------- */
+.logo-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 230px;
+  height: 230px;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+
+  circle { fill: none; stroke-width: 6; stroke-linecap: round; }
+  .track { stroke: #22252b; }
+
+  .progress {
+    stroke-dasharray: 578;
+    stroke-dashoffset: 578;
+    animation: draw 2.2s 0.45s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+}
+
+.glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244, 151, 184, 0.35), transparent 70%);
+  animation: pulse 1.6s 0.6s ease-in-out infinite;
+  opacity: 0;
+}
+
+.logo {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  object-fit: contain;
+  animation: drop-in 0.9s 0.1s cubic-bezier(0.34, 1.56, 0.64, 1) both, bob 2.4s 1s ease-in-out infinite;
+}
+
+/* ---------- greeting ---------- */
+.welcome {
+  margin: 26px 0 18px;
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 800;
+
+  span {
+    display: inline-block;
+    background: linear-gradient(90deg, #ffd6e4, #f497b8 40%, #b197fc 70%, #91a7ff);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0;
+    animation: letter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, shimmer 3s linear infinite;
+  }
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #aeb6c5;
+    opacity: 0;
+    animation: step-in 0.4s ease-out forwards;
+  }
+}
+
+.dot {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #3a3f4b;
+  border-radius: 50%;
+  animation: done 0.35s ease-out forwards;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid #0f1013;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    animation: tick 0.3s 0.15s ease-out forwards;
+    animation-delay: inherit;
+  }
+}
+
+.hint {
+  margin-top: 26px;
+  font-size: 12px;
+  color: #4d5361;
+  opacity: 0;
+  animation: step-in 0.5s 1.8s forwards;
+}
+
+/* ---------- reduced motion: just a calm fade ---------- */
+.calm {
+  .bubbles { display: none; }
+  .logo, .glow, .ring .progress, .welcome span, .steps li, .dot, .dot::after, .hint {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .ring .progress { stroke-dashoffset: 0; }
+  .dot { background: #51cf66; border-color: #51cf66; }
+  .dot::after { transform: rotate(45deg) scale(1); }
+}
+
+/* ---------- keyframes ---------- */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateY(-55vh) translateX(12px); }
+  100% { transform: translateY(-110vh) translateX(-8px); opacity: 0; }
+}
+
+@keyframes drop-in {
+  0% { opacity: 0; transform: translateY(-60px) scale(0.3) rotate(-25deg); }
+  60% { opacity: 1; transform: translateY(8px) scale(1.08) rotate(6deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes bob {
+  0%, 100% { translate: 0 0; rotate: -2deg; }
+  50% { translate: 0 -8px; rotate: 2deg; }
+}
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes letter {
+  0% { opacity: 0; transform: translateY(18px) scale(0.6); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes shimmer { to { background-position: -300% 0; } }
+
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes done {
+  to { background: #51cf66; border-color: #51cf66; }
+}
+
+@keyframes tick { to { transform: rotate(45deg) scale(1); } }
+
+@keyframes leave {
+  0% { opacity: 1; clip-path: circle(150% at 50% 45%); }
+  100% { opacity: 0.4; clip-path: circle(0% at 50% 45%); }
+}
+
+@keyframes zoom-out {
+  to { transform: scale(1.6); opacity: 0; }
+}

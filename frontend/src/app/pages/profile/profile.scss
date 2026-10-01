@@ -1,0 +1,105 @@
+:host { display: block; }
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.avatar-drop {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4c6ef5, #9775fa);
+  box-shadow: 0 0 0 4px #101113, 0 0 0 6px #364fc7;
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  .initial { font-size: 52px; font-weight: 800; color: white; }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    background: rgba(10, 12, 20, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover .overlay, &.busy .overlay, &.drag .overlay { opacity: 1; }
+  &.drag { transform: scale(1.04); box-shadow: 0 0 0 4px #101113, 0 0 0 6px #f497b8; }
+}
+
+.who {
+  flex: 1;
+  min-width: 0;
+
+  h3 { margin: 0; font-size: 24px; }
+  p { margin: 4px 0 0; }
+  .since { color: #c4cad5; font-size: 14px; }
+}
+
+.avatar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.small { padding: 6px 12px; font-size: 13px; }
+
+.ax { flex-shrink: 0; }
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+  form .ui-btn { align-self: flex-start; }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 14px;
+    color: #c5cbd6;
+  }
+}
+
+.hint { color: #fcc419; }
+
+.strength {
+  display: flex;
+  gap: 4px;
+
+  span {
+    flex: 1;
+    height: 5px;
+    background: #2a2d33;
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  &[data-level='1'] span.on, &[data-level='2'] span.on { background: #ff6b6b; }
+  &[data-level='3'] span.on { background: #fcc419; }
+  &[data-level='4'] span.on, &[data-level='5'] span.on { background: #51cf66; }
+}
+
+@media (max-width: 800px) {
+  .identity { flex-direction: column; text-align: center; }
+  .avatar-actions { justify-content: center; }
+  .columns { grid-template-columns: 1fr; }
+}

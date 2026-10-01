@@ -1,0 +1,128 @@
+:host { display: block; }
+
+.empty { color: #9da5b1; }
+
+.legend {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #818997;
+}
+
+.regret-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.regret-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #292c32;
+
+  &:last-child { border-bottom: 0; }
+}
+
+.regret-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  small { color: #8c939e; }
+}
+
+.score-buttons {
+  display: flex;
+  gap: 6px;
+
+  button {
+    width: 38px;
+    height: 38px;
+    color: white;
+    font-weight: 700;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s;
+
+    &:hover { transform: translateY(-2px); }
+  }
+}
+
+.heatmap-wrapper { overflow-x: auto; }
+
+.heatmap {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+
+  th {
+    padding: 6px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #9da5b1;
+    text-align: center;
+  }
+
+  tbody th { text-align: left; white-space: nowrap; }
+
+  td {
+    min-width: 46px;
+    padding: 10px 4px;
+    text-align: center;
+    font-weight: 700;
+    border-radius: 6px;
+  }
+
+  td.no-data { background: #1a1c20; }
+}
+
+.section-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+
+  small { color: #818997; }
+}
+
+.subscription-list { display: flex; flex-direction: column; }
+
+.subscription {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #292c32;
+
+  &:last-child { border-bottom: 0; }
+
+  > div { display: flex; flex-direction: column; gap: 5px; }
+  small { color: #8c939e; }
+
+  .right { align-items: flex-end; text-align: right; }
+}
+
+.horizon { display: flex; gap: 6px; }
+
+.forecast-stats { margin-top: 8px; }
+
+.chart-box {
+  position: relative;
+  height: 320px;
+}
+
+@media (max-width: 750px) {
+  .regret-item, .section-title { flex-direction: column; align-items: flex-start; }
+  .total { align-items: flex-start; }
+}
