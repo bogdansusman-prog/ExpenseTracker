@@ -40,7 +40,7 @@ public class AuthController(
 
         if (!result.Succeeded)
         {
-            return BadRequest(string.Join(" ", result.Errors.Select(error => error.Description)));
+            return BadRequest(Errors(result));
         }
 
         await ClaimDataCreatedBeforeAccountsAsync(user, cancellationToken);
@@ -67,11 +67,122 @@ public class AuthController(
     [HttpGet("me")]
     public async Task<ActionResult<UserDto>> Me()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var user = userId is null ? null : await userManager.FindByIdAsync(userId);
-
+        var user = await CurrentUserAsync();
         return user is null ? Unauthorized() : Ok(ToDto(user));
     }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<ActionResult<UserDto>> UpdateProfile(UpdateProfileDto dto)
+    {
+        var user = await CurrentUserAsync();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var name = dto.DisplayName.Trim();
+        if (name.Length == 0)
+        {
+            return BadRequest("Name is required.");
+        }
+
+        user.DisplayName = name;
+        var result = await userManager.UpdateAsync(user);
+
+        return result.Succeeded ? Ok(ToDto(user)) : BadRequest(Errors(result));
+    }
+
+    private const int MaxAvatarLength = 400_000;
+
+    private static readonly string[] AllowedAvatarPrefixes =
+    [
+        "data:image/png;base64,",
+        "data:image/jpeg;base64,",
+        "data:image/webp;base64,"
+    ];
+
+    [Authorize]
+    [HttpPut("avatar")]
+    public async Task<ActionResult<UserDto>> UpdateAvatar(UpdateAvatarDto dto)
+    {
+        var user = await CurrentUserAsync();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var prefix = AllowedAvatarPrefixes.FirstOrDefault(allowed => dto.DataUrl.StartsWith(allowed, StringComparison.Ordinal));
+        if (prefix is null)
+        {
+            return BadRequest("Only PNG, JPEG or WebP images are allowed.");
+        }
+
+        if (dto.DataUrl.Length > MaxAvatarLength)
+        {
+            return BadRequest("The image is too large (max ~300 KB).");
+        }
+
+        try
+        {
+            // Make sure the payload really is base64 and not arbitrary text.
+            Convert.FromBase64String(dto.DataUrl[prefix.Length..]);
+        }
+        catch (FormatException)
+        {
+            return BadRequest("The image data is invalid.");
+        }
+
+        user.AvatarDataUrl = dto.DataUrl;
+        var result = await userManager.UpdateAsync(user);
+
+        return result.Succeeded ? Ok(ToDto(user)) : BadRequest(Errors(result));
+    }
+
+    [Authorize]
+    [HttpDelete("avatar")]
+    public async Task<ActionResult<UserDto>> DeleteAvatar()
+    {
+        var user = await CurrentUserAsync();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        user.AvatarDataUrl = null;
+        var result = await userManager.UpdateAsync(user);
+
+        return result.Succeeded ? Ok(ToDto(user)) : BadRequest(Errors(result));
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordDto dto)
+    {
+        var user = await CurrentUserAsync();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await userManager.CheckPasswordAsync(user, dto.CurrentPassword))
+        {
+            return BadRequest("The current password is incorrect.");
+        }
+
+        var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+
+        return result.Succeeded ? NoContent() : BadRequest(Errors(result));
+    }
+
+    private async Task<AppUser?> CurrentUserAsync()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return userId is null ? null : await userManager.FindByIdAsync(userId);
+    }
+
+    private static string Errors(IdentityResult result) =>
+        string.Join(" ", result.Errors.Select(error => error.Description));
 
     private AuthResponseDto CreateResponse(AppUser user)
     {
@@ -79,7 +190,8 @@ public class AuthController(
         return new AuthResponseDto(token, expiresAt, ToDto(user));
     }
 
-    private static UserDto ToDto(AppUser user) => new(user.Id, user.Email ?? string.Empty, user.DisplayName);
+    private static UserDto ToDto(AppUser user) =>
+        new(user.Id, user.Email ?? string.Empty, user.DisplayName, user.AvatarDataUrl, user.CreatedAt);
 
     /// <summary>
     /// The app was single-user before accounts existed. The very first account that registers

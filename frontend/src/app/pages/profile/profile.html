@@ -1,0 +1,87 @@
+<div class="ui-page-header">
+  <div>
+    <h2>Profilul meu</h2>
+    <p>Poza, numele si parola contului tau</p>
+  </div>
+</div>
+
+@if (message()) { <div class="ui-alert success">{{ message() }}</div> }
+@if (error()) { <div class="ui-alert error">{{ error() }}</div> }
+
+@if (user(); as u) {
+  <section class="ui-card identity">
+    <label
+      class="avatar-drop"
+      [class.drag]="dragOver()"
+      [class.busy]="savingAvatar()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="dragOver.set(false)"
+      (drop)="onDrop($event)"
+      title="Schimba poza de profil"
+    >
+      @if (u.avatarUrl) {
+        <img [src]="u.avatarUrl" alt="Poza de profil" />
+      } @else {
+        <span class="initial">{{ initial() }}</span>
+      }
+      <span class="overlay">@if (savingAvatar()) { Se incarca... } @else { Schimba poza }</span>
+      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" (change)="onFileSelected($event)" hidden />
+    </label>
+
+    <div class="who">
+      <h3>{{ u.displayName }}</h3>
+      <p class="ui-muted">{{ u.email }}</p>
+      @if (memberSince()) {
+        <p class="since">Membru din {{ memberSince() }}</p>
+      }
+      <div class="avatar-actions">
+        <small class="ui-muted">Trage o imagine peste poza sau apasa pe ea. O decupam patrat, la 256×256.</small>
+        @if (u.avatarUrl) {
+          <button class="ui-btn ghost small" type="button" (click)="removeAvatar()" [disabled]="savingAvatar()">Sterge poza</button>
+        }
+      </div>
+    </div>
+
+    <app-ax class="ax" [mood]="axMood()" [size]="140" />
+  </section>
+
+  <div class="columns">
+    <form class="ui-card" (ngSubmit)="saveName()">
+      <h3>Nume afisat</h3>
+      <p class="ui-muted">Asa te saluta Ax si asa apari in meniul de sus.</p>
+      <label>
+        Nume
+        <input class="ui-input" name="displayName" [(ngModel)]="displayName" maxlength="100" autocomplete="name" />
+      </label>
+      <button class="ui-btn" type="submit" [disabled]="savingName() || displayName.trim() === u.displayName">
+        Salveaza numele
+      </button>
+    </form>
+
+    <form class="ui-card" (ngSubmit)="changePassword()">
+      <h3>Schimba parola</h3>
+      <p class="ui-muted">Minim 8 caractere, cu cel putin o cifra si o litera mica.</p>
+      <label>
+        Parola actuala
+        <input class="ui-input" type="password" name="currentPassword" [(ngModel)]="currentPassword" autocomplete="current-password" />
+      </label>
+      <label>
+        Parola noua
+        <input class="ui-input" type="password" name="newPassword" [(ngModel)]="newPassword" autocomplete="new-password" />
+        @if (newPassword) {
+          <div class="strength" [attr.data-level]="passwordStrength()">
+            @for (step of [1, 2, 3, 4, 5]; track step) {
+              <span [class.on]="passwordStrength() >= step"></span>
+            }
+          </div>
+        }
+        @if (passwordHint()) { <small class="hint">{{ passwordHint() }}</small> }
+      </label>
+      <label>
+        Confirma parola noua
+        <input class="ui-input" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password" />
+      </label>
+      <button class="ui-btn" type="submit" [disabled]="savingPassword()">Schimba parola</button>
+    </form>
+  </div>
+}

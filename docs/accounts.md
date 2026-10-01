@@ -34,3 +34,20 @@ dotnet ef database update
 # on every run in Development, so you would need to log in again after each restart.
 dotnet user-secrets set "Jwt:Key" "<a long random secret>"
 ```
+
+## Profile
+
+The **Profile** page (click your name in the header) lets you:
+
+- upload a profile picture (drag & drop or click). It is cropped to a square and resized to 256×256 **in the browser**, then stored as a small data URL (`AppUser.AvatarDataUrl`, max ~300 KB, PNG/JPEG/WebP only, validated server-side)
+- change the display name
+- change the password (requires the current one; same rules as at registration)
+
+| Method | Endpoint | Body |
+|---|---|---|
+| PUT | `/api/auth/profile` | `{ "displayName" }` |
+| PUT | `/api/auth/avatar` | `{ "dataUrl" }` |
+| DELETE | `/api/auth/avatar` | — |
+| POST | `/api/auth/change-password` | `{ "currentPassword", "newPassword" }` |
+
+Migration: `dotnet ef migrations add Profile` adds the `AvatarDataUrl` column.

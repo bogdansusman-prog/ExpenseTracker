@@ -1,0 +1,21 @@
+@if (page()) {
+  <aside class="companion" [class.collapsed]="collapsed()" aria-label="Sfatul lui Ax">
+    @if (!collapsed() && bubbleOpen()) {
+      <div class="bubble" role="status" (mouseenter)="showBubble()">
+        <button class="close" type="button" (click)="toggle()" aria-label="Ascunde-l pe Ax">×</button>
+        <p>{{ tip() }}</p>
+        <div class="actions">
+          @if (page()!.tips.length > 1) {
+            <button type="button" class="link" (click)="nextTip()">Alt sfat</button>
+          }
+          <a class="link strong" routerLink="/advisor">Intreaba-l pe Ax →</a>
+        </div>
+      </div>
+    }
+
+    <button class="ax-button" type="button" (click)="onAxClick()"
+            [attr.aria-label]="collapsed() ? 'Arata-l pe Ax' : 'Un sfat de la Ax'">
+      <app-ax [mood]="collapsed() ? 'idle' : mood()" [size]="collapsed() ? 64 : 104" />
+    </button>
+  </aside>
+}

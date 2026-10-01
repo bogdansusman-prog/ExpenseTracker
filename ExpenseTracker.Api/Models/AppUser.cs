@@ -10,4 +10,10 @@ public class AppUser : IdentityUser
     public string DisplayName { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Profile picture as a small data URL (the client resizes it to 256x256 before upload),
+    /// so it can be shown directly in an &lt;img&gt; without an extra authenticated request.
+    /// </summary>
+    public string? AvatarDataUrl { get; set; }
 }

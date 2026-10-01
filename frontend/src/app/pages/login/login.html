@@ -1,37 +1,60 @@
 <div class="auth-page">
-  <section class="auth-card">
-    <div class="brand">
-      <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'idle'" [size]="130" />
+  <section class="auth-shell">
+    <aside class="showcase">
+      <img class="logo" src="ax-logo.png" alt="Ax, mascota Ax Tracker" width="190" height="190" />
       <h1>Ax Tracker</h1>
-      <p>Intra in cont ca sa-ti vezi banii</p>
+      <p class="tagline">Banii tai, pe intelesul tau.</p>
+      <ul class="perks">
+        <li><span></span>Vezi unde se duc banii, nu doar cati</li>
+        <li><span></span>Prognoza soldului pe 30-90 de zile</li>
+        <li><span></span>Ax iti spune sincer cum stai</li>
+      </ul>
+    </aside>
+
+    <div class="panel">
+      <div class="panel-header">
+        <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'idle'" [size]="92" />
+        <div>
+          <h2>Bine ai revenit</h2>
+          <p>Intra in cont ca sa-ti vezi banii</p>
+        </div>
+      </div>
+
+      @if (expired) {
+        <div class="ui-alert info">Sesiunea a expirat. Autentifica-te din nou.</div>
+      }
+
+      @if (error()) {
+        <div class="ui-alert error">{{ error() }}</div>
+      }
+
+      <form (ngSubmit)="submit()">
+        <label>
+          Email
+          <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" placeholder="nume@exemplu.ro" required />
+        </label>
+
+        <label>
+          Parola
+          <div class="password">
+            <input class="ui-input" [type]="showPassword() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password" required />
+            <button type="button" class="toggle" (click)="showPassword.set(!showPassword())">
+              {{ showPassword() ? 'Ascunde' : 'Arata' }}
+            </button>
+          </div>
+        </label>
+
+        <button class="ui-btn full" type="submit" [disabled]="loading()">
+          @if (loading()) { <span class="spinner"></span> Se verifica... } @else { Intra in cont }
+        </button>
+      </form>
+
+      <p class="switch">
+        Nu ai cont? <a routerLink="/register">Creeaza unul</a>
+      </p>
+      <p class="switch subtle">
+        <a routerLink="/about">Despre Ax Tracker</a>
+      </p>
     </div>
-
-    @if (expired) {
-      <div class="ui-alert info">Sesiunea a expirat. Autentifica-te din nou.</div>
-    }
-
-    @if (error()) {
-      <div class="ui-alert error">{{ error() }}</div>
-    }
-
-    <form (ngSubmit)="submit()">
-      <label>
-        Email
-        <input class="ui-input" type="email" name="email" [(ngModel)]="email" autocomplete="email" required />
-      </label>
-
-      <label>
-        Parola
-        <input class="ui-input" type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required />
-      </label>
-
-      <button class="ui-btn full" type="submit" [disabled]="loading()">
-        @if (loading()) { Se verifica... } @else { Intra in cont }
-      </button>
-    </form>
-
-    <p class="switch">
-      Nu ai cont? <a routerLink="/register">Creeaza unul</a>
-    </p>
   </section>
 </div>
