@@ -60,7 +60,7 @@ export class InsightsApiService {
     return this.http.post<QuickAddResult>(`${this.apiUrl}/quickadd/parse`, { text });
   }
 
-  // Rule-based advisor ("Owl")
+  // Rule-based advisor ("Ax")
   getAdvisorStatus(): Observable<AdvisorStatus> {
     return this.http.get<AdvisorStatus>(`${this.apiUrl}/advisor/status`);
   }

@@ -21,7 +21,8 @@
 
 @if (pendingRegrets() > 0) {
   <a class="regret-banner" routerLink="/insights">
-    <span>
+    <app-ax mood="alert" [size]="62" />
+    <span class="banner-text">
       Ai <strong>{{ pendingRegrets() }}</strong>
       @if (pendingRegrets() === 1) { cheltuiala } @else { cheltuieli }
       de evaluat: au meritat banii?

@@ -1,7 +1,7 @@
 <div class="ui-page-header">
   <div>
-    <h2>Consilier financiar</h2>
-    <p>Owl iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati</p>
+    <h2>Intreaba-l pe Ax</h2>
+    <p>Ax iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati</p>
   </div>
 
   <div class="header-actions">
@@ -22,7 +22,7 @@
 @if (loadingReport() && !report()) {
   <section class="ui-card thinking">
     <div class="dot-pulse"></div>
-    Owl iti analizeaza tranzactiile, regretele, abonamentele si prognoza...
+    Ax iti analizeaza tranzactiile, regretele, abonamentele si prognoza...
   </section>
 } @else if (report(); as r) {
   <section class="report">
@@ -114,7 +114,14 @@
 
 <!-- ===================== CHAT ===================== -->
 <section class="ui-card chat">
-  <h3>{{ language() === 'ro' ? 'Intreaba-l pe Owl' : 'Ask Owl' }}</h3>
+  <div class="chat-layout">
+  <aside class="ax-corner">
+    <app-ax [mood]="mood()" [size]="190" />
+    <div class="ax-says">{{ greeting() }}</div>
+  </aside>
+
+  <div class="chat-main">
+  <h3>{{ language() === 'ro' ? 'Intreaba-l pe Ax' : 'Ask Ax' }}</h3>
 
   <div class="chat-log" #chatLog>
     @if (messages().length === 0) {
@@ -126,7 +133,8 @@
     }
 
     @for (message of messages(); track $index) {
-      <div class="bubble" [class.user]="message.role === 'user'">{{ message.content }}</div>
+      <!-- kept on one line: the bubble uses white-space: pre-wrap -->
+      <div class="bubble" [class.user]="message.role === 'user'">@if ($index === typingIndex()) {<span>{{ typedText() }}</span><span class="caret"></span>} @else {<span>{{ message.content }}</span>}</div>
     }
 
     @if (sending()) {
@@ -151,4 +159,6 @@
       {{ language() === 'ro' ? 'Trimite' : 'Send' }}
     </button>
   </form>
+  </div>
+  </div>
 </section>

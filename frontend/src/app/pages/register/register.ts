@@ -4,10 +4,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
+import { AxMascot } from '../../components/ax-mascot/ax-mascot';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, AxMascot],
   templateUrl: './register.html',
   styleUrl: './auth-page.scss'
 })

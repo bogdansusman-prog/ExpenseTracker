@@ -164,6 +164,10 @@
   border: 1px solid #5f3dc4;
   border-radius: 12px;
 
+  .banner-text {
+    flex: 1;
+  }
+
   .arrow {
     font-weight: 700;
     white-space: nowrap;

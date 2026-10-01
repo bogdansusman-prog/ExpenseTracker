@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -6,18 +6,20 @@ import { AdvisorReport, AppLanguage, ChatTurn } from '../../models/insights.mode
 import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { formatMoney } from '../../shared/format';
+import { AxMascot, AxMood } from '../../components/ax-mascot/ax-mascot';
 
 /**
- * "Owl": a rule-based financial advisor. Everything is calculated locally from the
- * user's data (no external AI): score with breakdown, verdict, actions and a keyword chat.
+ * "Ax": a rule-based financial advisor with an animated axolotl mascot. Everything is
+ * calculated locally from the user's data (no external AI): score with breakdown,
+ * verdict, actions and a keyword chat. Ax thinks while it computes, nods while it answers.
  */
 @Component({
   selector: 'app-advisor',
-  imports: [FormsModule],
+  imports: [FormsModule, AxMascot],
   templateUrl: './advisor.html',
   styleUrl: './advisor.scss'
 })
-export class Advisor implements OnInit {
+export class Advisor implements OnInit, OnDestroy {
   private readonly api = inject(InsightsApiService);
   readonly settings = inject(SettingsStore);
 
@@ -34,6 +36,50 @@ export class Advisor implements OnInit {
   readonly chatError = signal('');
 
   readonly formatMoney = formatMoney;
+
+  /** Index of the assistant message currently being "typed" and how much of it is visible. */
+  readonly typingIndex = signal<number | null>(null);
+  readonly typedText = signal('');
+  private typingTimer?: ReturnType<typeof setInterval>;
+  private nodTimeout?: ReturnType<typeof setTimeout>;
+
+  /** Ax's mood follows what is happening on the page. */
+  readonly mood = computed<AxMood>(() => {
+    if (this.sending() || this.loadingReport()) {
+      return 'thinking';
+    }
+    if (this.typingIndex() !== null) {
+      return 'nodding';
+    }
+    if (this.chatError() || this.reportError()) {
+      return 'worried';
+    }
+
+    const report = this.report();
+    if (!report) {
+      return 'idle';
+    }
+    if (report.verdict === 'good') {
+      return 'happy';
+    }
+    return report.verdict === 'bad' ? 'worried' : 'idle';
+  });
+
+  readonly greeting = computed(() => {
+    const report = this.report();
+    const ro = this.language() === 'ro';
+
+    if (!report) {
+      return ro ? 'Salut! Sunt Ax. Stai putin sa ma uit pe banii tai...' : 'Hi! I am Ax. Give me a second to look at your money...';
+    }
+    if (report.verdict === 'good') {
+      return ro ? `Scor ${report.score}/100! Stai foarte bine. Intreaba-ma orice.` : `Score ${report.score}/100! You're doing great. Ask me anything.`;
+    }
+    if (report.verdict === 'bad') {
+      return ro ? `Scor ${report.score}/100... Hai sa vedem impreuna ce putem repara.` : `Score ${report.score}/100... Let's fix this together.`;
+    }
+    return ro ? `Scor ${report.score}/100. Merge, dar am cateva idei pentru tine.` : `Score ${report.score}/100. Not bad, but I have a few ideas for you.`;
+  });
 
   readonly suggestions: Record<AppLanguage, string[]> = {
     ro: [
@@ -57,6 +103,11 @@ export class Advisor implements OnInit {
   ngOnInit(): void {
     this.settings.load();
     this.loadReport();
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.typingTimer);
+    clearTimeout(this.nodTimeout);
   }
 
   language(): AppLanguage {
@@ -107,7 +158,7 @@ export class Advisor implements OnInit {
       next: response => {
         this.messages.update(list => [...list, { role: 'assistant', content: response.reply }]);
         this.sending.set(false);
-        this.scrollChat();
+        this.typeOut(this.messages().length - 1, response.reply);
       },
       error: (error: HttpErrorResponse) => {
         this.chatError.set(this.describeError(error));
@@ -139,6 +190,39 @@ export class Advisor implements OnInit {
       return 'API-ul nu raspunde. Porneste backend-ul (dotnet run --launch-profile https).';
     }
     return 'A aparut o eroare. Incearca din nou.';
+  }
+
+  /** Reveals Ax's answer a few characters at a time while Ax nods. */
+  private typeOut(index: number, text: string): void {
+    clearInterval(this.typingTimer);
+    clearTimeout(this.nodTimeout);
+
+    const reduceMotion = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion) {
+      this.typingIndex.set(null);
+      this.scrollChat();
+      return;
+    }
+
+    this.typingIndex.set(index);
+    this.typedText.set('');
+
+    const step = Math.max(2, Math.ceil(text.length / 120));
+    let position = 0;
+
+    this.typingTimer = setInterval(() => {
+      position = Math.min(text.length, position + step);
+      this.typedText.set(text.slice(0, position));
+      this.scrollChat();
+
+      if (position >= text.length) {
+        clearInterval(this.typingTimer);
+        // keep nodding a moment after the last word
+        this.nodTimeout = setTimeout(() => this.typingIndex.set(null), 700);
+      }
+    }, 22);
   }
 
   private scrollChat(): void {

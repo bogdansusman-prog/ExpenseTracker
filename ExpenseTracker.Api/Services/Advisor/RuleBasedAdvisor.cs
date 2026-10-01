@@ -10,7 +10,7 @@ namespace ExpenseTracker.Api.Services.Advisor;
 /// </summary>
 public static class RuleBasedAdvisor
 {
-    public const string EngineName = "Owl rules engine v1";
+    public const string EngineName = "Ax rules engine v1";
 
     private sealed record Candidate(AdvisorAction Action, int Priority);
 
