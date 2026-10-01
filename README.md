@@ -1,533 +1,211 @@
-# Expense Tracker
+<p align="center">
+  <img src="frontend/public/ax-logo.png" alt="Ax, the Ax Tracker mascot" width="140" />
+</p>
 
-A full-stack personal finance management application built with ASP.NET Core, Angular and PostgreSQL.
+<h1 align="center">Ax Tracker</h1>
 
-Expense Tracker allows users to manage income and expenses, organize transactions into categories, filter financial records, visualize financial activity and compare income against expenses using interactive charts.
+<p align="center">
+  <b>Your money, made simple.</b><br />
+  A full-stack personal finance app with ASP.NET Core, Angular and PostgreSQL. It has an animated axolotl advisor that explains your spending with real numbers and uses no external AI.
+</p>
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Ax Tracker dashboard" width="900" />
+</p>
 
 ---
 
-## Features
+## Highlights
 
-### Dashboard
+- **Accounts.** Register and log in with ASP.NET Core Identity and JWT. Every user sees only their own data, enforced by global query filters in EF Core.
+- **Ax, the financial advisor.** You get a 0–100 financial health score with a full breakdown, strengths, concerns and 3 concrete steps with estimated savings. There is also a chat that answers questions about your own data. Everything is rule-based and computed locally.
+- **"Was it worth it?"** Seven days after an expense, you rate it from 1 to 5. A heatmap shows where and when you regret spending.
+- **Subscription detective.** It finds recurring payments on its own and flags quiet price increases.
+- **Monte Carlo forecast.** It runs 2,000 simulations on your real cash flow and shows a pessimistic, expected and optimistic balance for the next 30–90 days.
+- **Quick add in natural language.** For example, `yesterday 45 lei pizza with Andrei` becomes a ready-to-confirm transaction, offline, in Romanian or English.
+- **Prices in hours of work.** Set your hourly income and every expense also shows how many hours of your life it cost.
+- **Romanian / English.** The whole interface, Ax and quick add switch language instantly from Settings.
+- **Profile.** You can change your profile picture, display name and password.
+- The basics are covered too: dashboard, transactions with filters and bulk delete, categories, and charts comparing income and expenses.
 
-The dashboard provides a quick overview of the current financial situation:
+---
 
-- Total income
-- Total expenses
-- Current balance
-- Number of transactions
-- Recent transactions
+## Screenshots
 
-### Transaction Management
+| | |
+|---|---|
+| ![Login](docs/images/login.png) | ![Welcome animation](docs/images/welcome.png) |
+| **Login** with an RO / EN switch | **Welcome animation** after logging in |
+| ![Ask Ax](docs/images/advisor.png) | ![Insights](docs/images/insights.png) |
+| **Ask Ax**: score, breakdown, steps and chat | **Insights**: regret map, subscriptions, forecast |
+| ![Transactions](docs/images/transactions.png) | ![Categories](docs/images/categories.png) |
+| **Transactions** with filters and bulk delete | **Categories** |
+| ![Comparator](docs/images/comparator.png) | ![Settings](docs/images/settings.png) |
+| **Comparator** charts | **Settings**: language and hourly income |
+| ![About](docs/images/about.png) | ![Swagger](docs/images/swagger.png) |
+| **About** the project and its author | **Swagger UI** for the REST API |
 
-Users can create and manage financial transactions.
+> The screenshots use demo data.
 
-Each transaction contains:
+---
 
-- Category
-- Amount
-- Transaction type
-- Date
-- Optional description
+## Meet Ax
 
-Supported transaction types:
+Ax is an axolotl with round glasses and a bow tie. He is drawn from scratch in SVG and animated only with CSS. He thinks while he calculates, nods when he answers, cheers when you are doing well and gets worried when you risk going into the red. He also follows you on every page with short tips.
 
-- Income
-- Expense
+His score is the sum of six transparent components:
 
-Additional functionality includes:
+| Component | Max points |
+|---|---|
+| Savings rate (last 4 months) | 35 |
+| Spending pace compared with your own average | 15 |
+| Risk of a negative balance (from the forecast) | 20 |
+| Purchases that were worth it | 15 |
+| Subscriptions and price increases | 10 |
+| Safety buffer | 5 |
 
-- Delete individual transactions
-- Select multiple transactions
-- Select all visible transactions
-- Bulk delete selected transactions
+More details: [docs/smart-insights.md](docs/smart-insights.md).
 
-### Transaction Filters
+---
 
-Transactions can be filtered by:
+## Tech stack
 
-- Category
-- Transaction type
-- Start date
-- End date
+**Backend:** C#, ASP.NET Core 10, Entity Framework Core 10, PostgreSQL (Npgsql), ASP.NET Core Identity, JWT bearer authentication, OpenAPI and Swagger UI, xUnit.
 
-The category filter is dynamic and only displays categories that currently contain transactions.
+**Frontend:** Angular 22 (standalone components, signals, zoneless, new control flow), TypeScript, SCSS, RxJS, Chart.js, and a small custom i18n layer (a `t` pipe with Romanian text as the key).
 
-### Category Management
+**Algorithms:** bootstrap Monte Carlo simulation, recurring-payment detection (normalized descriptions plus median interval), a regret heatmap, a keyword- and regex-based natural language parser, and a rule-based scoring model.
 
-Users can:
+---
 
-- Create categories
-- Rename categories
-- Delete unused categories
-- View how many transactions use each category
-
-Categories that contain transactions cannot be deleted.
-
-This restriction is enforced both in the frontend and in the backend API.
-
-### Financial Comparator
-
-The Comparator page provides visual financial analysis using Chart.js.
-
-Available visualizations include:
-
-- Monthly income vs expenses
-- Expense distribution by category
-
-It also displays:
-
-- Total income
-- Total expenses
-- Difference between income and expenses
-
-### Swagger API Documentation
-
-The backend exposes interactive API documentation using Swagger UI.
-
-When running in the Development environment:
+## Architecture
 
 ```text
-http://localhost:5112/swagger
+Angular frontend  ──HTTP + JWT──▶  ASP.NET Core Web API  ──EF Core──▶  PostgreSQL
+ (signals, i18n,                    (Identity, controllers,
+  Chart.js, Ax SVG)                  Insights / Advisor / QuickAdd services)
 ```
-
-or, when using the HTTPS Visual Studio profile:
-
-```text
-https://localhost:7007/swagger
-```
-
-Swagger can be used to inspect and test the REST API directly from the browser.
-
----
-
-# Tech Stack
-
-## Backend
-
-- C#
-- ASP.NET Core 10
-- Entity Framework Core 10
-- PostgreSQL
-- Npgsql
-- REST API
-- OpenAPI
-- Swagger UI
-
-## Frontend
-
-- Angular 22
-- TypeScript
-- SCSS
-- Angular Reactive Forms
-- Angular Signals
-- Angular Router
-- RxJS
-- Chart.js
-
-## Database
-
-- PostgreSQL
-- Entity Framework Core migrations
-
-## Development Tools
-
-- Visual Studio 2026
-- Visual Studio Code
-- Git
-- GitHub
-- npm
-- Node.js
-
----
-
-# Architecture
-
-The application follows a client-server architecture.
-
-```text
-Angular Frontend
-       |
-       | HTTP REST requests
-       v
-ASP.NET Core Web API
-       |
-       | Entity Framework Core
-       v
-PostgreSQL Database
-```
-
-The Angular application communicates with the ASP.NET Core API through HTTP requests.
-
-The API handles validation, business logic and database operations through Entity Framework Core.
-
----
-
-# Project Structure
 
 ```text
 ExpenseTracker.Api/
-│
-├── ExpenseTracker.Api/
-│   ├── Controllers/
-│   │   ├── CategoriesController.cs
-│   │   └── TransactionsController.cs
-│   │
-│   ├── Data/
-│   │   └── AppDbContext.cs
-│   │
-│   ├── Dtos/
-│   │   ├── CategoryDto.cs
-│   │   └── FinancialTransactionDto.cs
-│   │
-│   ├── Migrations/
-│   │
-│   ├── Models/
-│   │   ├── Category.cs
-│   │   ├── FinancialTransaction.cs
-│   │   └── TransactionType.cs
-│   │
-│   ├── Properties/
-│   │   └── launchSettings.json
-│   │
-│   ├── Program.cs
-│   └── ExpenseTracker.Api.csproj
-│
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── models/
-│   │   │   ├── pages/
-│   │   │   │   ├── dashboard/
-│   │   │   │   ├── transactions/
-│   │   │   │   ├── categories/
-│   │   │   │   └── comparator/
-│   │   │   │
-│   │   │   ├── services/
-│   │   │   ├── app.routes.ts
-│   │   │   ├── app.ts
-│   │   │   ├── app.html
-│   │   │   └── app.scss
-│   │   │
-│   │   └── styles.scss
-│   │
-│   ├── package.json
-│   └── angular.json
-│
-├── ExpenseTracker.Api.slnx
-└── README.md
+├── ExpenseTracker.Api/           ASP.NET Core Web API
+│   ├── Controllers/              Auth, Transactions, Categories, Insights, Advisor, QuickAdd, Settings
+│   ├── Data/AppDbContext.cs      Identity + per-user global query filters
+│   ├── Models/  Dtos/  Migrations/
+│   └── Services/
+│       ├── Advisor/              RuleBasedAdvisor, AdvisorChatEngine, RO/EN texts
+│       ├── Analytics/            BalanceForecaster, SubscriptionDetector, RegretAnalyzer
+│       ├── QuickAdd/             NaturalLanguageParser
+│       └── Auth/                 JWT token service
+├── ExpenseTracker.Tests/         xUnit tests for the analytics, parser and advisor
+├── frontend/                     Angular app
+│   └── src/app/
+│       ├── auth/                 AuthService, interceptor, guards
+│       ├── components/           ax-mascot, ax-companion, quick-add, welcome-splash, language-switch
+│       ├── i18n/                 I18n service, t pipe, English dictionary
+│       ├── pages/                dashboard, transactions, categories, comparator, insights,
+│       │                         advisor, settings, profile, about, login, register
+│       └── services/  shared/  models/
+└── docs/                         feature docs and screenshots
 ```
 
 ---
 
-# API Endpoints
+## API overview
 
-## Categories
+All endpoints except register and login require a `Bearer` token.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/Categories` | Get all categories |
-| POST | `/api/Categories` | Create a category |
-| PUT | `/api/Categories/{id}` | Update a category |
-| DELETE | `/api/Categories/{id}` | Delete a category |
+| Area | Endpoints |
+|---|---|
+| Auth | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, `PUT /api/auth/profile`, `PUT/DELETE /api/auth/avatar`, `POST /api/auth/change-password` |
+| Transactions | `GET/POST /api/transactions`, `GET/PUT/DELETE /api/transactions/{id}` |
+| Categories | `GET/POST /api/categories`, `GET/PUT/DELETE /api/categories/{id}` (a category that still has transactions cannot be deleted) |
+| Insights | `GET /api/insights/regret/pending`, `POST /api/insights/regret/{id}`, `GET /api/insights/regret/summary`, `GET /api/insights/subscriptions`, `GET /api/insights/forecast?days=30` |
+| Ax | `GET /api/advisor/report?language=en`, `POST /api/advisor/chat` |
+| Quick add | `POST /api/quickadd/parse` |
+| Settings | `GET/PUT /api/settings` (hourly rate, language) |
 
-A category cannot be deleted while transactions are associated with it.
-
----
-
-## Transactions
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/Transactions` | Get all transactions |
-| POST | `/api/Transactions` | Create a transaction |
-| PUT | `/api/Transactions/{id}` | Update a transaction |
-| DELETE | `/api/Transactions/{id}` | Delete a transaction |
+You can explore everything interactively in Swagger UI at `https://localhost:7007/swagger` in Development.
 
 ---
 
-# Database Model
+## Getting started
 
-The application currently uses two main entities.
+### Prerequisites
 
-## Category
-
-```text
-Category
---------
-Id
-Name
-```
-
-## FinancialTransaction
-
-```text
-FinancialTransaction
---------------------
-Id
-Amount
-Date
-Type
-Description
-CategoryId
-```
-
-Relationship:
-
-```text
-Category 1 -------- * FinancialTransaction
-```
-
-A category can contain multiple transactions, while each transaction belongs to one category.
-
----
-
-# Getting Started
-
-## Prerequisites
-
-Make sure the following tools are installed:
-
-- .NET 10 SDK
+- .NET 10 SDK, with `dotnet tool install --global dotnet-ef` for migrations
 - PostgreSQL
-- Node.js
-- npm
-- Angular CLI
-- Git
+- Node.js and npm
 
----
-
-# Clone the Repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/bogdansusman-prog/ExpenseTracker.git
 cd ExpenseTracker
 ```
 
----
-
-# Backend Setup
-
-From the repository root:
+### 2. Configure secrets (never commit them)
 
 ```bash
-dotnet restore
+cd ExpenseTracker.Api
+
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=ExpenseTrackerDb;Username=postgres;Password=YOUR_PASSWORD"
+
+# 32+ random characters used to sign the login tokens
+dotnet user-secrets set "Jwt:Key" "YOUR_LONG_RANDOM_SECRET"
 ```
 
-The backend uses PostgreSQL.
+If `Jwt:Key` is missing, Development falls back to a temporary key, so you have to log in again after every restart.
 
-The database connection string is stored using .NET User Secrets and should not be committed to Git.
-
-Set your local connection string:
+### 3. Create the database and run the API
 
 ```bash
-dotnet user-secrets set \
-"ConnectionStrings:DefaultConnection" \
-"Host=localhost;Port=5432;Database=ExpenseTrackerDb;Username=postgres;Password=YOUR_PASSWORD" \
---project ExpenseTracker.Api/ExpenseTracker.Api.csproj
+dotnet ef database update
+dotnet run --launch-profile https
 ```
 
-Replace:
-
-```text
-YOUR_PASSWORD
-```
-
-with your PostgreSQL password.
-
----
-
-## Apply Database Migrations
-
-Run:
+### 4. Run the frontend
 
 ```bash
-dotnet ef database update \
---project ExpenseTracker.Api/ExpenseTracker.Api.csproj
-```
-
-This creates the required PostgreSQL database tables using the existing Entity Framework Core migrations.
-
----
-
-## Run the Backend
-
-```bash
-dotnet run --project ExpenseTracker.Api/ExpenseTracker.Api.csproj
-```
-
-The default HTTP development URL is:
-
-```text
-http://localhost:5112
-```
-
-Swagger UI:
-
-```text
-http://localhost:5112/swagger
-```
-
----
-
-# Frontend Setup
-
-Open another terminal.
-
-From the repository root:
-
-```bash
-cd frontend
-```
-
-Install dependencies:
-
-```bash
+cd ../frontend
 npm install
-```
-
-Start the Angular development server:
-
-```bash
 npm start
 ```
 
-The frontend will be available at:
+Open `http://localhost:4200`, create an account and meet Ax.
 
-```text
-http://localhost:4200
-```
+### 5. Run the tests
 
-The backend CORS configuration allows requests from this Angular development URL.
-
----
-
-# Application Routes
-
-| Route | Page |
-|---|---|
-| `/dashboard` | Financial overview |
-| `/transactions` | Transaction management |
-| `/categories` | Category management |
-| `/comparator` | Financial charts and comparison |
-
-Navigating to the root URL automatically redirects to:
-
-```text
-/dashboard
+```bash
+dotnet test
 ```
 
 ---
 
-# Example Workflow
+## Security
 
-A typical workflow is:
-
-1. Create one or more categories.
-2. Add income or expense transactions.
-3. View financial totals on the Dashboard.
-4. Filter transactions by category, type or date.
-5. Select and remove multiple transactions when necessary.
-6. Use the Comparator to analyze income and expenses.
-7. Use Swagger UI to test backend endpoints directly.
+- Passwords are hashed by ASP.NET Core Identity, and sessions use JWTs that expire after 12 hours.
+- Every query is filtered by the current user, and new records are assigned to their owner automatically.
+- The connection string and JWT key live in .NET User Secrets, not in the repository.
+- Profile pictures are validated (type and size) and resized in the browser to 256×256.
 
 ---
 
-# Security
+## Roadmap
 
-Database credentials are not stored directly in source control.
-
-The PostgreSQL connection string is configured using .NET User Secrets during local development.
-
-Sensitive files and generated directories should remain excluded from Git.
-
-Examples include:
-
-```text
-bin/
-obj/
-node_modules/
-```
+- Import bank statements (CSV), starting with BCR
+- Monthly budgets and alerts
+- CSV and Excel export
+- Docker and cloud deployment
 
 ---
 
-# Git Workflow
+## Author
 
-Development was organized using feature branches and pull requests.
+Built by **Bogdan Șușman**, a Computer Science student at the Technical University of Cluj-Napoca.
 
-Examples include:
+*„I learn by building: from the transistor all the way up to the app.”*
 
-```text
-feature/category-management
-feature/transaction-editing
-feature/app-routing
-feature/swagger-ui
-```
+[GitHub](https://github.com/bogdansusman-prog) · [LinkedIn](https://www.linkedin.com/in/bogdan-susman/)
 
-Completed features are merged into:
-
-```text
-main
-```
-
-through GitHub pull requests.
-
----
-
-# Future Improvements
-
-Possible future improvements include:
-
-- User authentication and authorization
-- Separate financial data for each user
-- JWT authentication
-- Monthly budgets
-- Budget alerts
-- CSV or Excel export
-- Advanced financial reports
-- Additional charts
-- Recurring transactions
-- Automated tests
-- Docker support
-- Deployment to a cloud platform
-
----
-
-# Author
-
-Developed by **Bogdan Susman**.
-
-GitHub:
-
-```text
-https://github.com/bogdansusman-prog
-```
-
----
-
-# License
-
-This project was created for educational and portfolio purposes.
-
-
-# Screenshots
-
-## Dashboard
-
-![Dashboard](docs/images/dashboard.png)
-
-## Transactions
-
-![Transactions](docs/images/transactions.png)
-
-## Categories
-
-![Categories](docs/images/categories.png)
-
-## Financial Comparator
-
-![Financial Comparator](docs/images/comparator.png)
-
-## Swagger API
-
-![Swagger API](docs/images/swagger.png)
+This project was created for learning and portfolio purposes.
