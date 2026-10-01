@@ -6,17 +6,33 @@ import {
   signal
 } from '@angular/core';
 
+import { RouterLink } from '@angular/router';
+
 import { ExpenseApiService } from '../../services/expense-api.service';
+import { InsightsApiService } from '../../services/insights-api.service';
+import { SettingsStore } from '../../services/settings.store';
+import { QuickAdd } from '../../components/quick-add/quick-add';
+import { AxMascot } from '../../components/ax-mascot/ax-mascot';
+import { formatHours } from '../../shared/format';
 import { FinancialTransaction } from '../../models/financial-transaction.model';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [QuickAdd, RouterLink, AxMascot, TranslatePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
+  private readonly i18n = inject(I18n);
+
   private readonly apiService = inject(ExpenseApiService);
+  private readonly insightsApi = inject(InsightsApiService);
+  readonly settings = inject(SettingsStore);
+
+  /** Number of expenses waiting for a "Was it worth it?" rating. */
+  readonly pendingRegrets = signal(0);
 
   readonly transactions =
     signal<FinancialTransaction[]>([]);
@@ -75,12 +91,24 @@ export class Dashboard implements OnInit {
   );
 
   ngOnInit(): void {
+    this.settings.load();
     this.loadData();
+  }
+
+  hoursFor(amount: number): string {
+    return formatHours(this.settings.workHours(amount));
   }
 
   loadData(): void {
     this.loading.set(true);
     this.errorMessage.set('');
+
+    this.insightsApi
+      .getPendingRegrets()
+      .subscribe({
+        next: pending => this.pendingRegrets.set(pending.length),
+        error: () => this.pendingRegrets.set(0)
+      });
 
     this.apiService
       .getTransactions()
@@ -110,7 +138,7 @@ export class Dashboard implements OnInit {
 
   formatMoney(value: number): string {
     return value.toLocaleString(
-      'ro-RO',
+      this.i18n.locale(),
       {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2

@@ -1,8 +1,8 @@
 <div class="page-header">
   <div>
-    <h2>Dashboard</h2>
+    <h2>{{ 'Dashboard' | t }}</h2>
     <p>
-      Sumarul situatiei financiare
+      {{ 'Sumarul situatiei financiare' | t }}
     </p>
   </div>
 
@@ -11,14 +11,30 @@
     type="button"
     (click)="loadData()"
   >
-    Reincarca
+    {{ 'Reincarca' | t }}
   </button>
 </div>
 
 
+<app-quick-add (saved)="loadData()" />
+
+
+@if (pendingRegrets() > 0) {
+  <a class="regret-banner" routerLink="/insights">
+    <app-ax mood="alert" [size]="62" />
+    <span class="banner-text">
+      {{ 'Ai' | t }} <strong>{{ pendingRegrets() }}</strong>
+      @if (pendingRegrets() === 1) { {{ 'cheltuiala' | t }} } @else { {{ 'cheltuieli' | t }} }
+      {{ 'de evaluat: au meritat banii?' | t }}
+    </span>
+    <span class="arrow">{{ 'Evalueaza →' | t }}</span>
+  </a>
+}
+
+
 @if (errorMessage()) {
   <div class="error-message">
-    {{ errorMessage() }}
+    {{ errorMessage() | t }}
   </div>
 }
 
@@ -26,7 +42,7 @@
 @if (loading()) {
 
   <div class="card">
-    Se incarca datele...
+    {{ 'Se incarca datele...' | t }}
   </div>
 
 } @else {
@@ -36,17 +52,17 @@
     <article class="summary-card">
 
       <span>
-        Venituri
+        {{ 'Venituri' | t }}
       </span>
 
       <strong class="income">
         {{ formatMoney(totalIncome()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
       <small>
         {{ incomeCount() }}
-        tranzactii
+        {{ 'tranzactii' | t }}
       </small>
 
     </article>
@@ -55,17 +71,17 @@
     <article class="summary-card">
 
       <span>
-        Cheltuieli
+        {{ 'Cheltuieli' | t }}
       </span>
 
       <strong class="expense">
         {{ formatMoney(totalExpenses()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
       <small>
         {{ expenseCount() }}
-        tranzactii
+        {{ 'tranzactii' | t }}
       </small>
 
     </article>
@@ -74,7 +90,7 @@
     <article class="summary-card">
 
       <span>
-        Sold
+        {{ 'Sold' | t }}
       </span>
 
       <strong
@@ -82,11 +98,11 @@
         [class.expense]="balance() < 0"
       >
         {{ formatMoney(balance()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
       <small>
-        Venituri - Cheltuieli
+        {{ 'Venituri - Cheltuieli' | t }}
       </small>
 
     </article>
@@ -98,11 +114,10 @@
 
     <div class="card-header">
       <div>
-        <h3>Total tranzactii</h3>
+        <h3>{{ 'Total tranzactii' | t }}</h3>
 
         <p>
-          Numarul tuturor tranzactiilor
-          inregistrate
+          {{ 'Numarul tuturor tranzactiilor inregistrate' | t }}
         </p>
       </div>
 
@@ -116,12 +131,12 @@
 
   <section class="card">
 
-    <h3>Ultimele tranzactii</h3>
+    <h3>{{ 'Ultimele tranzactii' | t }}</h3>
 
     @if (transactions().length === 0) {
 
       <p>
-        Nu exista tranzactii.
+        {{ 'Nu exista tranzactii.' | t }}
       </p>
 
     } @else {
@@ -144,6 +159,9 @@
 
               <small>
                 {{ transaction.date.slice(0, 10) }}
+                @if (transaction.type === 2 && hoursFor(transaction.amount)) {
+                  · {{ hoursFor(transaction.amount) }}
+                }
               </small>
 
             </div>
@@ -169,7 +187,7 @@
                   transaction.amount
                 )
               }}
-              lei
+              {{ 'lei' | t }}
             </span>
 
           </div>

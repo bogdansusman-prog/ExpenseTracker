@@ -1,0 +1,151 @@
+<svg
+  class="ax"
+  [class]="mood()"
+  [attr.width]="size()"
+  [attr.height]="size()"
+  viewBox="0 0 220 220"
+  role="img"
+  [attr.aria-label]="label()"
+>
+    <defs>
+      <linearGradient [attr.id]="ids.skin" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffc3d8"/>
+        <stop offset="1" stop-color="#f497b8"/>
+      </linearGradient>
+      <linearGradient [attr.id]="ids.gill" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#e2558a"/>
+        <stop offset="1" stop-color="#f27aa7"/>
+      </linearGradient>
+      <linearGradient [attr.id]="ids.lens" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity=".05"/>
+      </linearGradient>
+    </defs>
+
+    <!-- shadow -->
+    <ellipse cx="110" cy="203" rx="52" ry="7" fill="#000" opacity=".28"/>
+
+    <g class="body-group part">
+      <!-- tail -->
+      <!-- fin + highlight in one group, so they swing together -->
+      <g class="tail part">
+        <path d="M146 176 C 172 178, 192 166, 200 148 C 186 160, 166 164, 148 160 Z" [attr.fill]="fills.gill"/>
+        <!-- highlight follows the middle of the fin and tapers to a point at the tip -->
+        <path d="M150 166.6 C 169 169.4, 188 161.6, 198.5 149.4 C 188 163.8, 169 172.6, 150 169.8 Q 148.6 168.2 150 166.6 Z" fill="#ffd6e4" opacity=".65"/>
+      </g>
+
+      <!-- feet -->
+      <ellipse cx="88" cy="198" rx="12" ry="6" fill="#f08ab0"/>
+      <ellipse cx="132" cy="198" rx="12" ry="6" fill="#f08ab0"/>
+
+      <!-- body -->
+      <ellipse cx="110" cy="166" rx="46" ry="36" [attr.fill]="fills.skin"/>
+      <ellipse cx="110" cy="174" rx="28" ry="22" fill="#ffe1ec"/>
+
+      <!-- arms -->
+      <g class="arm-l part"><ellipse cx="68" cy="166" rx="9" ry="15" fill="#f497b8" transform="rotate(20 68 166)"/></g>
+      <g class="arm-r part"><ellipse cx="152" cy="166" rx="9" ry="15" fill="#f497b8" transform="rotate(-20 152 166)"/></g>
+
+      <!-- head -->
+      <g class="head part">
+        <!-- gills left -->
+        <g>
+          <g class="gill-l part"><path d="M58 70 C 44 52, 26 46, 20 52 C 18 60, 34 70, 56 78 Z" [attr.fill]="fills.gill"/><circle cx="24" cy="54" r="5" fill="#ff9cc1"/></g>
+          <g class="gill-l part"><path d="M54 90 C 36 84, 16 86, 12 94 C 14 102, 34 100, 54 98 Z" [attr.fill]="fills.gill"/><circle cx="15" cy="94" r="5" fill="#ff9cc1"/></g>
+          <g class="gill-l part"><path d="M58 108 C 42 114, 26 126, 26 134 C 32 138, 46 126, 62 116 Z" [attr.fill]="fills.gill"/><circle cx="28" cy="132" r="5" fill="#ff9cc1"/></g>
+        </g>
+        <!-- gills right -->
+        <g>
+          <g class="gill-r part"><path d="M162 70 C 176 52, 194 46, 200 52 C 202 60, 186 70, 164 78 Z" [attr.fill]="fills.gill"/><circle cx="196" cy="54" r="5" fill="#ff9cc1"/></g>
+          <g class="gill-r part"><path d="M166 90 C 184 84, 204 86, 208 94 C 206 102, 186 100, 166 98 Z" [attr.fill]="fills.gill"/><circle cx="205" cy="94" r="5" fill="#ff9cc1"/></g>
+          <g class="gill-r part"><path d="M162 108 C 178 114, 194 126, 194 134 C 188 138, 174 126, 158 116 Z" [attr.fill]="fills.gill"/><circle cx="192" cy="132" r="5" fill="#ff9cc1"/></g>
+        </g>
+
+        <!-- head shape -->
+        <ellipse cx="110" cy="92" rx="58" ry="46" [attr.fill]="fills.skin"/>
+        <ellipse cx="96" cy="66" rx="20" ry="8" fill="#fff" opacity=".25"/>
+
+        <!-- cheeks -->
+        <ellipse cx="72" cy="110" rx="9" ry="5.5" fill="#ff6f9f" opacity=".45"/>
+        <ellipse cx="148" cy="110" rx="9" ry="5.5" fill="#ff6f9f" opacity=".45"/>
+
+        <!-- eyes -->
+        <g class="eyes part">
+          <g class="pupils">
+            <circle cx="88" cy="92" r="8" fill="#2a1b2e"/>
+            <circle cx="132" cy="92" r="8" fill="#2a1b2e"/>
+            <circle cx="91" cy="89" r="2.8" fill="#fff"/>
+            <circle cx="135" cy="89" r="2.8" fill="#fff"/>
+            <circle cx="85.5" cy="95.5" r="1.2" fill="#fff" opacity=".8"/>
+            <circle cx="129.5" cy="95.5" r="1.2" fill="#fff" opacity=".8"/>
+          </g>
+        </g>
+        <!-- happy eyes ^^ -->
+        <g class="happy-eyes" stroke="#2a1b2e" stroke-width="3.2" fill="none" stroke-linecap="round">
+          <path d="M80 95 Q 88 85 96 95"/>
+          <path d="M124 95 Q 132 85 140 95"/>
+        </g>
+
+        <!-- round glasses -->
+        <g>
+          <circle cx="88" cy="92" r="17" [attr.fill]="fills.lens" stroke="#c9a227" stroke-width="3.2"/>
+          <circle cx="132" cy="92" r="17" [attr.fill]="fills.lens" stroke="#c9a227" stroke-width="3.2"/>
+          <path d="M105 90 Q 110 85 115 90" stroke="#c9a227" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M71 89 L 58 84" stroke="#c9a227" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M149 89 L 162 84" stroke="#c9a227" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M78 81 Q 84 77 90 78" stroke="#fff" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/>
+          <path d="M122 81 Q 128 77 134 78" stroke="#fff" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/>
+        </g>
+
+        <!-- brows -->
+        <g class="brows brows-think" stroke="#b2457a" stroke-width="3" stroke-linecap="round" fill="none">
+          <path d="M76 70 Q 86 64 98 69"/>
+          <path d="M122 67 Q 132 66 144 70"/>
+        </g>
+        <g class="brows brows-worry" stroke="#b2457a" stroke-width="3" stroke-linecap="round" fill="none">
+          <path d="M78 72 Q 88 70 98 64"/>
+          <path d="M122 64 Q 132 70 142 72"/>
+        </g>
+
+        <!-- mouths -->
+        <path class="mouth mouth-smile" d="M100 116 Q 110 124 120 116" stroke="#8c2f5c" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path class="mouth mouth-big" d="M98 114 Q 110 132 122 114 Z" fill="#8c2f5c"/>
+        <ellipse class="mouth mouth-talk" cx="110" cy="119" rx="6" ry="5" fill="#8c2f5c"/>
+        <path class="mouth mouth-hmm" d="M103 119 L 117 117" stroke="#8c2f5c" stroke-width="3" stroke-linecap="round"/>
+        <path class="mouth mouth-worry" d="M100 121 Q 105 116 110 120 Q 115 124 120 119" stroke="#8c2f5c" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse class="mouth mouth-o" cx="110" cy="119" rx="4.5" ry="5.5" fill="#8c2f5c"/>
+
+        <!-- sweat drop -->
+        <g class="sweat"><path d="M160 60 Q 166 70 160 74 Q 154 70 160 60 Z" fill="#8fd3ff"/></g>
+      </g>
+      <!-- bow tie -->
+      <g transform="translate(0 13)">
+        <path d="M110 135 L 92 126 Q 88 135 92 144 Z" fill="#2b3a6b"/>
+        <path d="M110 135 L 128 126 Q 132 135 128 144 Z" fill="#2b3a6b"/>
+        <path d="M96 130 L 104 135 L 96 140" stroke="#4c6ef5" stroke-width="1.6" fill="none" opacity=".8"/>
+        <path d="M124 130 L 116 135 L 124 140" stroke="#4c6ef5" stroke-width="1.6" fill="none" opacity=".8"/>
+        <rect x="105" y="130" width="10" height="10" rx="3" fill="#c9a227"/>
+      </g>
+    </g>
+
+    <!-- thought dots -->
+    <g class="thought" fill="#c4cad5">
+      <circle cx="170" cy="40" r="4"/>
+      <circle cx="183" cy="28" r="5.5"/>
+      <circle cx="199" cy="14" r="7"/>
+    </g>
+
+    <!-- sparkles -->
+    <g class="sparkles" fill="#ffd43b">
+      <path d="M28 30 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"/>
+      <path d="M190 24 l2.4 6 6 2.4 -6 2.4 -2.4 6 -2.4 -6 -6 -2.4 6 -2.4 Z"/>
+      <path d="M200 150 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z"/>
+    </g>
+
+    <!-- alert mark -->
+    <g class="alert-mark">
+      <circle cx="190" cy="34" r="16" fill="#fcc419"/>
+      <rect x="187.5" y="23" width="5" height="14" rx="2.5" fill="#17191d"/>
+      <circle cx="190" cy="42.5" r="2.8" fill="#17191d"/>
+    </g>
+</svg>

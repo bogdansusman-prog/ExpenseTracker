@@ -72,7 +72,7 @@ public class TransactionsController(AppDbContext context) : ControllerBase
             return BadRequest("Transaction type is invalid.");
         }
 
-        var category = await context.Categories.FindAsync(dto.CategoryId);
+        var category = await context.Categories.FirstOrDefaultAsync(category => category.Id == dto.CategoryId);
 
         if (category is null)
         {
@@ -113,7 +113,7 @@ public class TransactionsController(AppDbContext context) : ControllerBase
         int id,
         FinancialTransactionRequestDto dto)
     {
-        var transaction = await context.Transactions.FindAsync(id);
+        var transaction = await context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id);
 
         if (transaction is null)
         {
@@ -156,7 +156,7 @@ public class TransactionsController(AppDbContext context) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var transaction = await context.Transactions.FindAsync(id);
+        var transaction = await context.Transactions.FirstOrDefaultAsync(transaction => transaction.Id == id);
 
         if (transaction is null)
         {

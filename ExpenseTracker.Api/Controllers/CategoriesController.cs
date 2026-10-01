@@ -91,7 +91,7 @@ public class CategoriesController(AppDbContext context) : ControllerBase
         int id,
         CategoryUpdateDto dto)
     {
-        var category = await context.Categories.FindAsync(id);
+        var category = await context.Categories.FirstOrDefaultAsync(category => category.Id == id);
 
         if (category is null)
         {
