@@ -2,11 +2,15 @@ import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angul
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { AdvisorReport, AdvisorStatus, AppLanguage, ChatTurn } from '../../models/insights.model';
+import { AdvisorReport, AppLanguage, ChatTurn } from '../../models/insights.model';
 import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { formatMoney } from '../../shared/format';
 
+/**
+ * "Owl": a rule-based financial advisor. Everything is calculated locally from the
+ * user's data (no external AI): score with breakdown, verdict, actions and a keyword chat.
+ */
 @Component({
   selector: 'app-advisor',
   imports: [FormsModule],
@@ -20,7 +24,6 @@ export class Advisor implements OnInit {
   @ViewChild('chatLog')
   private chatLog?: ElementRef<HTMLDivElement>;
 
-  readonly status = signal<AdvisorStatus | null>(null);
   readonly report = signal<AdvisorReport | null>(null);
   readonly loadingReport = signal(false);
   readonly reportError = signal('');
@@ -34,30 +37,26 @@ export class Advisor implements OnInit {
 
   readonly suggestions: Record<AppLanguage, string[]> = {
     ro: [
-      'Unde pot sa economisesc 300 lei luna asta?',
-      'Sunt pe drumul bun fata de luna trecuta?',
-      'Ce abonamente ar trebui sa anulez?',
-      'Cate ore de munca m-au costat iesirile in oras?'
+      'Cum stau?',
+      'Unde pot sa economisesc?',
+      'Ce abonamente am?',
+      'Cati bani o sa am la sfarsitul lunii?',
+      'Cum stau fata de luna trecuta?',
+      'Cate ore de munca m-au costat cheltuielile?'
     ],
     en: [
-      'Where can I save 300 lei this month?',
+      'How am I doing?',
+      'Where can I save?',
+      'What subscriptions do I have?',
+      'How much will I have at the end of the month?',
       'Am I doing better than last month?',
-      'Which subscriptions should I cancel?',
-      'How many work hours did eating out cost me?'
+      'How many work hours did my spending cost?'
     ]
   };
 
   ngOnInit(): void {
     this.settings.load();
-    this.api.getAdvisorStatus().subscribe({
-      next: status => {
-        this.status.set(status);
-        if (status.configured) {
-          this.loadReport(false);
-        }
-      },
-      error: () => this.status.set({ configured: false, model: '' })
-    });
+    this.loadReport();
   }
 
   language(): AppLanguage {
@@ -69,14 +68,16 @@ export class Advisor implements OnInit {
       return;
     }
 
-    this.settings.save({ hourlyRate: this.settings.hourlyRate(), language }).subscribe(() => this.loadReport(false));
+    this.settings
+      .save({ hourlyRate: this.settings.hourlyRate(), language })
+      .subscribe(() => this.loadReport());
   }
 
-  loadReport(refresh: boolean): void {
+  loadReport(): void {
     this.loadingReport.set(true);
     this.reportError.set('');
 
-    this.api.getAdvisorReport(this.language(), refresh).subscribe({
+    this.api.getAdvisorReport(this.language()).subscribe({
       next: report => {
         this.report.set(report);
         this.loadingReport.set(false);
@@ -120,6 +121,10 @@ export class Advisor implements OnInit {
     return `hsl(${hue} 70% 45%)`;
   }
 
+  componentPercent(points: number, max: number): number {
+    return max > 0 ? Math.round((points / max) * 100) : 0;
+  }
+
   verdictLabel(verdict: string): string {
     const labels: Record<string, Record<AppLanguage, string>> = {
       good: { ro: 'Esti pe drumul bun', en: 'You are on track' },
@@ -130,11 +135,8 @@ export class Advisor implements OnInit {
   }
 
   private describeError(error: HttpErrorResponse): string {
-    if (error.status === 503) {
-      return 'Consilierul AI nu este disponibil. Verifica cheia API (Anthropic:ApiKey) si conexiunea la internet.';
-    }
     if (error.status === 0) {
-      return 'API-ul nu raspunde. Porneste backend-ul (dotnet run).';
+      return 'API-ul nu raspunde. Porneste backend-ul (dotnet run --launch-profile https).';
     }
     return 'A aparut o eroare. Incearca din nou.';
   }

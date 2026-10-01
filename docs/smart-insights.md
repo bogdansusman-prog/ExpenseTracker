@@ -1,4 +1,4 @@
-# Smart Insights & AI Advisor
+# Smart Insights & Owl, the rule-based financial advisor
 
 This update makes Expense Tracker look at **how** you spend money, not just how much.
 
@@ -10,8 +10,25 @@ This update makes Expense Tracker look at **how** you spend money, not just how 
 | **Price in work hours** | Every expense can be shown as hours of your life, e.g. "Sneakers = 14 h of work". | Set your net hourly rate (or monthly salary) in *Settings*. |
 | **Subscription detective** | Finds recurring payments automatically and flags **silent price increases**. | `SubscriptionDetector` groups similar expenses by normalized description (or category + amount), checks for a regular rhythm (weekly … yearly, median interval with tolerance) and compares the latest amount with the previous one. |
 | **Monte Carlo forecast** | Shows a pessimistic / expected / optimistic balance band for the next 30–90 days, plus the risk of going negative. | `BalanceForecaster` resamples the last 90 days of real daily cash flow (bootstrap) over 2,000 simulations and takes the 10th, 50th and 90th percentiles. |
-| **Quick add in natural language** | Type `ieri 45 lei pizza cu Andrei` or `salary 4500 yesterday` and confirm the draft. | `NaturalLanguageParser` (offline, RO + EN): amounts with a decimal comma, dates (`azi`, `ieri`, weekdays, `15.09`), income keywords, keyword → category mapping. When it cannot find the amount or the category, Claude fills in the gaps. |
-| **AI advisor "Owl"** | A 0–100 financial health score, a verdict, strengths, concerns and 3 concrete actions, plus a chat about your own data. | `AdvisorService` sends Claude an anonymized numeric snapshot: monthly totals, category trends, regret stats, subscriptions and the forecast. The answer is structured JSON and is cached for 15 minutes. Romanian or English is set in *Settings*. |
+| **Quick add in natural language** | Type `ieri 45 lei pizza cu Andrei` or `salary 4500 yesterday` and confirm the draft. | `NaturalLanguageParser` (offline, RO + EN): amounts with a decimal comma, dates (`azi`, `ieri`, weekdays, `15.09`), income keywords, keyword → category mapping. |
+| **Owl, the financial advisor** | A 0–100 financial health score **with a full breakdown**, a verdict, strengths, concerns and 3 concrete actions with estimated savings, plus a chat about your own data. | `RuleBasedAdvisor`: a transparent scoring model with no external AI (see below). `AdvisorChatEngine` detects the intent of a question with RO/EN keywords and answers with computed numbers. |
+
+## How Owl scores your finances
+
+The score is the sum of six components, so every point can be explained:
+
+| Component | Max | Rule |
+|---|---|---|
+| Savings rate (last 4 months) | 35 | ≥20% → 35 · 10-20% → 25-35 · 0-10% → 10-25 · negative → 0-10 |
+| Spending pace vs. your own average | 15 | This month's spending is projected to the end of the month and compared with the previous 3 months |
+| Forecast risk | 20 | Probability of a negative balance in 30 days (from the Monte Carlo forecast) |
+| Purchases worth it | 15 | Average "Was it worth it?" score (needs at least 5 ratings) |
+| Subscriptions | 10 | Recurring payments as a share of income; −2 for every silent price increase |
+| Safety buffer | 5 | How many months of expenses the current balance covers |
+
+Verdict: **good** at 70 or more, **ok** from 45 to 69, **bad** below 45.
+
+Actions are generated from the same data: category spikes (projected vs. average), the most regretted category ("24-hour rule"), price increases, an expensive subscription, automatic 10% saving and a safety buffer. They are ranked by estimated monthly savings.
 
 ## API
 
@@ -22,31 +39,22 @@ This update makes Expense Tracker look at **how** you spend money, not just how 
 | GET | `/api/insights/regret/summary` | Heatmap, worst category and weekday, regretted amount |
 | GET | `/api/insights/subscriptions` | Detected recurring payments |
 | GET | `/api/insights/forecast?days=30` | Monte Carlo forecast |
-| GET | `/api/insights/snapshot` | The data the AI advisor sees |
-| POST | `/api/quickadd/parse` | `{ "text": "ieri 45 lei pizza", "useAi": true }` returns a draft (not saved) |
-| GET | `/api/advisor/status` | Whether the AI is configured |
-| GET | `/api/advisor/report?language=ro&refresh=false` | AI report |
+| GET | `/api/insights/snapshot` | The data Owl works with |
+| POST | `/api/quickadd/parse` | `{ "text": "ieri 45 lei pizza" }` returns a draft (not saved) |
+| GET | `/api/advisor/status` | Advisor engine info |
+| GET | `/api/advisor/report?language=ro` | Score, breakdown, verdict, strengths, concerns, actions |
 | POST | `/api/advisor/chat` | `{ "messages": [{ "role": "user", "content": "..." }], "language": "ro" }` |
 | GET/PUT | `/api/settings` | `{ "hourlyRate": 25, "language": "ro" }` |
 
 ## Setup
 
 ```bash
-cd ExpenseTracker.Api
-
-# 1. Database migration (adds RegretScore, RegretRatedAt and the Settings table)
-dotnet ef migrations add SmartInsights
+cd ExpenseTracker.Api   # the API project folder
 dotnet ef database update
-
-# 2. Claude API key (optional: everything except the AI advisor works without it)
-dotnet user-secrets set "Anthropic:ApiKey" "sk-ant-..."
-# Optional: choose another model
-dotnet user-secrets set "Anthropic:Model" "claude-sonnet-4-5"
-
-dotnet run
+dotnet run --launch-profile https
 ```
 
-The key is stored in .NET User Secrets and is never committed.
+No API key is needed: everything runs locally.
 
 ## Tests
 
@@ -54,8 +62,8 @@ The key is stored in .NET User Secrets and is never committed.
 dotnet test
 ```
 
-The `ExpenseTracker.Tests` project covers the pure algorithms: subscription detection, the Monte Carlo forecast, the natural-language parser and the regret analysis.
+The `ExpenseTracker.Tests` project covers the pure algorithms: subscription detection, the Monte Carlo forecast, the natural-language parser, the regret analysis, the advisor's scoring and the chat intents.
 
 ## Privacy
 
-Only aggregated numbers, category names and transaction descriptions are sent to the AI, with no names or e-mails. The quick-add parser works fully offline and uses the AI only for the fields it could not fill in itself.
+All calculations run on your machine. No data is sent to any external service.

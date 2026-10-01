@@ -1,6 +1,6 @@
 using ExpenseTracker.Api.Dtos;
 using ExpenseTracker.Api.Services;
-using ExpenseTracker.Api.Services.Ai;
+using ExpenseTracker.Api.Services.Advisor;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.Api.Controllers;
@@ -11,24 +11,14 @@ public class AdvisorController(AdvisorService advisor, InsightsService insights)
 {
     [HttpGet("status")]
     public ActionResult<AdvisorStatusDto> Status() =>
-        Ok(new AdvisorStatusDto(advisor.IsConfigured, advisor.Model));
+        Ok(new AdvisorStatusDto(true, advisor.Engine));
 
-    /// <summary>AI verdict on your finances: score, strengths, concerns and 3 concrete actions.</summary>
+    /// <summary>Financial health report: score with breakdown, strengths, concerns and 3 concrete actions.</summary>
     [HttpGet("report")]
-    public async Task<ActionResult<AdvisorReport>> Report(
-        [FromQuery] string? language,
-        [FromQuery] bool refresh = false,
-        CancellationToken cancellationToken = default)
+    public async Task<ActionResult<AdvisorReport>> Report([FromQuery] string? language, CancellationToken cancellationToken)
     {
-        try
-        {
-            var lang = language ?? (await insights.GetSettingsAsync(cancellationToken)).Language;
-            return Ok(await advisor.GetReportAsync(lang, refresh, cancellationToken));
-        }
-        catch (AiUnavailableException exception)
-        {
-            return Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
-        }
+        var lang = language ?? (await insights.GetSettingsAsync(cancellationToken)).Language;
+        return Ok(await advisor.GetReportAsync(lang, cancellationToken));
     }
 
     [HttpPost("chat")]
@@ -39,10 +29,6 @@ public class AdvisorController(AdvisorService advisor, InsightsService insights)
             var lang = dto.Language ?? (await insights.GetSettingsAsync(cancellationToken)).Language;
             var reply = await advisor.ChatAsync(dto.Messages, lang, cancellationToken);
             return Ok(new AdvisorChatResponseDto(reply));
-        }
-        catch (AiUnavailableException exception)
-        {
-            return Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
         }
         catch (ArgumentException exception)
         {

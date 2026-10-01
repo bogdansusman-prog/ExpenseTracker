@@ -1,7 +1,7 @@
 <div class="ui-page-header">
   <div>
-    <h2>Consilier AI</h2>
-    <p>Owl iti analizeaza banii si iti spune sincer cum stai si ce poti imbunatati</p>
+    <h2>Consilier financiar</h2>
+    <p>Owl iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati</p>
   </div>
 
   <div class="header-actions">
@@ -9,134 +9,146 @@
       <button type="button" [class.active]="language() === 'ro'" (click)="setLanguage('ro')">RO</button>
       <button type="button" [class.active]="language() === 'en'" (click)="setLanguage('en')">EN</button>
     </div>
-    @if (status()?.configured) {
-      <button class="ui-btn" type="button" (click)="loadReport(true)" [disabled]="loadingReport()">
-        Analiza noua
-      </button>
-    }
+    <button class="ui-btn" type="button" (click)="loadReport()" [disabled]="loadingReport()">
+      Recalculeaza
+    </button>
   </div>
 </div>
 
-@if (status(); as st) {
-  @if (!st.configured) {
-    <section class="ui-card setup">
-      <h3>Activeaza consilierul AI</h3>
-      <p class="ui-muted">Consilierul foloseste Claude (Anthropic). Ai nevoie de o cheie API de pe console.anthropic.com.</p>
-      <ol>
-        <li>In folderul <code>ExpenseTracker.Api</code> ruleaza:
-          <pre>dotnet user-secrets set "Anthropic:ApiKey" "sk-ant-..."</pre>
-        </li>
-        <li>Reporneste API-ul (<code>dotnet run</code>) si reincarca pagina.</li>
-      </ol>
-      <p class="ui-muted">Cheia ramane doar pe calculatorul tau, in User Secrets. Nu ajunge niciodata in Git.</p>
-    </section>
-  } @else {
+@if (reportError()) {
+  <div class="ui-alert error">{{ reportError() }}</div>
+}
 
-    @if (reportError()) {
-      <div class="ui-alert error">{{ reportError() }}</div>
-    }
+@if (loadingReport() && !report()) {
+  <section class="ui-card thinking">
+    <div class="dot-pulse"></div>
+    Owl iti analizeaza tranzactiile, regretele, abonamentele si prognoza...
+  </section>
+} @else if (report(); as r) {
+  <section class="report">
+    <div class="ui-card score-card">
+      <div class="score-ring" [style.--score-color]="scoreColor(r.score)" [style.--score]="r.score">
+        <span>{{ r.score }}</span>
+        <small>/ 100</small>
+      </div>
+      <div>
+        <span class="ui-badge" [class.success]="r.verdict === 'good'" [class.danger]="r.verdict === 'bad'">
+          {{ verdictLabel(r.verdict) }}
+        </span>
+        <h3 class="headline">{{ r.headline }}</h3>
+        <p>{{ r.summary }}</p>
+      </div>
+    </div>
 
-    @if (loadingReport()) {
-      <section class="ui-card thinking">
-        <div class="dot-pulse"></div>
-        Owl iti analizeaza tranzactiile, regretele, abonamentele si prognoza...
-      </section>
-    } @else if (report(); as r) {
-      <section class="report">
-        <div class="ui-card score-card">
-          <div class="score-ring" [style.--score-color]="scoreColor(r.score)" [style.--score]="r.score">
-            <span>{{ r.score }}</span>
-            <small>/ 100</small>
-          </div>
-          <div>
-            <span class="ui-badge" [class.success]="r.verdict === 'good'" [class.danger]="r.verdict === 'bad'">
-              {{ verdictLabel(r.verdict) }}
-            </span>
-            <h3 class="headline">{{ r.headline }}</h3>
-            <p>{{ r.summary }}</p>
-          </div>
-        </div>
-
-        <div class="two-columns">
-          <div class="ui-card">
-            <h3 class="ui-income">{{ language() === 'ro' ? 'Ce faci bine' : 'What you do well' }}</h3>
-            <ul>
-              @for (item of r.strengths; track $index) { <li>{{ item }}</li> }
-            </ul>
-          </div>
-          <div class="ui-card">
-            <h3 class="ui-expense">{{ language() === 'ro' ? 'Ce te costa' : 'What is costing you' }}</h3>
-            <ul>
-              @for (item of r.concerns; track $index) { <li>{{ item }}</li> }
-            </ul>
-          </div>
-        </div>
-
-        <div class="ui-card">
-          <h3>{{ language() === 'ro' ? '3 pasi concreti' : '3 concrete steps' }}</h3>
-          <div class="actions">
-            @for (action of r.actions; track $index) {
-              <article class="action">
-                <span class="step">{{ $index + 1 }}</span>
-                <div>
-                  <strong>{{ action.title }}</strong>
-                  <p>{{ action.detail }}</p>
-                  @if (action.estimatedMonthlySavings) {
-                    <small class="ui-income">~ {{ formatMoney(action.estimatedMonthlySavings) }} lei / luna</small>
-                  }
-                </div>
-              </article>
-            }
-          </div>
-          @if (r.funFact) {
-            <p class="fun-fact"><strong>{{ language() === 'ro' ? 'Stiai ca?' : 'Did you know?' }}</strong> {{ r.funFact }}</p>
+    @if (r.breakdown.length > 0) {
+      <div class="ui-card">
+        <h3>{{ language() === 'ro' ? 'Cum am calculat scorul' : 'How the score is calculated' }}</h3>
+        <p class="ui-muted">
+          {{ language() === 'ro'
+            ? 'Fiecare componenta are un punctaj maxim. Scorul final e suma lor, fara cutii negre.'
+            : 'Each component has a maximum. The final score is their sum, no black boxes.' }}
+        </p>
+        <div class="breakdown">
+          @for (component of r.breakdown; track component.key) {
+            <div class="component">
+              <div class="component-header">
+                <strong>{{ component.label }}</strong>
+                <span>{{ component.points }} / {{ component.maxPoints }}</span>
+              </div>
+              <div class="bar">
+                <div
+                  class="fill"
+                  [style.width.%]="componentPercent(component.points, component.maxPoints)"
+                  [style.background]="scoreColor(componentPercent(component.points, component.maxPoints))"
+                ></div>
+              </div>
+              <small>{{ component.explanation }}</small>
+            </div>
           }
-          <p class="meta">Generat cu {{ r.model }} · {{ r.generatedAt.slice(0, 16).replace('T', ' ') }} UTC</p>
         </div>
-      </section>
+      </div>
     }
 
-    <!-- ===================== CHAT ===================== -->
-    <section class="ui-card chat">
-      <h3>{{ language() === 'ro' ? 'Intreaba-l pe Owl' : 'Ask Owl' }}</h3>
+    <div class="two-columns">
+      <div class="ui-card">
+        <h3 class="ui-income">{{ language() === 'ro' ? 'Ce faci bine' : 'What you do well' }}</h3>
+        <ul>
+          @for (item of r.strengths; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </div>
+      <div class="ui-card">
+        <h3 class="ui-expense">{{ language() === 'ro' ? 'Ce te costa' : 'What is costing you' }}</h3>
+        <ul>
+          @for (item of r.concerns; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </div>
+    </div>
 
-      <div class="chat-log" #chatLog>
-        @if (messages().length === 0) {
-          <div class="suggestions">
-            @for (suggestion of suggestions[language()]; track suggestion) {
-              <button type="button" class="chip" (click)="ask(suggestion)">{{ suggestion }}</button>
-            }
-          </div>
-        }
-
-        @for (message of messages(); track $index) {
-          <div class="bubble" [class.user]="message.role === 'user'">{{ message.content }}</div>
-        }
-
-        @if (sending()) {
-          <div class="bubble typing"><span></span><span></span><span></span></div>
+    <div class="ui-card">
+      <h3>{{ language() === 'ro' ? '3 pasi concreti' : '3 concrete steps' }}</h3>
+      <div class="actions">
+        @for (action of r.actions; track $index) {
+          <article class="action">
+            <span class="step">{{ $index + 1 }}</span>
+            <div>
+              <strong>{{ action.title }}</strong>
+              <p>{{ action.detail }}</p>
+              @if (action.estimatedMonthlySavings) {
+                <small class="ui-income">
+                  ~ {{ formatMoney(action.estimatedMonthlySavings) }} lei / {{ language() === 'ro' ? 'luna' : 'month' }}
+                </small>
+              }
+            </div>
+          </article>
         }
       </div>
-
-      @if (chatError()) {
-        <div class="ui-alert error">{{ chatError() }}</div>
+      @if (r.funFact) {
+        <p class="fun-fact"><strong>{{ language() === 'ro' ? 'Stiai ca?' : 'Did you know?' }}</strong> {{ r.funFact }}</p>
       }
-
-      <form class="chat-input" (ngSubmit)="ask()">
-        <input
-          class="ui-input"
-          name="question"
-          [ngModel]="question()"
-          (ngModelChange)="question.set($event)"
-          [placeholder]="language() === 'ro' ? 'Scrie o intrebare despre banii tai...' : 'Ask something about your money...'"
-          autocomplete="off"
-        />
-        <button class="ui-btn" type="submit" [disabled]="sending() || !question().trim()">
-          {{ language() === 'ro' ? 'Trimite' : 'Send' }}
-        </button>
-      </form>
-    </section>
-  }
-} @else {
-  <section class="ui-card">Se verifica consilierul...</section>
+      <p class="meta">
+        {{ r.engine }} · {{ language() === 'ro' ? 'calculat local, fara AI extern' : 'computed locally, no external AI' }}
+      </p>
+    </div>
+  </section>
 }
+
+<!-- ===================== CHAT ===================== -->
+<section class="ui-card chat">
+  <h3>{{ language() === 'ro' ? 'Intreaba-l pe Owl' : 'Ask Owl' }}</h3>
+
+  <div class="chat-log" #chatLog>
+    @if (messages().length === 0) {
+      <div class="suggestions">
+        @for (suggestion of suggestions[language()]; track suggestion) {
+          <button type="button" class="chip" (click)="ask(suggestion)">{{ suggestion }}</button>
+        }
+      </div>
+    }
+
+    @for (message of messages(); track $index) {
+      <div class="bubble" [class.user]="message.role === 'user'">{{ message.content }}</div>
+    }
+
+    @if (sending()) {
+      <div class="bubble typing"><span></span><span></span><span></span></div>
+    }
+  </div>
+
+  @if (chatError()) {
+    <div class="ui-alert error">{{ chatError() }}</div>
+  }
+
+  <form class="chat-input" (ngSubmit)="ask()">
+    <input
+      class="ui-input"
+      name="question"
+      [ngModel]="question()"
+      (ngModelChange)="question.set($event)"
+      [placeholder]="language() === 'ro' ? 'Scrie o intrebare despre banii tai...' : 'Ask something about your money...'"
+      autocomplete="off"
+    />
+    <button class="ui-btn" type="submit" [disabled]="sending() || !question().trim()">
+      {{ language() === 'ro' ? 'Trimite' : 'Send' }}
+    </button>
+  </form>
+</section>

@@ -1,6 +1,6 @@
 using ExpenseTracker.Api.Data;
 using ExpenseTracker.Api.Services;
-using ExpenseTracker.Api.Services.Ai;
+using ExpenseTracker.Api.Services.Advisor;
 using ExpenseTracker.Api.Services.QuickAdd;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,16 +29,11 @@ var connectionString =
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Smart insights: regret score, subscriptions, Monte Carlo forecast, quick add, AI advisor
-builder.Services.AddMemoryCache();
+// Smart insights: regret score, subscriptions, Monte Carlo forecast, quick add, rule-based advisor
 builder.Services.AddSingleton<AppClock>();
 builder.Services.AddScoped<InsightsService>();
 builder.Services.AddScoped<QuickAddService>();
 builder.Services.AddScoped<AdvisorService>();
-
-builder.Services.Configure<AnthropicOptions>(
-    builder.Configuration.GetSection(AnthropicOptions.SectionName));
-builder.Services.AddHttpClient<IAiClient, ClaudeClient>();
 
 var app = builder.Build();
 

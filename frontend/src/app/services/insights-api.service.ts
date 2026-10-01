@@ -56,17 +56,17 @@ export class InsightsApiService {
   }
 
   // Quick add
-  parseQuickAdd(text: string, useAi = true): Observable<QuickAddResult> {
-    return this.http.post<QuickAddResult>(`${this.apiUrl}/quickadd/parse`, { text, useAi });
+  parseQuickAdd(text: string): Observable<QuickAddResult> {
+    return this.http.post<QuickAddResult>(`${this.apiUrl}/quickadd/parse`, { text });
   }
 
-  // AI advisor
+  // Rule-based advisor ("Owl")
   getAdvisorStatus(): Observable<AdvisorStatus> {
     return this.http.get<AdvisorStatus>(`${this.apiUrl}/advisor/status`);
   }
 
-  getAdvisorReport(language: AppLanguage, refresh = false): Observable<AdvisorReport> {
-    const params = new HttpParams().set('language', language).set('refresh', refresh);
+  getAdvisorReport(language: AppLanguage): Observable<AdvisorReport> {
+    const params = new HttpParams().set('language', language);
     return this.http.get<AdvisorReport>(`${this.apiUrl}/advisor/report`, { params });
   }
 

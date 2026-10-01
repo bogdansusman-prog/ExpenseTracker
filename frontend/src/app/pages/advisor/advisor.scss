@@ -24,17 +24,39 @@
   }
 }
 
-.setup {
-  pre {
-    margin: 8px 0;
-    padding: 12px;
-    overflow-x: auto;
-    background: #1a1c20;
-    border-radius: 8px;
-  }
+.breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 24px;
+  margin-top: 14px;
+}
 
-  li { margin-bottom: 10px; }
-  code { color: #a5d8ff; }
+.component {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  small { color: #8c939e; }
+}
+
+.component-header {
+  display: flex;
+  justify-content: space-between;
+
+  span { color: #c4cad5; font-variant-numeric: tabular-nums; }
+}
+
+.bar {
+  height: 8px;
+  overflow: hidden;
+  background: #22252b;
+  border-radius: 999px;
+
+  .fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
 }
 
 .thinking {
