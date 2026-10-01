@@ -39,6 +39,31 @@ export class Register {
     return '';
   }
 
+  private describe(error: HttpErrorResponse): string {
+    switch (error.status) {
+      case 0:
+        return 'API-ul nu raspunde. Porneste backend-ul (dotnet run --launch-profile https).';
+      case 404:
+        return 'API-ul ruleaza o versiune veche, fara conturi. Opreste-l, ruleaza migratia si porneste-l din nou.';
+      case 409:
+        return 'Exista deja un cont cu acest email.';
+      case 500:
+        return 'Eroare pe server. Ai rulat "dotnet ef database update" dupa migratia Accounts?';
+    }
+
+    if (typeof error.error === 'string' && error.error) {
+      return error.error;
+    }
+
+    // ASP.NET validation errors: { errors: { Password: ["..."] } }
+    const errors = error.error?.errors as Record<string, string[]> | undefined;
+    if (errors) {
+      return Object.values(errors).flat().join(' ');
+    }
+
+    return `Contul nu a putut fi creat (eroare ${error.status}).`;
+  }
+
   submit(): void {
     this.error.set('');
 
@@ -66,11 +91,7 @@ export class Register {
     }).subscribe({
       next: () => this.router.navigateByUrl('/dashboard'),
       error: (error: HttpErrorResponse) => {
-        this.error.set(error.status === 409
-          ? 'Exista deja un cont cu acest email.'
-          : typeof error.error === 'string' && error.error
-            ? error.error
-            : 'Contul nu a putut fi creat.');
+        this.error.set(this.describe(error));
         this.loading.set(false);
       }
     });
