@@ -1,5 +1,11 @@
+import { currentLang, translate } from '../i18n/i18n.service';
+
+function locale(): string {
+  return currentLang() === 'en' ? 'en-US' : 'ro-RO';
+}
+
 export function formatMoney(value: number): string {
-  return value.toLocaleString('ro-RO', {
+  return value.toLocaleString(locale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
@@ -11,12 +17,15 @@ export function formatHours(hours: number | null): string {
   }
 
   if (hours < 1) {
-    return `${Math.max(1, Math.round(hours * 60))} min de munca`;
+    return translate('{n} min de munca', currentLang(), { n: Math.max(1, Math.round(hours * 60)) });
   }
 
-  return `${hours.toLocaleString('ro-RO', { maximumFractionDigits: 1 })} h de munca`;
+  return translate('{n} h de munca', currentLang(), {
+    n: hours.toLocaleString(locale(), { maximumFractionDigits: 1 })
+  });
 }
 
+/** Romanian names; translate them with the `t` pipe in templates. */
 export const WEEK_DAYS_RO = ['Duminica', 'Luni', 'Marti', 'Miercuri', 'Joi', 'Vineri', 'Sambata'];
 
 export const FREQUENCY_RO: Record<string, string> = {

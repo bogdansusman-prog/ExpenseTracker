@@ -33,7 +33,17 @@
   color: transparent;
 }
 
-.pronounce { margin: 0 0 14px; color: #9da5b1; }
+.pronounce { margin: 0 0 12px; color: #9da5b1; }
+
+.motto {
+  margin: 0 0 14px;
+  padding-left: 14px;
+  border-left: 3px solid #f783ac;
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 600;
+  color: #fcc2d7;
+}
 
 .lead { margin: 0; font-size: 17px; line-height: 1.6; color: #d0d5dd; }
 

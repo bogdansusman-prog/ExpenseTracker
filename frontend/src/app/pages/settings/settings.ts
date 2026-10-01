@@ -1,21 +1,22 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppLanguage } from '../../models/insights.model';
 import { SettingsStore } from '../../services/settings.store';
 import { formatHours } from '../../shared/format';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-settings',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './settings.html',
   styleUrl: './settings.scss'
 })
 export class Settings implements OnInit {
   readonly store = inject(SettingsStore);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   hourlyRate: number | null = null;
-  language: AppLanguage = 'ro';
 
   /** Helper: compute the hourly rate from a monthly net salary (~168 working hours). */
   monthlySalary: number | null = null;
@@ -31,7 +32,8 @@ export class Settings implements OnInit {
     effect(() => {
       if (this.store.loaded()) {
         this.hourlyRate = this.store.hourlyRate();
-        this.language = this.store.language();
+        // Plain fields are not signals: ask zoneless change detection to re-render the form.
+        this.cdr.markForCheck();
       }
     });
   }
@@ -51,6 +53,12 @@ export class Settings implements OnInit {
     return rate > 0 ? formatHours(Math.round((amount / rate) * 10) / 10) : '';
   }
 
+  setLanguage(language: AppLanguage): void {
+    this.store.setLanguage(language);
+    this.message.set('');
+    this.error.set('');
+  }
+
   save(): void {
     this.saving.set(true);
     this.message.set('');
@@ -58,7 +66,7 @@ export class Settings implements OnInit {
 
     const rate = this.hourlyRate === null || `${this.hourlyRate}` === '' ? null : Number(this.hourlyRate);
 
-    this.store.save({ hourlyRate: rate && rate > 0 ? rate : null, language: this.language }).subscribe({
+    this.store.save({ hourlyRate: rate && rate > 0 ? rate : null, language: this.store.language() }).subscribe({
       next: () => {
         this.message.set('Setarile au fost salvate.');
         this.saving.set(false);

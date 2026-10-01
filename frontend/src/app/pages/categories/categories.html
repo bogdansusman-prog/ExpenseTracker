@@ -3,11 +3,11 @@
   <div>
 
     <h2>
-      Categorii
+      {{ 'Categorii' | t }}
     </h2>
 
     <p>
-      Gestioneaza categoriile folosite pentru tranzactii
+      {{ 'Gestioneaza categoriile folosite pentru tranzactii' | t }}
     </p>
 
   </div>
@@ -18,7 +18,7 @@
     type="button"
     (click)="loadData()"
   >
-    Reincarca
+    {{ 'Reincarca' | t }}
   </button>
 
 </div>
@@ -27,7 +27,7 @@
 @if (errorMessage()) {
 
   <div class="alert error-alert">
-    {{ errorMessage() }}
+    {{ errorMessage() | t }}
   </div>
 
 }
@@ -36,7 +36,7 @@
 @if (successMessage()) {
 
   <div class="alert success-alert">
-    {{ successMessage() }}
+    {{ successMessage() | t }}
   </div>
 
 }
@@ -45,7 +45,7 @@
 @if (loading()) {
 
   <section class="card">
-    Se incarca datele...
+    {{ 'Se incarca datele...' | t }}
   </section>
 
 } @else {
@@ -57,7 +57,7 @@
     <article class="summary-card">
 
       <span>
-        Total categorii
+        {{ 'Total categorii' | t }}
       </span>
 
       <strong>
@@ -70,7 +70,7 @@
     <article class="summary-card">
 
       <span>
-        Categorii utilizate
+        {{ 'Categorii utilizate' | t }}
       </span>
 
       <strong class="used">
@@ -83,7 +83,7 @@
     <article class="summary-card">
 
       <span>
-        Categorii neutilizate
+        {{ 'Categorii neutilizate' | t }}
       </span>
 
       <strong class="unused">
@@ -105,11 +105,11 @@
         editingCategoryId() === null
       ) {
 
-        Adauga categorie
+        {{ 'Adauga categorie' | t }}
 
       } @else {
 
-        Editeaza categoria
+        {{ 'Editeaza categoria' | t }}
 
       }
 
@@ -127,14 +127,14 @@
         <label
           for="category-name"
         >
-          Numele categoriei
+          {{ 'Numele categoriei' | t }}
         </label>
 
         <input
           id="category-name"
           type="text"
           formControlName="name"
-          placeholder="Exemplu: Transport"
+          [placeholder]="'Exemplu: Transport' | t"
         />
 
 
@@ -146,7 +146,7 @@
         ) {
 
           <small>
-            Numele categoriei este obligatoriu.
+            {{ 'Numele categoriei este obligatoriu.' | t }}
           </small>
 
         }
@@ -164,17 +164,17 @@
 
           @if (saving()) {
 
-            Se salveaza...
+            {{ 'Se salveaza...' | t }}
 
           } @else if (
             editingCategoryId() === null
           ) {
 
-            Adauga categoria
+            {{ 'Adauga categoria' | t }}
 
           } @else {
 
-            Salveaza modificarea
+            {{ 'Salveaza modificarea' | t }}
 
           }
 
@@ -190,7 +190,7 @@
             type="button"
             (click)="cancelEdit()"
           >
-            Anuleaza
+            {{ 'Anuleaza' | t }}
           </button>
 
         }
@@ -209,12 +209,12 @@
     <div class="section-header">
 
       <h3>
-        Lista categorii
+        {{ 'Lista categorii' | t }}
       </h3>
 
       <span>
         {{ categories().length }}
-        categorii
+        {{ 'categorii' | t }}
       </span>
 
     </div>
@@ -225,7 +225,7 @@
     ) {
 
       <p>
-        Nu exista categorii.
+        {{ 'Nu exista categorii.' | t }}
       </p>
 
     } @else {
@@ -257,7 +257,7 @@
                   )
                 }}
 
-                tranzactii
+                {{ 'tranzactii' | t }}
 
               </span>
 
@@ -277,7 +277,7 @@
                   )
                 "
               >
-                Editeaza
+                {{ 'Editeaza' | t }}
               </button>
 
 
@@ -295,7 +295,7 @@
                   )
                 "
               >
-                Sterge
+                {{ 'Sterge' | t }}
               </button>
 
             </div>

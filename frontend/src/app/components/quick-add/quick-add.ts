@@ -8,6 +8,8 @@ import { ExpenseApiService } from '../../services/expense-api.service';
 import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { formatHours, formatMoney } from '../../shared/format';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface Draft {
   amount: number | null;
@@ -22,7 +24,7 @@ interface Draft {
  */
 @Component({
   selector: 'app-quick-add',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './quick-add.html',
   styleUrl: './quick-add.scss'
 })
@@ -48,12 +50,17 @@ export class QuickAdd implements OnInit {
     return { amount: null, type: 2, date: '', categoryId: null, description: '' };
   }
 
-  readonly examples = [
-    'ieri 45 lei pizza cu Andrei',
-    'salariu 4500 lei',
-    '23,50 uber vineri',
-    'factura curent 210 lei 15.09'
-  ];
+  private readonly i18n = inject(I18n);
+
+  /** Ax understands both languages, so the examples follow the UI language. */
+  readonly examplesByLanguage = {
+    ro: ['ieri 45 lei pizza cu Andrei', 'salariu 4500 lei', '23,50 uber vineri', 'factura curent 210 lei 15.09'],
+    en: ['yesterday 45 lei pizza with Andrei', 'salary 4500 lei', '23.50 uber friday', 'electricity bill 210 lei 15.09']
+  };
+
+  get examples(): string[] {
+    return this.examplesByLanguage[this.i18n.language()];
+  }
 
   readonly formatMoney = formatMoney;
   readonly formatHours = formatHours;

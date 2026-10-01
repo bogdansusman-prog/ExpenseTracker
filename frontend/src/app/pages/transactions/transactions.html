@@ -1,10 +1,10 @@
 <div class="page-header">
 
   <div>
-    <h2>Tranzactii</h2>
+    <h2>{{ 'Tranzactii' | t }}</h2>
 
     <p>
-      Adauga, filtreaza si gestioneaza tranzactiile
+      {{ 'Adauga, filtreaza si gestioneaza tranzactiile' | t }}
     </p>
   </div>
 
@@ -14,7 +14,7 @@
     type="button"
     (click)="loadData()"
   >
-    Reincarca
+    {{ 'Reincarca' | t }}
   </button>
 
 </div>
@@ -23,7 +23,7 @@
 @if (errorMessage()) {
 
   <div class="alert error-alert">
-    {{ errorMessage() }}
+    {{ errorMessage() | t }}
   </div>
 
 }
@@ -32,7 +32,7 @@
 @if (successMessage()) {
 
   <div class="alert success-alert">
-    {{ successMessage() }}
+    {{ successMessage() | t }}
   </div>
 
 }
@@ -41,7 +41,7 @@
 @if (loading()) {
 
   <section class="card">
-    Se incarca datele...
+    {{ 'Se incarca datele...' | t }}
   </section>
 
 } @else {
@@ -51,7 +51,7 @@
   <section class="card">
 
     <h3>
-      Adauga tranzactie
+      {{ 'Adauga tranzactie' | t }}
     </h3>
 
 
@@ -60,7 +60,7 @@
     ) {
 
       <p>
-        Creeaza mai intai o categorie.
+        {{ 'Creeaza mai intai o categorie.' | t }}
       </p>
 
     } @else {
@@ -76,7 +76,7 @@
         <div class="form-field">
 
           <label for="category">
-            Categorie
+            {{ 'Categorie' | t }}
           </label>
 
           <select
@@ -107,7 +107,7 @@
         <div class="form-field">
 
           <label for="amount">
-            Suma
+            {{ 'Suma' | t }}
           </label>
 
           <input
@@ -127,7 +127,7 @@
           ) {
 
             <small>
-              Suma trebuie sa fie mai mare decat zero.
+              {{ 'Suma trebuie sa fie mai mare decat zero.' | t }}
             </small>
 
           }
@@ -140,7 +140,7 @@
         <div class="form-field">
 
           <label for="type">
-            Tip
+            {{ 'Tip' | t }}
           </label>
 
           <select
@@ -149,11 +149,11 @@
           >
 
             <option value="1">
-              Venit
+              {{ 'Venit' | t }}
             </option>
 
             <option value="2">
-              Cheltuiala
+              {{ 'Cheltuiala' | t }}
             </option>
 
           </select>
@@ -166,7 +166,7 @@
         <div class="form-field">
 
           <label for="date">
-            Data
+            {{ 'Data' | t }}
           </label>
 
           <input
@@ -185,14 +185,14 @@
         >
 
           <label for="description">
-            Descriere
+            {{ 'Descriere' | t }}
           </label>
 
           <textarea
             id="description"
             rows="3"
             formControlName="description"
-            placeholder="Optional"
+            [placeholder]="'Optional' | t"
           ></textarea>
 
         </div>
@@ -206,11 +206,7 @@
             [disabled]="saving()"
           >
 
-            {{
-              saving()
-                ? 'Se salveaza...'
-                : 'Adauga tranzactia'
-            }}
+            {{ (saving() ? 'Se salveaza...' : 'Adauga tranzactia') | t }}
 
           </button>
 
@@ -230,14 +226,14 @@
     <div class="section-header">
 
       <h3>
-        Lista tranzactii
+        {{ 'Lista tranzactii' | t }}
       </h3>
 
       <span>
         {{ filteredTransactions().length }}
-        din
+        {{ 'din' | t }}
         {{ transactions().length }}
-        inregistrari
+        {{ 'inregistrari' | t }}
       </span>
 
     </div>
@@ -250,7 +246,7 @@
       <div class="form-field">
 
         <label for="filter-category">
-          Categorie
+          {{ 'Categorie' | t }}
         </label>
 
         <select
@@ -260,7 +256,7 @@
         >
 
           <option value="0">
-            Toate categoriile
+            {{ 'Toate categoriile' | t }}
           </option>
 
           @for (
@@ -284,7 +280,7 @@
       <div class="form-field">
 
         <label for="filter-type">
-          Tip
+          {{ 'Tip' | t }}
         </label>
 
         <select
@@ -294,15 +290,15 @@
         >
 
           <option value="0">
-            Toate
+            {{ 'Toate' | t }}
           </option>
 
           <option value="1">
-            Venit
+            {{ 'Venit' | t }}
           </option>
 
           <option value="2">
-            Cheltuiala
+            {{ 'Cheltuiala' | t }}
           </option>
 
         </select>
@@ -313,7 +309,7 @@
       <div class="form-field">
 
         <label for="filter-date-from">
-          De la
+          {{ 'De la' | t }}
         </label>
 
         <input
@@ -329,7 +325,7 @@
       <div class="form-field">
 
         <label for="filter-date-to">
-          Pana la
+          {{ 'Pana la' | t }}
         </label>
 
         <input
@@ -347,7 +343,7 @@
         type="button"
         (click)="resetTransactionFilters()"
       >
-        Reset filtre
+        {{ 'Reset filtre' | t }}
       </button>
 
     </div>
@@ -363,7 +359,7 @@
 
         <span>
           {{ selectedCount() }}
-          tranzactii selectate
+          {{ 'tranzactii selectate' | t }}
         </span>
 
 
@@ -374,7 +370,7 @@
             type="button"
             (click)="clearTransactionSelection()"
           >
-            Deselecteaza
+            {{ 'Deselecteaza' | t }}
           </button>
 
 
@@ -383,7 +379,7 @@
             type="button"
             (click)="deleteSelectedTransactions()"
           >
-            Sterge selectate
+            {{ 'Sterge selectate' | t }}
           </button>
 
         </div>
@@ -400,7 +396,7 @@
     ) {
 
       <p>
-        Nu exista tranzactii.
+        {{ 'Nu exista tranzactii.' | t }}
       </p>
 
     } @else if (
@@ -408,7 +404,7 @@
     ) {
 
       <p class="no-results">
-        Nu exista tranzactii pentru filtrele selectate.
+        {{ 'Nu exista tranzactii pentru filtrele selectate.' | t }}
       </p>
 
     } @else {
@@ -444,17 +440,17 @@
 
               </th>
 
-              <th>Categorie</th>
+              <th>{{ 'Categorie' | t }}</th>
 
-              <th>Tip</th>
+              <th>{{ 'Tip' | t }}</th>
 
-              <th>Suma</th>
+              <th>{{ 'Suma' | t }}</th>
 
-              <th>Data</th>
+              <th>{{ 'Data' | t }}</th>
 
-              <th>Descriere</th>
+              <th>{{ 'Descriere' | t }}</th>
 
-              <th>Actiuni</th>
+              <th>{{ 'Actiuni' | t }}</th>
 
             </tr>
 
@@ -514,7 +510,7 @@
                     <span
                       class="badge income-badge"
                     >
-                      Venit
+                      {{ 'Venit' | t }}
                     </span>
 
                   } @else {
@@ -522,7 +518,7 @@
                     <span
                       class="badge expense-badge"
                     >
-                      Cheltuiala
+                      {{ 'Cheltuiala' | t }}
                     </span>
 
                   }
@@ -546,7 +542,7 @@
                       transaction.amount
                     )
                   }}
-                  lei
+                  {{ 'lei' | t }}
 
                 </td>
 
@@ -599,7 +595,7 @@
                       )
                     "
                   >
-                    Sterge
+                    {{ 'Sterge' | t }}
                   </button>
 
                 </td>

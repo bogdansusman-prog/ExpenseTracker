@@ -25,7 +25,7 @@
         <circle class="progress" cx="100" cy="100" r="92" stroke="url(#splash-ring)" />
       </svg>
       <div class="glow"></div>
-      <img class="logo" src="ax-logo.png" alt="Ax" />
+      <img class="logo" src="ax-logo.png" [alt]="'Ax' | t" />
     </div>
 
     <h1 class="welcome" [attr.aria-label]="'Bine ai venit, ' + firstName() + '!'">
@@ -38,11 +38,11 @@
       @for (step of steps; track step; let i = $index) {
         <li [style.animation-delay.ms]="1300 + i * 380">
           <span class="dot" [style.animation-delay.ms]="1500 + i * 380"></span>
-          {{ step }}
+          {{ step | t }}
         </li>
       }
     </ul>
 
-    <small class="hint">apasa oriunde ca sa sari peste</small>
+    <small class="hint">{{ 'apasa oriunde ca sa sari peste' | t }}</small>
   </div>
 </div>

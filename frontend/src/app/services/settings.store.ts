@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
+import { I18n } from '../i18n/i18n.service';
 import { AppLanguage, AppSettings } from '../models/insights.model';
 import { InsightsApiService } from './insights-api.service';
 
@@ -12,9 +13,11 @@ import { InsightsApiService } from './insights-api.service';
 })
 export class SettingsStore {
   private readonly api = inject(InsightsApiService);
+  private readonly i18n = inject(I18n);
 
   readonly hourlyRate = signal<number | null>(null);
-  readonly language = signal<AppLanguage>('ro');
+  /** Same signal as the UI language: one switch translates the app and Ax. */
+  readonly language = this.i18n.language;
   readonly loaded = signal(false);
 
   load(): void {
@@ -23,9 +26,15 @@ export class SettingsStore {
     }
 
     this.api.getSettings().subscribe({
-      next: settings => this.apply(settings),
+      next: settings => this.applyFromServer(settings),
       error: () => this.loaded.set(true)
     });
+  }
+
+  /** Switch the language right away (UI + Ax) and remember it on the server. */
+  setLanguage(language: AppLanguage): void {
+    this.i18n.setLanguage(language);
+    this.api.updateSettings({ hourlyRate: this.hourlyRate(), language }).subscribe({ error: () => undefined });
   }
 
   save(settings: AppSettings): Observable<void> {
@@ -40,9 +49,22 @@ export class SettingsStore {
     return rate && rate > 0 ? Math.round((amount / rate) * 10) / 10 : null;
   }
 
+  /**
+   * The language picked on this device wins (it is what the user is looking at),
+   * so if the server remembers another one we update the server instead.
+   */
+  private applyFromServer(settings: AppSettings): void {
+    const local = this.i18n.language();
+    if (settings.language !== local) {
+      this.api.updateSettings({ hourlyRate: settings.hourlyRate, language: local }).subscribe({ error: () => undefined });
+    }
+    this.hourlyRate.set(settings.hourlyRate);
+    this.loaded.set(true);
+  }
+
   private apply(settings: AppSettings): void {
     this.hourlyRate.set(settings.hourlyRate);
-    this.language.set(settings.language === 'en' ? 'en' : 'ro');
+    this.i18n.setLanguage(settings.language === 'en' ? 'en' : 'ro');
     this.loaded.set(true);
   }
 }

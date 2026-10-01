@@ -6,10 +6,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
 import { SplashService } from '../../components/welcome-splash/splash.service';
+import { LanguageSwitch } from '../../components/language-switch/language-switch';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink, AxMascot],
+  imports: [FormsModule, RouterLink, AxMascot, TranslatePipe, LanguageSwitch],
   templateUrl: './login.html',
   styleUrl: '../register/auth-page.scss'
 })

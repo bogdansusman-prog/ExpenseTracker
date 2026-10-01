@@ -13,6 +13,7 @@ import { AuthService } from './auth/auth.service';
 import { AxCompanion } from './components/ax-companion/ax-companion';
 import { WelcomeSplash } from './components/welcome-splash/welcome-splash';
 import { SplashService } from './components/welcome-splash/splash.service';
+import { TranslatePipe } from './i18n/translate.pipe';
 
 @Component({
   selector: 'app-root',
@@ -21,8 +22,7 @@ import { SplashService } from './components/welcome-splash/splash.service';
     RouterLink,
     RouterLinkActive,
     AxCompanion,
-    WelcomeSplash
-  ],
+    WelcomeSplash, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

@@ -1,4 +1,6 @@
-import { Component, computed, input } from '@angular/core';
+import { inject, Component, computed, input } from '@angular/core';
+
+import { I18n } from '../../i18n/i18n.service';
 
 export type AxMood = 'idle' | 'thinking' | 'nodding' | 'happy' | 'worried' | 'alert';
 
@@ -32,6 +34,8 @@ export class AxMascot {
     lens: `url(#${this.ids.lens})`
   };
 
+  private readonly i18n = inject(I18n);
+
   readonly label = computed(() => {
     const labels: Record<AxMood, string> = {
       idle: 'Ax, mascota Ax Tracker',
@@ -41,6 +45,6 @@ export class AxMascot {
       worried: 'Ax este ingrijorat',
       alert: 'Ax are ceva important de spus'
     };
-    return labels[this.mood()];
+    return this.i18n.t(labels[this.mood()]);
   });
 }

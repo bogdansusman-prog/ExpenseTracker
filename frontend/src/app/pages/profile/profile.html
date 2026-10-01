@@ -1,12 +1,12 @@
 <div class="ui-page-header">
   <div>
-    <h2>Profilul meu</h2>
-    <p>Poza, numele si parola contului tau</p>
+    <h2>{{ 'Profilul meu' | t }}</h2>
+    <p>{{ 'Poza, numele si parola contului tau' | t }}</p>
   </div>
 </div>
 
-@if (message()) { <div class="ui-alert success">{{ message() }}</div> }
-@if (error()) { <div class="ui-alert error">{{ error() }}</div> }
+@if (message()) { <div class="ui-alert success">{{ message() | t }}</div> }
+@if (error()) { <div class="ui-alert error">{{ error() | t }}</div> }
 
 @if (user(); as u) {
   <section class="ui-card identity">
@@ -17,14 +17,14 @@
       (dragover)="onDragOver($event)"
       (dragleave)="dragOver.set(false)"
       (drop)="onDrop($event)"
-      title="Schimba poza de profil"
+      [title]="'Schimba poza de profil' | t"
     >
       @if (u.avatarUrl) {
-        <img [src]="u.avatarUrl" alt="Poza de profil" />
+        <img [src]="u.avatarUrl" [alt]="'Poza de profil' | t" />
       } @else {
         <span class="initial">{{ initial() }}</span>
       }
-      <span class="overlay">@if (savingAvatar()) { Se incarca... } @else { Schimba poza }</span>
+      <span class="overlay">@if (savingAvatar()) { {{ 'Se incarca...' | t }} } @else { {{ 'Schimba poza' | t }} }</span>
       <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" (change)="onFileSelected($event)" hidden />
     </label>
 
@@ -32,12 +32,12 @@
       <h3>{{ u.displayName }}</h3>
       <p class="ui-muted">{{ u.email }}</p>
       @if (memberSince()) {
-        <p class="since">Membru din {{ memberSince() }}</p>
+        <p class="since">{{ 'Membru din' | t }} {{ memberSince() }}</p>
       }
       <div class="avatar-actions">
-        <small class="ui-muted">Trage o imagine peste poza sau apasa pe ea. O decupam patrat, la 256×256.</small>
+        <small class="ui-muted">{{ 'Trage o imagine peste poza sau apasa pe ea. O decupam patrat, la 256×256.' | t }}</small>
         @if (u.avatarUrl) {
-          <button class="ui-btn ghost small" type="button" (click)="removeAvatar()" [disabled]="savingAvatar()">Sterge poza</button>
+          <button class="ui-btn ghost small" type="button" (click)="removeAvatar()" [disabled]="savingAvatar()">{{ 'Sterge poza' | t }}</button>
         }
       </div>
     </div>
@@ -47,26 +47,26 @@
 
   <div class="columns">
     <form class="ui-card" (ngSubmit)="saveName()">
-      <h3>Nume afisat</h3>
-      <p class="ui-muted">Asa te saluta Ax si asa apari in meniul de sus.</p>
+      <h3>{{ 'Nume afisat' | t }}</h3>
+      <p class="ui-muted">{{ 'Asa te saluta Ax si asa apari in meniul de sus.' | t }}</p>
       <label>
-        Nume
+        {{ 'Nume' | t }}
         <input class="ui-input" name="displayName" [(ngModel)]="displayName" maxlength="100" autocomplete="name" />
       </label>
       <button class="ui-btn" type="submit" [disabled]="savingName() || displayName.trim() === u.displayName">
-        Salveaza numele
+        {{ 'Salveaza numele' | t }}
       </button>
     </form>
 
     <form class="ui-card" (ngSubmit)="changePassword()">
-      <h3>Schimba parola</h3>
-      <p class="ui-muted">Minim 8 caractere, cu cel putin o cifra si o litera mica.</p>
+      <h3>{{ 'Schimba parola' | t }}</h3>
+      <p class="ui-muted">{{ 'Minim 8 caractere, cu cel putin o cifra si o litera mica.' | t }}</p>
       <label>
-        Parola actuala
+        {{ 'Parola actuala' | t }}
         <input class="ui-input" type="password" name="currentPassword" [(ngModel)]="currentPassword" autocomplete="current-password" />
       </label>
       <label>
-        Parola noua
+        {{ 'Parola noua' | t }}
         <input class="ui-input" type="password" name="newPassword" [(ngModel)]="newPassword" autocomplete="new-password" />
         @if (newPassword) {
           <div class="strength" [attr.data-level]="passwordStrength()">
@@ -75,13 +75,13 @@
             }
           </div>
         }
-        @if (passwordHint()) { <small class="hint">{{ passwordHint() }}</small> }
+        @if (passwordHint()) { <small class="hint">{{ passwordHint() | t }}</small> }
       </label>
       <label>
-        Confirma parola noua
+        {{ 'Confirma parola noua' | t }}
         <input class="ui-input" type="password" name="confirmPassword" [(ngModel)]="confirmPassword" autocomplete="new-password" />
       </label>
-      <button class="ui-btn" type="submit" [disabled]="savingPassword()">Schimba parola</button>
+      <button class="ui-btn" type="submit" [disabled]="savingPassword()">{{ 'Schimba parola' | t }}</button>
     </form>
   </div>
 }

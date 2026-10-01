@@ -1,28 +1,28 @@
 <div class="ui-page-header">
   <div>
-    <h2>Intreaba-l pe Ax</h2>
-    <p>Ax iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati</p>
+    <h2>{{ 'Intreaba-l pe Ax' | t }}</h2>
+    <p>{{ 'Ax iti analizeaza banii pe baza calculelor si iti spune sincer cum stai si ce poti imbunatati' | t }}</p>
   </div>
 
   <div class="header-actions">
-    <div class="lang-switch" role="group" aria-label="Limba">
+    <div class="lang-switch" role="group" [aria-label]="'Limba' | t">
       <button type="button" [class.active]="language() === 'ro'" (click)="setLanguage('ro')">RO</button>
       <button type="button" [class.active]="language() === 'en'" (click)="setLanguage('en')">EN</button>
     </div>
     <button class="ui-btn" type="button" (click)="loadReport()" [disabled]="loadingReport()">
-      Recalculeaza
+      {{ 'Recalculeaza' | t }}
     </button>
   </div>
 </div>
 
 @if (reportError()) {
-  <div class="ui-alert error">{{ reportError() }}</div>
+  <div class="ui-alert error">{{ reportError() | t }}</div>
 }
 
 @if (loadingReport() && !report()) {
   <section class="ui-card thinking">
     <div class="dot-pulse"></div>
-    Ax iti analizeaza tranzactiile, regretele, abonamentele si prognoza...
+    {{ 'Ax iti analizeaza tranzactiile, regretele, abonamentele si prognoza...' | t }}
   </section>
 } @else if (report(); as r) {
   <section class="report">
@@ -42,11 +42,9 @@
 
     @if (r.breakdown.length > 0) {
       <div class="ui-card">
-        <h3>{{ language() === 'ro' ? 'Cum am calculat scorul' : 'How the score is calculated' }}</h3>
+        <h3>{{ 'Cum am calculat scorul' | t }}</h3>
         <p class="ui-muted">
-          {{ language() === 'ro'
-            ? 'Fiecare componenta are un punctaj maxim. Scorul final e suma lor, fara cutii negre.'
-            : 'Each component has a maximum. The final score is their sum, no black boxes.' }}
+          {{ 'Fiecare componenta are un punctaj maxim. Scorul final e suma lor, fara cutii negre.' | t }}
         </p>
         <div class="breakdown">
           @for (component of r.breakdown; track component.key) {
@@ -71,13 +69,13 @@
 
     <div class="two-columns">
       <div class="ui-card">
-        <h3 class="ui-income">{{ language() === 'ro' ? 'Ce faci bine' : 'What you do well' }}</h3>
+        <h3 class="ui-income">{{ 'Ce faci bine' | t }}</h3>
         <ul>
           @for (item of r.strengths; track $index) { <li>{{ item }}</li> }
         </ul>
       </div>
       <div class="ui-card">
-        <h3 class="ui-expense">{{ language() === 'ro' ? 'Ce te costa' : 'What is costing you' }}</h3>
+        <h3 class="ui-expense">{{ 'Ce te costa' | t }}</h3>
         <ul>
           @for (item of r.concerns; track $index) { <li>{{ item }}</li> }
         </ul>
@@ -85,7 +83,7 @@
     </div>
 
     <div class="ui-card">
-      <h3>{{ language() === 'ro' ? '3 pasi concreti' : '3 concrete steps' }}</h3>
+      <h3>{{ '3 pasi concreti' | t }}</h3>
       <div class="actions">
         @for (action of r.actions; track $index) {
           <article class="action">
@@ -95,7 +93,7 @@
               <p>{{ action.detail }}</p>
               @if (action.estimatedMonthlySavings) {
                 <small class="ui-income">
-                  ~ {{ formatMoney(action.estimatedMonthlySavings) }} lei / {{ language() === 'ro' ? 'luna' : 'month' }}
+                  ~ {{ formatMoney(action.estimatedMonthlySavings) }} {{ 'lei /' | t }} {{ 'luna' | t }}
                 </small>
               }
             </div>
@@ -103,10 +101,10 @@
         }
       </div>
       @if (r.funFact) {
-        <p class="fun-fact"><strong>{{ language() === 'ro' ? 'Stiai ca?' : 'Did you know?' }}</strong> {{ r.funFact }}</p>
+        <p class="fun-fact"><strong>{{ 'Stiai ca?' | t }}</strong> {{ r.funFact }}</p>
       }
       <p class="meta">
-        {{ r.engine }} · {{ language() === 'ro' ? 'calculat local, fara AI extern' : 'computed locally, no external AI' }}
+        {{ r.engine }} · {{ 'calculat local, fara AI extern' | t }}
       </p>
     </div>
   </section>
@@ -121,7 +119,7 @@
   </aside>
 
   <div class="chat-main">
-  <h3>{{ language() === 'ro' ? 'Intreaba-l pe Ax' : 'Ask Ax' }}</h3>
+  <h3>{{ 'Intreaba-l pe Ax' | t }}</h3>
 
   <div class="chat-log" #chatLog>
     @if (messages().length === 0) {
@@ -143,7 +141,7 @@
   </div>
 
   @if (chatError()) {
-    <div class="ui-alert error">{{ chatError() }}</div>
+    <div class="ui-alert error">{{ chatError() | t }}</div>
   }
 
   <form class="chat-input" (ngSubmit)="ask()">
@@ -152,11 +150,11 @@
       name="question"
       [ngModel]="question()"
       (ngModelChange)="question.set($event)"
-      [placeholder]="language() === 'ro' ? 'Scrie o intrebare despre banii tai...' : 'Ask something about your money...'"
+      [placeholder]="'Scrie o intrebare despre banii tai...' | t"
       autocomplete="off"
     />
     <button class="ui-btn" type="submit" [disabled]="sending() || !question().trim()">
-      {{ language() === 'ro' ? 'Trimite' : 'Send' }}
+      {{ 'Trimite' | t }}
     </button>
   </form>
   </div>

@@ -1,29 +1,28 @@
 <div class="ui-page-header">
   <div>
-    <h2>Insights</h2>
-    <p>Ce spun cheltuielile tale despre tine: regret, abonamente si viitorul soldului</p>
+    <h2>{{ 'Insights' | t }}</h2>
+    <p>{{ 'Ce spun cheltuielile tale despre tine: regret, abonamente si viitorul soldului' | t }}</p>
   </div>
-  <button class="ui-btn secondary" type="button" (click)="loadData()">Reincarca</button>
+  <button class="ui-btn secondary" type="button" (click)="loadData()">{{ 'Reincarca' | t }}</button>
 </div>
 
 @if (errorMessage()) {
-  <div class="ui-alert error">{{ errorMessage() }}</div>
+  <div class="ui-alert error">{{ errorMessage() | t }}</div>
 }
 
 @if (loading()) {
-  <div class="ui-card">Se incarca datele...</div>
+  <div class="ui-card">{{ 'Se incarca datele...' | t }}</div>
 } @else {
 
   <!-- ===================== A MERITAT? ===================== -->
   <section class="ui-card">
-    <h3>A meritat?</h3>
+    <h3>{{ 'A meritat?' | t }}</h3>
     <p class="ui-muted">
-      La cel putin 7 zile dupa o cheltuiala, spune-ne sincer daca a meritat.
-      Din raspunsuri aflam unde iti pierzi banii.
+      {{ 'La cel putin 7 zile dupa o cheltuiala, spune-ne sincer daca a meritat. Din raspunsuri aflam unde iti pierzi banii.' | t }}
     </p>
 
     @if (pending().length === 0) {
-      <p class="empty">Nu ai cheltuieli de evaluat acum. Revino peste cateva zile.</p>
+      <p class="empty">{{ 'Nu ai cheltuieli de evaluat acum. Revino peste cateva zile.' | t }}</p>
     } @else {
       <div class="regret-list">
         @for (item of pending(); track item.transactionId) {
@@ -31,14 +30,14 @@
             <div class="regret-info">
               <strong>{{ item.description || item.categoryName }}</strong>
               <small>
-                {{ item.categoryName }} · acum {{ item.daysAgo }} zile ·
-                <span class="ui-expense">{{ formatMoney(item.amount) }} lei</span>
+                {{ item.categoryName }} {{ '· acum' | t }} {{ item.daysAgo }} {{ 'zile ·' | t }}
+                <span class="ui-expense">{{ formatMoney(item.amount) }} {{ 'lei' | t }}</span>
                 @if (hoursFor(item.amount)) {
                   · <span class="ui-warning">{{ hoursFor(item.amount) }}</span>
                 }
               </small>
             </div>
-            <div class="score-buttons" role="group" aria-label="Cat de mult a meritat">
+            <div class="score-buttons" role="group" [aria-label]="'Cat de mult a meritat' | t">
               @for (score of [1, 2, 3, 4, 5]; track score) {
                 <button
                   type="button"
@@ -53,7 +52,7 @@
           </article>
         }
       </div>
-      <p class="legend">1 = regret total · 5 = a meritat din plin</p>
+      <p class="legend">{{ '1 = regret total · 5 = a meritat din plin' | t }}</p>
     }
   </section>
 
@@ -61,31 +60,31 @@
     @if (s.ratedCount > 0) {
       <section class="ui-grid">
         <article class="ui-stat">
-          <span>Regretat luna asta</span>
-          <strong class="ui-expense">{{ formatMoney(s.regrettedAmountThisMonth) }} lei</strong>
-          <small>cheltuieli notate cu 1 sau 2</small>
+          <span>{{ 'Regretat luna asta' | t }}</span>
+          <strong class="ui-expense">{{ formatMoney(s.regrettedAmountThisMonth) }} {{ 'lei' | t }}</strong>
+          <small>{{ 'cheltuieli notate cu 1 sau 2' | t }}</small>
         </article>
         <article class="ui-stat">
-          <span>Scor mediu</span>
+          <span>{{ 'Scor mediu' | t }}</span>
           <strong>{{ s.averageScore }} / 5</strong>
-          <small>din {{ s.ratedCount }} cheltuieli evaluate</small>
+          <small>{{ 'din cele' | t }} {{ s.ratedCount }} {{ 'cheltuieli evaluate' | t }}</small>
         </article>
         <article class="ui-stat">
-          <span>Unde regreti cel mai des</span>
+          <span>{{ 'Unde regreti cel mai des' | t }}</span>
           <strong>{{ s.worstCategory ?? '—' }}</strong>
           <small>
             @if (s.worstDayOfWeek !== null) {
-              mai ales {{ dayNames[s.worstDayOfWeek] }}
+              {{ 'mai ales' | t }} {{ dayNames[s.worstDayOfWeek] | t }}
             } @else {
-              ai nevoie de mai multe evaluari
+              {{ 'ai nevoie de mai multe evaluari' | t }}
             }
           </small>
         </article>
       </section>
 
       <section class="ui-card">
-        <h3>Harta regretului</h3>
-        <p class="ui-muted">Scorul mediu pe categorie si zi a saptamanii. Rosu = regret, verde = a meritat.</p>
+        <h3>{{ 'Harta regretului' | t }}</h3>
+        <p class="ui-muted">{{ 'Scorul mediu pe categorie si zi a saptamanii. Rosu = regret, verde = a meritat.' | t }}</p>
 
         <div class="heatmap-wrapper">
           <table class="heatmap">
@@ -93,7 +92,7 @@
               <tr>
                 <th></th>
                 @for (day of dayOrder; track day) {
-                  <th>{{ dayNames[day].slice(0, 3) }}</th>
+                  <th>{{ (dayNames[day] | t).slice(0, 3) }}</th>
                 }
               </tr>
             </thead>
@@ -123,13 +122,13 @@
   <section class="ui-card">
     <div class="section-title">
       <div>
-        <h3>Detectiv de abonamente</h3>
-        <p class="ui-muted">Plati recurente gasite automat in istoricul tau, inclusiv scumpirile pe care nu le-ai observat.</p>
+        <h3>{{ 'Detectiv de abonamente' | t }}</h3>
+        <p class="ui-muted">{{ 'Plati recurente gasite automat in istoricul tau, inclusiv scumpirile pe care nu le-ai observat.' | t }}</p>
       </div>
       @if (subscriptions().length > 0) {
         <div class="total">
-          <strong>{{ formatMoney(subscriptionsMonthly()) }} lei / luna</strong>
-          <small>{{ formatMoney(subscriptionsMonthly() * 12) }} lei / an</small>
+          <strong>{{ formatMoney(subscriptionsMonthly()) }} {{ 'lei / luna' | t }}</strong>
+          <small>{{ formatMoney(subscriptionsMonthly() * 12) }} {{ 'lei / an' | t }}</small>
         </div>
       }
     </div>
@@ -137,16 +136,15 @@
     @if (priceIncreases().length > 0) {
       <div class="ui-alert error">
         @for (sub of priceIncreases(); track sub.name) {
-          <div>Atentie: <strong>{{ sub.name }}</strong> s-a scumpit cu {{ sub.priceChangePercent }}%:
-            {{ formatMoney(sub.previousAmount ?? 0) }} → {{ formatMoney(sub.currentAmount) }} lei</div>
+          <div>{{ 'Atentie:' | t }} <strong>{{ sub.name }}</strong> {{ 's-a scumpit cu' | t }} {{ sub.priceChangePercent }}%:
+            {{ formatMoney(sub.previousAmount ?? 0) }} → {{ formatMoney(sub.currentAmount) }} {{ 'lei' | t }}</div>
         }
       </div>
     }
 
     @if (subscriptions().length === 0) {
       <p class="empty">
-        Nu am gasit inca plati recurente. Avem nevoie de cel putin 3 plati similare (aceeasi descriere sau categorie si suma),
-        la intervale regulate.
+        {{ 'Nu am gasit inca plati recurente. Avem nevoie de cel putin 3 plati similare (aceeasi descriere sau categorie si suma), la intervale regulate.' | t }}
       </p>
     } @else {
       <div class="subscription-list">
@@ -154,13 +152,13 @@
           <article class="subscription">
             <div>
               <strong>{{ sub.name }}</strong>
-              <small>{{ sub.categoryName }} · {{ frequencyLabel[sub.frequency] }} · de {{ sub.occurrences }} ori</small>
+              <small>{{ sub.categoryName }} · {{ frequencyLabel[sub.frequency] | t }} {{ '· de' | t }} {{ sub.occurrences }} {{ 'ori' | t }}</small>
             </div>
             <div class="right">
-              <strong>{{ formatMoney(sub.currentAmount) }} lei</strong>
-              <small>urmatoarea plata ~ {{ sub.nextExpectedDate.slice(0, 10) }}</small>
+              <strong>{{ formatMoney(sub.currentAmount) }} {{ 'lei' | t }}</strong>
+              <small>{{ 'urmatoarea plata ~' | t }} {{ sub.nextExpectedDate.slice(0, 10) }}</small>
               @if (hoursFor(sub.yearlyCost)) {
-                <small class="ui-warning">{{ hoursFor(sub.yearlyCost) }} / an</small>
+                <small class="ui-warning">{{ hoursFor(sub.yearlyCost) }} {{ '/ an' | t }}</small>
               }
             </div>
           </article>
@@ -174,16 +172,15 @@
     <section class="ui-card">
       <div class="section-title">
         <div>
-          <h3>Prognoza soldului</h3>
+          <h3>{{ 'Prognoza soldului' | t }}</h3>
           <p class="ui-muted">
-            {{ f.simulations }} simulari Monte Carlo pe baza ultimelor {{ f.historyDays }} zile.
-            Banda arata intervalul in care soldul tau va fi cel mai probabil.
+            {{ f.simulations }} {{ 'simulari Monte Carlo pe baza ultimelor' | t }} {{ f.historyDays }} {{ 'zile. Banda arata intervalul in care soldul tau va fi cel mai probabil.' | t }}
           </p>
         </div>
         <div class="horizon">
           @for (days of [30, 60, 90]; track days) {
             <button class="ui-btn" [class.ghost]="horizon() !== days" type="button" (click)="changeHorizon(days)">
-              {{ days }} zile
+              {{ days }} {{ 'zile' | t }}
             </button>
           }
         </div>
@@ -191,20 +188,20 @@
 
       <div class="ui-grid forecast-stats">
         <article class="ui-stat">
-          <span>Pesimist</span>
-          <strong [class.ui-expense]="f.endPessimistic < 0">{{ formatMoney(f.endPessimistic) }} lei</strong>
+          <span>{{ 'Pesimist' | t }}</span>
+          <strong [class.ui-expense]="f.endPessimistic < 0">{{ formatMoney(f.endPessimistic) }} {{ 'lei' | t }}</strong>
         </article>
         <article class="ui-stat">
-          <span>Cel mai probabil</span>
-          <strong>{{ formatMoney(f.endExpected) }} lei</strong>
-          <small>pe {{ f.to }}</small>
+          <span>{{ 'Cel mai probabil' | t }}</span>
+          <strong>{{ formatMoney(f.endExpected) }} {{ 'lei' | t }}</strong>
+          <small>{{ 'pe' | t }} {{ f.to }}</small>
         </article>
         <article class="ui-stat">
-          <span>Optimist</span>
-          <strong class="ui-income">{{ formatMoney(f.endOptimistic) }} lei</strong>
+          <span>{{ 'Optimist' | t }}</span>
+          <strong class="ui-income">{{ formatMoney(f.endOptimistic) }} {{ 'lei' | t }}</strong>
         </article>
         <article class="ui-stat">
-          <span>Risc de sold negativ</span>
+          <span>{{ 'Risc de sold negativ' | t }}</span>
           <strong [class.ui-expense]="f.probabilityNegative > 0.2" [class.ui-income]="f.probabilityNegative <= 0.05">
             {{ (f.probabilityNegative * 100).toFixed(0) }}%
           </strong>
