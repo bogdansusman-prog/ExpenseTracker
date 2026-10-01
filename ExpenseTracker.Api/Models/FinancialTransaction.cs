@@ -20,4 +20,14 @@ public class FinancialTransaction
     public int CategoryId { get; set; }
 
     public Category Category { get; set; } = null!;
+
+    /// <summary>
+    /// "Was it worth it?" score given by the user a few days after an expense
+    /// (1 = total regret, 5 = absolutely worth it). Null while not rated.
+    /// </summary>
+    [Range(1, 5)]
+    public int? RegretScore { get; set; }
+
+    public DateTime? RegretRatedAt { get; set; }
+
 }

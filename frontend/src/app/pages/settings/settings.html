@@ -1,0 +1,55 @@
+<div class="ui-page-header">
+  <div>
+    <h2>Setari</h2>
+    <p>Personalizeaza consilierul AI si afisarea preturilor in ore de munca</p>
+  </div>
+</div>
+
+@if (message()) { <div class="ui-alert success">{{ message() }}</div> }
+@if (error()) { <div class="ui-alert error">{{ error() }}</div> }
+
+<form (ngSubmit)="save()">
+  <section class="ui-card">
+    <h3>Cat valoreaza o ora din viata ta?</h3>
+    <p class="ui-muted">
+      Seteaza venitul net pe ora, iar aplicatia iti arata fiecare cheltuiala si in ore de munca.
+      De exemplu, niste adidasi de 600 lei nu mai sunt doar 600 lei, ci o zi si jumatate de munca.
+    </p>
+
+    <div class="fields">
+      <label>
+        Venit net pe ora (lei)
+        <input class="ui-input" type="number" min="0" step="0.01" name="hourlyRate" [(ngModel)]="hourlyRate" placeholder="ex: 25" />
+      </label>
+
+      <label>
+        sau calculeaza din salariul lunar net
+        <div class="inline">
+          <input class="ui-input" type="number" min="0" name="monthlySalary" [(ngModel)]="monthlySalary" placeholder="ex: 4200" />
+          <button class="ui-btn ghost" type="button" (click)="fromSalary()">Calculeaza</button>
+        </div>
+        <small>presupunem 168 de ore lucrate pe luna</small>
+      </label>
+    </div>
+
+    @if (example(50)) {
+      <div class="examples">
+        <span>Cafea 15 lei = <strong>{{ example(15) }}</strong></span>
+        <span>Pizza 50 lei = <strong>{{ example(50) }}</strong></span>
+        <span>Telefon 3000 lei = <strong>{{ example(3000) }}</strong></span>
+      </div>
+    }
+  </section>
+
+  <section class="ui-card">
+    <h3>Limba consilierului AI</h3>
+    <p class="ui-muted">In ce limba iti raspunde Owl si cum intelege adaugarea rapida.</p>
+
+    <div class="radio-row">
+      <label><input type="radio" name="language" value="ro" [(ngModel)]="language" /> Romana</label>
+      <label><input type="radio" name="language" value="en" [(ngModel)]="language" /> English</label>
+    </div>
+  </section>
+
+  <button class="ui-btn" type="submit" [disabled]="saving()">Salveaza setarile</button>
+</form>

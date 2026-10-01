@@ -1,0 +1,93 @@
+<section class="ui-card quick-add">
+  <div class="title-row">
+    <div>
+      <h3>Adaugare rapida</h3>
+      <p class="ui-muted">Scrie ca intr-un mesaj, iar aplicatia completeaza singura tranzactia.</p>
+    </div>
+  </div>
+
+  <form class="input-row" (ngSubmit)="parse()">
+    <input
+      class="ui-input"
+      name="quickText"
+      [ngModel]="text()"
+      (ngModelChange)="text.set($event)"
+      placeholder="ex: ieri 45 lei pizza cu Andrei"
+      autocomplete="off"
+    />
+    <button class="ui-btn" type="submit" [disabled]="parsing() || !text().trim()">
+      @if (parsing()) { Analizez... } @else { Analizeaza }
+    </button>
+  </form>
+
+  @if (!showDraft()) {
+    <div class="examples">
+      @for (example of examples; track example) {
+        <button type="button" class="chip" (click)="useExample(example)">{{ example }}</button>
+      }
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="ui-alert error">{{ errorMessage() }}</div>
+  }
+
+  @if (successMessage()) {
+    <div class="ui-alert success">{{ successMessage() }}</div>
+  }
+
+  @if (showDraft() && result(); as res) {
+    <div class="draft">
+      <div class="draft-header">
+        <strong>Verifica si confirma</strong>
+        <span class="ui-badge" [class.success]="res.source === 'ai'">
+          @if (res.source === 'ai') { completat cu AI } @else { reguli locale }
+        </span>
+      </div>
+
+      <div class="draft-grid">
+        <label>
+          Suma (lei)
+          <input class="ui-input" type="number" min="0.01" step="0.01" name="amount" [(ngModel)]="draft.amount" />
+        </label>
+
+        <label>
+          Tip
+          <select class="ui-input" name="type" [(ngModel)]="draft.type">
+            <option [ngValue]="2">Cheltuiala</option>
+            <option [ngValue]="1">Venit</option>
+          </select>
+        </label>
+
+        <label>
+          Data
+          <input class="ui-input" type="date" name="date" [(ngModel)]="draft.date" />
+        </label>
+
+        <label>
+          Categorie
+          <select class="ui-input" name="category" [(ngModel)]="draft.categoryId">
+            <option [ngValue]="null">Alege categoria</option>
+            @for (category of categories(); track category.id) {
+              <option [ngValue]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="wide">
+          Descriere
+          <input class="ui-input" name="description" [(ngModel)]="draft.description" />
+        </label>
+      </div>
+
+      @if (draftHours() && draft.type === 2) {
+        <p class="hours">Asta inseamna aproximativ <strong>{{ draftHours() }}</strong>.</p>
+      }
+
+      <div class="actions">
+        <button class="ui-btn" type="button" (click)="save()" [disabled]="!canSave() || saving()">Salveaza</button>
+        <button class="ui-btn ghost" type="button" (click)="cancel()">Renunta</button>
+      </div>
+    </div>
+  }
+</section>

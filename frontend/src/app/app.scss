@@ -60,6 +60,11 @@
     color: white;
     background: #4c6ef5;
   }
+
+  a.ai-link:not(.active) {
+    color: #d0bfff;
+    border: 1px solid #5f3dc4;
+  }
 }
 
 .page-container {

@@ -1,1 +1,106 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* ---------- Shared UI for the Smart Insights pages (prefixed to avoid clashes) ---------- */
+.ui-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h2 { margin: 0; font-size: 28px; }
+  p { margin: 6px 0 0; color: #9da5b1; }
+}
+
+.ui-card {
+  margin-bottom: 22px;
+  padding: 24px;
+  background: #101113;
+  border: 1px solid #292c32;
+  border-radius: 14px;
+
+  h3 { margin: 0 0 6px; }
+  > p.ui-muted { margin-top: 0; }
+}
+
+.ui-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.ui-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: #101113;
+  border: 1px solid #2a2d33;
+  border-radius: 14px;
+
+  span { color: #b9c0ca; font-size: 14px; }
+  strong { font-size: 24px; }
+  small { color: #818997; }
+}
+
+.ui-muted { color: #9da5b1; }
+.ui-income { color: #51cf66; }
+.ui-expense { color: #ff6b6b; }
+.ui-warning { color: #fcc419; }
+
+.ui-btn {
+  padding: 10px 16px;
+  color: white;
+  background: #4c6ef5;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  transition: opacity 0.2s, background 0.2s;
+
+  &:hover { background: #5c7cfa; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  &.secondary { background: #555b66; &:hover { background: #636a76; } }
+  &.ghost { background: transparent; border: 1px solid #373b43; &:hover { background: #1f232a; } }
+}
+
+.ui-input {
+  width: 100%;
+  padding: 11px 12px;
+  color: #f5f7fa;
+  background: #1a1c20;
+  border: 1px solid #373b43;
+  border-radius: 8px;
+  outline: none;
+  font: inherit;
+
+  &:focus { border-color: #748ffc; }
+}
+
+.ui-alert {
+  margin-bottom: 18px;
+  padding: 14px;
+  border-radius: 8px;
+
+  &.error { color: #ff8787; background: #3a1d20; }
+  &.success { color: #8ce99a; background: #1b3322; }
+  &.info { color: #a5d8ff; background: #172a3a; }
+}
+
+.ui-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  font-size: 12px;
+  border-radius: 999px;
+  background: #252f46;
+  color: #c4cad5;
+
+  &.danger { background: #3a1d20; color: #ff8787; }
+  &.success { background: #1b3322; color: #8ce99a; }
+}
+
+@media (max-width: 750px) {
+  .ui-page-header { flex-direction: column; align-items: flex-start; }
+}

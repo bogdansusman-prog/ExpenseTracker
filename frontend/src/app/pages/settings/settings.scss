@@ -1,0 +1,48 @@
+:host { display: block; }
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 14px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 14px;
+    color: #c5cbd6;
+  }
+
+  small { color: #818997; }
+}
+
+.inline {
+  display: flex;
+  gap: 8px;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  padding: 14px;
+  color: #c4cad5;
+  background: #1a1c20;
+  border-radius: 8px;
+
+  strong { color: #fcc419; }
+}
+
+.radio-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 10px;
+
+  label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+}
+
+@media (max-width: 750px) {
+  .fields { grid-template-columns: 1fr; }
+}
