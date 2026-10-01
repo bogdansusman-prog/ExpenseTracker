@@ -224,3 +224,64 @@
   .two-columns { grid-template-columns: 1fr; }
   .score-card { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---------- Ax next to the chat ---------- */
+.chat-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.ax-corner {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.ax-says {
+  position: relative;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #f3d9fa;
+  background: #2a1f33;
+  border: 1px solid #5f3dc4;
+  border-radius: 12px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: #2a1f33;
+    border-top: 1px solid #5f3dc4;
+    border-left: 1px solid #5f3dc4;
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
+
+.chat-main { min-width: 0; }
+
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: #f497b8;
+  animation: caret 0.8s steps(1) infinite;
+}
+
+@keyframes caret { 50% { opacity: 0; } }
+
+@media (max-width: 800px) {
+  .chat-layout { grid-template-columns: 1fr; }
+  .ax-corner { position: static; }
+}

@@ -1,6 +1,7 @@
 <div class="auth-page">
   <section class="auth-card">
     <div class="brand">
+      <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'happy'" [size]="130" />
       <h1>Creeaza cont</h1>
       <p>Fiecare cont isi vede doar tranzactiile lui</p>
     </div>

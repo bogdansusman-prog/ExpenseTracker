@@ -12,12 +12,13 @@ import { ExpenseApiService } from '../../services/expense-api.service';
 import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { QuickAdd } from '../../components/quick-add/quick-add';
+import { AxMascot } from '../../components/ax-mascot/ax-mascot';
 import { formatHours } from '../../shared/format';
 import { FinancialTransaction } from '../../models/financial-transaction.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [QuickAdd, RouterLink],
+  imports: [QuickAdd, RouterLink, AxMascot],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })

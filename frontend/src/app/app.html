@@ -1,9 +1,12 @@
 <header class="app-header">
 
-  <div class="brand">
-    <h1>Expense Tracker</h1>
-    <p>Personal finance dashboard</p>
-  </div>
+  <a class="brand" routerLink="/dashboard">
+    <app-ax [size]="54" />
+    <div>
+      <h1>Ax Tracker</h1>
+      <p>Banii tai, pe intelesul tau</p>
+    </div>
+  </a>
 
   @if (auth.isLoggedIn()) {
   <nav class="navigation">
@@ -48,7 +51,7 @@
       routerLinkActive="active"
       class="ai-link"
     >
-      Consilier
+      Intreaba-l pe Ax
     </a>
 
     <a

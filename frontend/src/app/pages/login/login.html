@@ -1,7 +1,8 @@
 <div class="auth-page">
   <section class="auth-card">
     <div class="brand">
-      <h1>Expense Tracker</h1>
+      <app-ax [mood]="loading() ? 'thinking' : error() ? 'worried' : 'idle'" [size]="130" />
+      <h1>Ax Tracker</h1>
       <p>Intra in cont ca sa-ti vezi banii</p>
     </div>
 

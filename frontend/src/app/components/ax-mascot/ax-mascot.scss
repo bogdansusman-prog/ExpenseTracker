@@ -1,0 +1,95 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+}
+
+.ax {
+  display: block;
+  overflow: visible;
+}
+
+.ax .part { transform-box: fill-box; }
+
+/* --- default: idle --- */
+.ax .body-group { transform-origin: 50% 100%; animation: breathe 3.2s ease-in-out infinite; }
+.ax .head { transform-origin: 50% 85%; transition: transform .45s ease; }
+.ax .gill-l { transform-origin: 100% 50%; animation: gill 2.6s ease-in-out infinite; }
+.ax .gill-r { transform-origin: 0% 50%; animation: gill 2.6s ease-in-out infinite reverse; }
+.ax .gill-l:nth-of-type(2), .ax .gill-r:nth-of-type(2) { animation-delay: -.6s; }
+.ax .gill-l:nth-of-type(3), .ax .gill-r:nth-of-type(3) { animation-delay: -1.2s; }
+.ax .eyes { transform-origin: 50% 50%; animation: blink 4.5s infinite; }
+.ax .pupils { transition: transform .4s ease; }
+.ax .tail { transform-origin: 0% 30%; animation: tail 3s ease-in-out infinite; }
+.ax .arm-r { transform-origin: 20% 20%; transition: transform .4s ease; }
+.ax .arm-l { transform-origin: 80% 20%; transition: transform .4s ease; }
+
+.ax .mouth, .ax .brows, .ax .thought, .ax .sweat, .ax .sparkles, .ax .alert-mark, .ax .happy-eyes {
+  opacity: 0; transition: opacity .3s ease;
+}
+.ax .mouth-smile { opacity: 1; }
+
+@keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.025, .985); } }
+@keyframes gill { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+@keyframes tail { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(6deg); } }
+
+/* --- thinking: head tilt, eyes look up, thought dots --- */
+.ax.thinking .head { transform: rotate(-9deg); }
+.ax.thinking .pupils { transform: translate(3px, -4px); }
+.ax.thinking .brows-think { opacity: 1; }
+.ax.thinking .thought { opacity: 1; }
+.ax.thinking .thought circle { animation: dot 1.2s ease-in-out infinite; }
+.ax.thinking .thought circle:nth-child(2) { animation-delay: .2s; }
+.ax.thinking .thought circle:nth-child(3) { animation-delay: .4s; }
+.ax.thinking .mouth-smile { opacity: 0; }
+.ax.thinking .mouth-hmm { opacity: 1; }
+.ax.thinking .arm-r { transform: rotate(-55deg) translate(-2px, -4px); }
+@keyframes dot { 0%,100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+
+/* --- nodding: answers while nodding --- */
+.ax.nodding .head { animation: nod .55s ease-in-out infinite; }
+.ax.nodding .mouth-smile { opacity: 0; }
+.ax.nodding .mouth-talk { opacity: 1; animation: talk .28s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes nod { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(5px) rotate(2deg); } }
+@keyframes talk { from { transform: scaleY(.45); } to { transform: scaleY(1); } }
+
+/* --- happy: bounce, ^^ eyes, sparkles --- */
+.ax.happy .body-group { animation: bounce .8s ease-in-out infinite; }
+.ax.happy .eyes { opacity: 0; animation: none; }
+.ax.happy .happy-eyes { opacity: 1; }
+.ax.happy .mouth-smile { opacity: 0; }
+.ax.happy .mouth-big { opacity: 1; }
+.ax.happy .sparkles { opacity: 1; }
+.ax.happy .sparkles path { animation: twinkle 1.1s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.ax.happy .sparkles path:nth-child(2) { animation-delay: .35s; }
+.ax.happy .sparkles path:nth-child(3) { animation-delay: .7s; }
+.ax.happy .arm-l { transform: rotate(35deg); }
+.ax.happy .arm-r { transform: rotate(-35deg); }
+.ax.happy .gill-l, .ax.happy .gill-r { animation-duration: .9s; }
+@keyframes bounce { 0%,100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-9px) scale(1.01,.99); } 70% { transform: translateY(0) scale(1.03,.97); } }
+@keyframes twinkle { 0%,100% { transform: scale(.4); opacity: .3; } 50% { transform: scale(1.1); opacity: 1; } }
+
+/* --- worried: brows, sweat drop, small head shake --- */
+.ax.worried .head { animation: shake 1.6s ease-in-out infinite; }
+.ax.worried .brows-worry { opacity: 1; }
+.ax.worried .sweat { opacity: 1; }
+.ax.worried .sweat path { animation: sweat 1.6s ease-in infinite; }
+.ax.worried .mouth-smile { opacity: 0; }
+.ax.worried .mouth-worry { opacity: 1; }
+.ax.worried .pupils { transform: translate(0, 2px); }
+.ax.worried .gill-l, .ax.worried .gill-r { animation-duration: 4.5s; }
+@keyframes shake { 0%,60%,100% { transform: rotate(0); } 70% { transform: rotate(-4deg); } 80% { transform: rotate(4deg); } 90% { transform: rotate(-2deg); } }
+@keyframes sweat { 0% { transform: translateY(-4px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(10px); opacity: 0; } }
+
+/* --- alert: raises an arm, "!" --- */
+.ax.alert .arm-r { transform: rotate(-125deg) translate(-4px, -2px); }
+.ax.alert .alert-mark { opacity: 1; }
+.ax.alert .alert-mark { animation: pop .9s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+.ax.alert .brows-think { opacity: 1; }
+.ax.alert .mouth-smile { opacity: 0; }
+.ax.alert .mouth-o { opacity: 1; }
+@keyframes pop { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ax * { animation: none !important; transition: none !important; }
+}
