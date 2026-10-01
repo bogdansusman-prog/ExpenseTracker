@@ -5,24 +5,24 @@
     <img class="logo" src="ax-logo.png" alt="" width="58" height="58" />
     <div>
       <h1>Ax Tracker</h1>
-      <p>Banii tai, pe intelesul tau</p>
+      <p>{{ 'Banii tai, pe intelesul tau' | t }}</p>
     </div>
   </a>
 
   @if (auth.isLoggedIn()) {
   <nav class="navigation">
-    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <a routerLink="/transactions" routerLinkActive="active">Tranzactii</a>
-    <a routerLink="/categories" routerLinkActive="active">Categorii</a>
-    <a routerLink="/comparator" routerLinkActive="active">Comparator</a>
-    <a routerLink="/insights" routerLinkActive="active">Insights</a>
-    <a routerLink="/advisor" routerLinkActive="active" class="ai-link">Intreaba-l pe Ax</a>
-    <a routerLink="/settings" routerLinkActive="active">Setari</a>
-    <a routerLink="/about" routerLinkActive="active">Despre</a>
+    <a routerLink="/dashboard" routerLinkActive="active">{{ 'Dashboard' | t }}</a>
+    <a routerLink="/transactions" routerLinkActive="active">{{ 'Tranzactii' | t }}</a>
+    <a routerLink="/categories" routerLinkActive="active">{{ 'Categorii' | t }}</a>
+    <a routerLink="/comparator" routerLinkActive="active">{{ 'Comparator' | t }}</a>
+    <a routerLink="/insights" routerLinkActive="active">{{ 'Insights' | t }}</a>
+    <a routerLink="/advisor" routerLinkActive="active" class="ai-link">{{ 'Intreaba-l pe Ax' | t }}</a>
+    <a routerLink="/settings" routerLinkActive="active">{{ 'Setari' | t }}</a>
+    <a routerLink="/about" routerLinkActive="active">{{ 'Despre' | t }}</a>
   </nav>
 
   <div class="user-menu">
-    <a class="profile-link" routerLink="/profile" routerLinkActive="active" title="Profilul meu">
+    <a class="profile-link" routerLink="/profile" routerLinkActive="active" [title]="'Profilul meu' | t">
       @if (auth.user()?.avatarUrl; as avatar) {
         <img class="avatar" [src]="avatar" alt="" />
       } @else {
@@ -30,10 +30,10 @@
       }
       <span class="user-name">{{ auth.user()?.displayName }}</span>
     </a>
-    <button type="button" class="logout" (click)="auth.logout()">Iesire</button>
+    <button type="button" class="logout" (click)="auth.logout()">{{ 'Iesire' | t }}</button>
   </div>
   } @else {
-    <a class="login-link" routerLink="/login">Intra in cont</a>
+    <a class="login-link" routerLink="/login">{{ 'Intra in cont' | t }}</a>
   }
 
 </header>

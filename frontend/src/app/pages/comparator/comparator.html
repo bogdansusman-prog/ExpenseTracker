@@ -1,11 +1,10 @@
 <div class="page-header">
 
   <div>
-    <h2>Comparator</h2>
+    <h2>{{ 'Comparator' | t }}</h2>
 
     <p>
-      Compara veniturile si cheltuielile
-      folosind datele existente
+      {{ 'Compara veniturile si cheltuielile folosind datele existente' | t }}
     </p>
   </div>
 
@@ -14,7 +13,7 @@
     type="button"
     (click)="loadData()"
   >
-    Reincarca
+    {{ 'Reincarca' | t }}
   </button>
 
 </div>
@@ -23,7 +22,7 @@
 @if (errorMessage()) {
 
   <div class="error-message">
-    {{ errorMessage() }}
+    {{ errorMessage() | t }}
   </div>
 
 }
@@ -32,7 +31,7 @@
 @if (loading()) {
 
   <section class="card">
-    Se incarca datele...
+    {{ 'Se incarca datele...' | t }}
   </section>
 
 } @else {
@@ -44,12 +43,12 @@
     <article class="summary-card">
 
       <span>
-        Total venituri
+        {{ 'Total venituri' | t }}
       </span>
 
       <strong class="income">
         {{ formatMoney(totalIncome()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
     </article>
@@ -58,12 +57,12 @@
     <article class="summary-card">
 
       <span>
-        Total cheltuieli
+        {{ 'Total cheltuieli' | t }}
       </span>
 
       <strong class="expense">
         {{ formatMoney(totalExpenses()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
     </article>
@@ -72,7 +71,7 @@
     <article class="summary-card">
 
       <span>
-        Diferenta
+        {{ 'Diferenta' | t }}
       </span>
 
       <strong
@@ -80,7 +79,7 @@
         [class.expense]="difference() < 0"
       >
         {{ formatMoney(difference()) }}
-        lei
+        {{ 'lei' | t }}
       </strong>
 
     </article>
@@ -95,8 +94,7 @@
     <section class="card">
 
       <p>
-        Nu exista suficiente date
-        pentru comparatie.
+        {{ 'Nu exista suficiente date pentru comparatie.' | t }}
       </p>
 
     </section>
@@ -111,11 +109,11 @@
 
         <div>
           <h3>
-            Venituri vs Cheltuieli
+            {{ 'Venituri vs Cheltuieli' | t }}
           </h3>
 
           <p>
-            Comparatie lunara
+            {{ 'Comparatie lunara' | t }}
           </p>
         </div>
 
@@ -142,12 +140,11 @@
         <div>
 
           <h3>
-            Cheltuieli pe categorii
+            {{ 'Cheltuieli pe categorii' | t }}
           </h3>
 
           <p>
-            Distributia cheltuielilor
-            intre categorii
+            {{ 'Distributia cheltuielilor intre categorii' | t }}
           </p>
 
         </div>

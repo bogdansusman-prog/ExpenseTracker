@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface Project {
   name: string;
@@ -18,7 +19,7 @@ interface Milestone {
 
 @Component({
   selector: 'app-about',
-  imports: [AxMascot],
+  imports: [AxMascot, TranslatePipe],
   templateUrl: './about.html',
   styleUrl: './about.scss'
 })

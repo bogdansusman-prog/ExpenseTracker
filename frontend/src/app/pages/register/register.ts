@@ -6,14 +6,19 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
 import { SplashService } from '../../components/welcome-splash/splash.service';
+import { I18n } from '../../i18n/i18n.service';
+import { LanguageSwitch } from '../../components/language-switch/language-switch';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink, AxMascot],
+  imports: [FormsModule, RouterLink, AxMascot, TranslatePipe, LanguageSwitch],
   templateUrl: './register.html',
   styleUrl: './auth-page.scss'
 })
 export class Register {
+  private readonly i18n = inject(I18n);
+
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly splash = inject(SplashService);
@@ -64,7 +69,7 @@ export class Register {
       return Object.values(errors).flat().join(' ');
     }
 
-    return `Contul nu a putut fi creat (eroare ${error.status}).`;
+    return this.i18n.t('Contul nu a putut fi creat (eroare {status}).', { status: error.status });
   }
 
   submit(): void {
@@ -76,7 +81,7 @@ export class Register {
     }
 
     if (this.passwordHint()) {
-      this.error.set(`Parola nu e suficient de puternica: ${this.passwordHint().toLowerCase()}.`);
+      this.error.set(this.i18n.t('Parola nu e suficient de puternica: {hint}.', { hint: this.i18n.t(this.passwordHint()).toLowerCase() }));
       return;
     }
 

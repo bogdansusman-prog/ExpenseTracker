@@ -17,15 +17,19 @@ import {
 import {
   ExpenseApiService
 } from '../../services/expense-api.service';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-comparator',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './comparator.html',
   styleUrl: './comparator.scss'
 })
 export class Comparator
   implements AfterViewInit, OnDestroy {
+  private readonly i18n = inject(I18n);
+
 
   private readonly apiService =
     inject(ExpenseApiService);
@@ -231,11 +235,11 @@ export class Comparator
 
             datasets: [
               {
-                label: 'Venituri',
+                label: this.i18n.t('Venituri'),
                 data: incomeData
               },
               {
-                label: 'Cheltuieli',
+                label: this.i18n.t('Cheltuieli'),
                 data: expenseData
               }
             ]
@@ -343,7 +347,7 @@ export class Comparator
             datasets: [
               {
                 label:
-                  'Cheltuieli',
+                  this.i18n.t('Cheltuieli'),
 
                 data:
                   values
@@ -374,7 +378,7 @@ export class Comparator
   ): string {
 
     return value.toLocaleString(
-      'ro-RO',
+      this.i18n.locale(),
       {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2

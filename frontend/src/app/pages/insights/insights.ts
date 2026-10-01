@@ -20,6 +20,8 @@ import {
 import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { formatHours, formatMoney, FREQUENCY_RO, WEEK_DAYS_RO } from '../../shared/format';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface HeatmapRow {
   category: string;
@@ -28,11 +30,13 @@ interface HeatmapRow {
 
 @Component({
   selector: 'app-insights',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './insights.html',
   styleUrl: './insights.scss'
 })
 export class Insights implements OnInit, OnDestroy {
+  private readonly i18n = inject(I18n);
+
   private readonly api = inject(InsightsApiService);
   readonly settings = inject(SettingsStore);
 
@@ -167,7 +171,7 @@ export class Insights implements OnInit, OnDestroy {
         labels,
         datasets: [
           {
-            label: 'Optimist (90%)',
+            label: this.i18n.t('Optimist (90%)'),
             data: forecast.points.map(point => point.optimistic),
             borderColor: 'rgba(81, 207, 102, 0.6)',
             backgroundColor: 'rgba(76, 110, 245, 0.15)',
@@ -176,7 +180,7 @@ export class Insights implements OnInit, OnDestroy {
             fill: '+2'
           },
           {
-            label: 'Asteptat (mediana)',
+            label: this.i18n.t('Asteptat (mediana)'),
             data: forecast.points.map(point => point.expected),
             borderColor: '#748ffc',
             pointRadius: 0,
@@ -184,7 +188,7 @@ export class Insights implements OnInit, OnDestroy {
             fill: false
           },
           {
-            label: 'Pesimist (10%)',
+            label: this.i18n.t('Pesimist (10%)'),
             data: forecast.points.map(point => point.pessimistic),
             borderColor: 'rgba(255, 107, 107, 0.6)',
             pointRadius: 0,

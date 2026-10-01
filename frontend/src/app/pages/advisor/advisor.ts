@@ -7,6 +7,7 @@ import { InsightsApiService } from '../../services/insights-api.service';
 import { SettingsStore } from '../../services/settings.store';
 import { formatMoney } from '../../shared/format';
 import { AxMascot, AxMood } from '../../components/ax-mascot/ax-mascot';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 /**
  * "Ax": a rule-based financial advisor with an animated axolotl mascot. Everything is
@@ -15,7 +16,7 @@ import { AxMascot, AxMood } from '../../components/ax-mascot/ax-mascot';
  */
 @Component({
   selector: 'app-advisor',
-  imports: [FormsModule, AxMascot],
+  imports: [FormsModule, AxMascot, TranslatePipe],
   templateUrl: './advisor.html',
   styleUrl: './advisor.scss'
 })

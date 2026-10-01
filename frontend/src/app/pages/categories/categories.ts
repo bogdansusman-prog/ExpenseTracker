@@ -25,14 +25,18 @@ import {
 import {
   ExpenseApiService
 } from '../../services/expense-api.service';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-categories',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslatePipe],
   templateUrl: './categories.html',
   styleUrl: './categories.scss'
 })
 export class Categories implements OnInit {
+  private readonly i18n = inject(I18n);
+
 
   private readonly apiService =
     inject(ExpenseApiService);
@@ -375,7 +379,7 @@ export class Categories implements OnInit {
 
     const confirmed =
       window.confirm(
-        `Sigur vrei sa stergi categoria "${category.name}"?`
+        this.i18n.t('Sigur vrei sa stergi categoria "{name}"?', { name: category.name })
       );
 
     if (!confirmed) {

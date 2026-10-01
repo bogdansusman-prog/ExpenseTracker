@@ -5,14 +5,18 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../auth/auth.service';
 import { AxMascot, AxMood } from '../../components/ax-mascot/ax-mascot';
 import { resizeImageToDataUrl } from '../../shared/image-resize';
+import { I18n } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, AxMascot],
+  imports: [FormsModule, AxMascot, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
 export class Profile implements OnInit {
+  private readonly i18n = inject(I18n);
+
   readonly auth = inject(AuthService);
 
   readonly user = this.auth.user;
@@ -35,7 +39,7 @@ export class Profile implements OnInit {
   readonly memberSince = computed(() => {
     const created = this.user()?.createdAt;
     return created
-      ? new Date(created).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })
+      ? new Date(created).toLocaleDateString(this.i18n.locale(), { day: 'numeric', month: 'long', year: 'numeric' })
       : '';
   });
 
@@ -175,7 +179,7 @@ export class Profile implements OnInit {
       return;
     }
     if (this.passwordHint()) {
-      this.error.set(`Parola noua nu e suficient de puternica: ${this.passwordHint().toLowerCase()}.`);
+      this.error.set(this.i18n.t('Parola noua nu e suficient de puternica: {hint}.', { hint: this.i18n.t(this.passwordHint()).toLowerCase() }));
       return;
     }
     if (this.newPassword !== this.confirmPassword) {

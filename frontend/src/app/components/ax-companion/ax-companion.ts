@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs';
 
 import { AxMascot, AxMood } from '../ax-mascot/ax-mascot';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 interface PageTip {
   mood: AxMood;
@@ -81,7 +82,7 @@ const TIPS: Record<string, PageTip> = {
  */
 @Component({
   selector: 'app-ax-companion',
-  imports: [AxMascot, RouterLink],
+  imports: [AxMascot, RouterLink, TranslatePipe],
   templateUrl: './ax-companion.html',
   styleUrl: './ax-companion.scss'
 })
