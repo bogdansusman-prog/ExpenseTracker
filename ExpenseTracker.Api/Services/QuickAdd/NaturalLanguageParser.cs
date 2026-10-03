@@ -210,6 +210,15 @@ public static partial class NaturalLanguageParser
             missing);
     }
 
+    /// <summary>
+    /// Best category for a free text such as a bank description ("LIDL ORADEA", "BOLT.EU/O/2609"),
+    /// using the same rules as quick add. Null when nothing matches.
+    /// </summary>
+    public static CategoryOption? SuggestCategory(string? text, IReadOnlyList<CategoryOption> categories) =>
+        string.IsNullOrWhiteSpace(text)
+            ? null
+            : MatchCategory(Tokenize(TextNormalizer.GroupingKey(text)), categories);
+
     private static CategoryOption? MatchCategory(IReadOnlyCollection<string> words, IReadOnlyList<CategoryOption> categories)
     {
         if (categories.Count == 0)

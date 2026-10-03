@@ -13,6 +13,8 @@ import { Comparator } from './pages/comparator/comparator';
 import { Insights } from './pages/insights/insights';
 import { Advisor } from './pages/advisor/advisor';
 import { Settings } from './pages/settings/settings';
+import { Bank } from './pages/bank/bank';
+import { BankCallback } from './pages/bank-callback/bank-callback';
 
 export const routes: Routes = [
   {
@@ -48,6 +50,16 @@ export const routes: Routes = [
   {
     path: 'advisor',
     component: Advisor,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'bank',
+    component: Bank,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'bank/callback',
+    component: BankCallback,
     canActivate: [authGuard]
   },
   {

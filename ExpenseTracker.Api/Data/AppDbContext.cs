@@ -15,6 +15,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUser c
 
     public DbSet<UserSettings> Settings => Set<UserSettings>();
 
+    public DbSet<BankConnection> BankConnections => Set<BankConnection>();
+
+    public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
+
+    public DbSet<BankAuthRequest> BankAuthRequests => Set<BankAuthRequest>();
+
     /// <summary>
     /// Id of the logged-in user. Used by the global query filters below, so every query
     /// only ever sees the current user's data (EF re-evaluates it for each context instance).
@@ -34,6 +40,49 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUser c
 
         modelBuilder.Entity<UserSettings>()
             .HasQueryFilter(settings => settings.UserId == CurrentUserId);
+
+        modelBuilder.Entity<BankConnection>()
+            .HasQueryFilter(connection => connection.UserId == CurrentUserId);
+
+        modelBuilder.Entity<BankAccount>()
+            .HasQueryFilter(account => account.UserId == CurrentUserId);
+
+        modelBuilder.Entity<BankAuthRequest>()
+            .HasQueryFilter(request => request.UserId == CurrentUserId);
+
+        modelBuilder.Entity<BankConnection>()
+            .HasOne(connection => connection.User)
+            .WithMany()
+            .HasForeignKey(connection => connection.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BankAccount>()
+            .HasOne(account => account.User)
+            .WithMany()
+            .HasForeignKey(account => account.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BankAccount>()
+            .HasOne(account => account.BankConnection)
+            .WithMany(connection => connection.Accounts)
+            .HasForeignKey(account => account.BankConnectionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BankAuthRequest>()
+            .HasOne(request => request.User)
+            .WithMany()
+            .HasForeignKey(request => request.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BankAuthRequest>()
+            .HasIndex(request => request.State)
+            .IsUnique();
+
+        // A bank transaction can only be imported once per user.
+        modelBuilder.Entity<FinancialTransaction>()
+            .HasIndex(transaction => new { transaction.UserId, transaction.ExternalId })
+            .IsUnique()
+            .HasFilter("\"ExternalId\" IS NOT NULL");
 
         modelBuilder.Entity<Category>()
             .HasOne(category => category.User)

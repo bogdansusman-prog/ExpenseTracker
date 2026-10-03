@@ -53,6 +53,14 @@ const TIPS: Record<string, PageTip> = {
       'Banda din prognoza iti arata cat de sigur sunt pe soldul de la final de luna.'
     ]
   },
+  bank: {
+    mood: 'happy',
+    tips: [
+      'Sincronizeaza o data pe saptamana si nu mai scrii nimic de mana.',
+      'Accesul e doar pentru citire: eu vad tranzactiile, dar nu pot face plati.',
+      'Daca schimbi o categorie, data viitoare o tin minte pentru acelasi comerciant.'
+    ]
+  },
   settings: {
     mood: 'idle',
     tips: [
