@@ -58,7 +58,7 @@ export const EN: Record<string, string> = {
   "Despre Ax Tracker": "About Ax Tracker",
   "Salut, sunt": "Hi, I'm",
   "Se pronunță": "Pronounced",
-  "„Învăț construind: de la tranzistor până la aplicație.”": "“I learn by building: from the transistor all the way up to the app.”",
+  "„Nu știu încă, dar o să aflu: între biți sau între pixeli!”": "“I don't know yet, but I'll find out: between bits or between pixels!”",
   "Student la Calculatoare la Universitatea Tehnică din Cluj-Napoca și full-stack developer din Oradea. Scriu aplicații web și mobile cu Angular, Flutter și ASP.NET Core, iar când codul nu-mi ajunge, cobor în hardware și proiectez procesoare în VHDL.": "Computer Science student at the Technical University of Cluj-Napoca and full-stack developer from Oradea. I build web and mobile apps with Angular, Flutter and ASP.NET Core, and when code is not enough, I go down to the hardware and design processors in VHDL.",
   "De ce am făcut Ax Tracker": "Why I built Ax Tracker",
   "Ca student, banii se duc repede și pe lucruri mărunte: o cafea aici, un Bolt acolo, un abonament uitat. Voiam o aplicație care să nu-mi arate doar": "As a student, money goes fast and on small things: a coffee here, a Bolt ride there, a forgotten subscription. I wanted an app that would show me not just",

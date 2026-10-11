@@ -66,7 +66,7 @@ export class About implements AfterViewInit, OnDestroy {
   /** "Bogdan Șușman" as single letters (spaces kept as non-breaking spaces). */
   readonly nameLetters = Array.from('Bogdan Șușman').map(letter => (letter === ' ' ? '\u00a0' : letter));
 
-  readonly mottoWords = computed(() => this.words([{ key: '„Învăț construind: de la tranzistor până la aplicație.”' }]));
+  readonly mottoWords = computed(() => this.words([{ key: '„Nu știu încă, dar o să aflu: între biți sau între pixeli!”' }]));
 
   readonly leadWords = computed(() => this.words([
     { key: 'Student la Calculatoare la Universitatea Tehnică din Cluj-Napoca și full-stack developer din Oradea. Scriu aplicații web și mobile cu Angular, Flutter și ASP.NET Core, iar când codul nu-mi ajunge, cobor în hardware și proiectez procesoare în VHDL.' }
