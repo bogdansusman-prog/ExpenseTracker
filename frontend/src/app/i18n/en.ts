@@ -425,5 +425,14 @@ export const EN: Record<string, string> = {
   "{n} tranzactii fara categorie vor merge in „Necategorizat”. Le poti muta oricand.": "{n} transactions without a category will go to “Necategorizat” (uncategorized). You can move them anytime.",
   "Sau pune-le pe toate in...": "Or put them all in...",
   "Vezi codul": "See the code",
-  "Hai să vorbim": "Let's talk"
+  "Hai să vorbim": "Let's talk",
+  "Ăsta e motto-ul lui. Și-l ia în serios.": "That's his motto. He means it.",
+  "Calculatoare la Cluj: și cod, și hardware.": "Computer Science in Cluj: code and hardware.",
+  "O cafea aici, un Bolt acolo... știu, doare.": "A coffee here, a Bolt ride there... I know, it hurts.",
+  "Partea mea preferată: cifrele!": "My favourite part: the numbers!",
+  "Toate astea au intrat în aplicație.": "All of this went into the app.",
+  "Ăsta sunt eu!": "That's me!",
+  "Pas cu pas, ca într-un pipeline.": "Step by step, like a pipeline.",
+  "Și software, și hardware.": "Software and hardware.",
+  "Hai să lucrăm împreună!": "Let's work together!"
 };

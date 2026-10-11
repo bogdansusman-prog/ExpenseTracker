@@ -1,3 +1,21 @@
+<!-- Living background: light blobs that drift, one follows the mouse -->
+<div class="ambient" aria-hidden="true">
+  <span class="blob drift b1"></span>
+  <span class="blob drift b2"></span>
+  <span class="blob drift b3"></span>
+  <span class="blob follow"></span>
+</div>
+
+<!-- Custom cursor (only with a mouse) -->
+<span class="cursor-dot" aria-hidden="true"></span>
+<span class="cursor-ring" aria-hidden="true"></span>
+
+<!-- Ax, the guide: swims down the side and reacts to each chapter -->
+<aside class="guide" aria-hidden="true">
+  <p class="bubble" [class.empty]="!guideLine()">{{ guideLine() | t }}</p>
+  <div class="swim"><app-ax [mood]="guideMood()" [size]="110" /></div>
+</aside>
+
 <!-- Intro: the name, letter by letter -->
 <section class="intro">
   <div class="intro-inner">
@@ -20,13 +38,13 @@
 </section>
 
 <!-- The motto, pinned while it lights up -->
-<section class="statement reveal pin">
+<section class="statement reveal pin" data-mood="thinking" data-line="Ăsta e motto-ul lui. Și-l ia în serios.">
   <p class="big motto">
     @for (word of mottoWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>
 </section>
 
-<section class="statement reveal">
+<section class="statement reveal" data-mood="nodding" data-line="Calculatoare la Cluj: și cod, și hardware.">
   <p class="medium">
     @for (word of leadWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>
@@ -37,7 +55,7 @@
 </section>
 
 <!-- 01 Why -->
-<section class="chapter">
+<section class="chapter" data-mood="worried" data-line="O cafea aici, un Bolt acolo... știu, doare.">
   <span class="chapter-label"><b>01</b> {{ 'De ce am făcut Ax Tracker' | t }}</span>
   <p class="medium reveal">
     @for (word of whyWords(); track $index) { <span class="w" [class.em]="word.em">{{ word.text }}</span> }
@@ -48,7 +66,7 @@
 </section>
 
 <!-- 02 What it does -->
-<section class="chapter">
+<section class="chapter" data-mood="happy" data-line="Partea mea preferată: cifrele!">
   <span class="chapter-label"><b>02</b> {{ 'Ce face aplicația' | t }}</span>
   <div class="features">
     @for (item of highlights; track item.title; let i = $index) {
@@ -64,7 +82,7 @@
 </section>
 
 <!-- Built with: two rows drifting in opposite directions -->
-<section class="marquee" [attr.aria-label]="'Construit cu' | t">
+<section class="marquee" data-mood="thinking" data-line="Toate astea au intrat în aplicație." [attr.aria-label]="'Construit cu' | t">
   <span class="chapter-label small"><b>·</b> {{ 'Construit cu' | t }}</span>
   <div class="rows" aria-hidden="true">
     <div class="row row-a">
@@ -77,7 +95,7 @@
 </section>
 
 <!-- 03 Ax -->
-<section class="chapter meet">
+<section class="chapter meet" data-mood="alert" data-line="Ăsta sunt eu!">
   <span class="chapter-label"><b>03</b> {{ 'Și cine e Ax?' | t }}</span>
   <div class="meet-grid">
     <div class="ax-wrap"><app-ax mood="happy" [size]="220" /></div>
@@ -89,7 +107,7 @@
 </section>
 
 <!-- 04 Journey -->
-<section class="chapter journey">
+<section class="chapter journey" data-mood="nodding" data-line="Pas cu pas, ca într-un pipeline.">
   <span class="chapter-label"><b>04</b> {{ 'Drumul meu' | t }}</span>
   <div class="steps">
     <div class="line"><div class="line-fill"></div></div>
@@ -105,7 +123,7 @@
 </section>
 
 <!-- 05 Projects: horizontal gallery -->
-<section class="projects">
+<section class="projects" data-mood="happy" data-line="Și software, și hardware.">
   <div class="projects-head">
     <span class="chapter-label"><b>05</b> {{ 'Alte proiecte de-ale mele' | t }}</span>
     <p class="muted">{{ 'Software și hardware: tot codul e pe GitHub.' | t }}</p>
@@ -128,7 +146,7 @@
 </section>
 
 <!-- Finale -->
-<section class="finale">
+<section class="finale" data-mood="happy" data-line="Hai să lucrăm împreună!">
   <p class="big reveal">
     @for (word of finaleWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>

@@ -8,7 +8,110 @@ $line: #262a31;
 
 :host {
   display: block;
-  overflow-x: clip; // the drifting rows must never widen the page
+  overflow-x: clip; // the drifting rows and the zoomed name must never widen the page
+}
+
+// The custom cursor replaces the system one only inside this page.
+:host(.custom-cursor),
+:host(.custom-cursor) * {
+  cursor: none !important;
+}
+
+// ---------- living background ----------
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  width: 46vw;
+  height: 46vw;
+  max-width: 720px;
+  max-height: 720px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.32;
+  will-change: transform;
+
+  &.b1 { top: -12%; left: -10%; background: radial-gradient(circle, $pink, transparent 65%); }
+  &.b2 { top: 30%; right: -14%; background: radial-gradient(circle, $purple, transparent 65%); }
+  &.b3 { bottom: -18%; left: 22%; background: radial-gradient(circle, $blue, transparent 65%); }
+
+  &.follow {
+    top: 50%;
+    left: 50%;
+    width: 32vw;
+    height: 32vw;
+    margin: -16vw 0 0 -16vw;
+    opacity: 0.22;
+    background: radial-gradient(circle, #fff, $pink 30%, transparent 65%);
+  }
+}
+
+// ---------- custom cursor ----------
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  visibility: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: $pink;
+}
+
+.cursor-ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  border: 1.5px solid rgba(244, 151, 184, 0.7);
+  mix-blend-mode: screen;
+}
+
+// ---------- Ax, the guide ----------
+// While Ax swims on the right, the story keeps a free lane for him.
+:host(.with-guide) section:not(.intro):not(.marquee) {
+  padding-right: 160px;
+}
+
+.guide {
+  position: fixed;
+  top: 16vh;
+  right: 28px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  width: 190px;
+  visibility: hidden; // shown by GSAP on wide screens only
+  pointer-events: none;
+}
+
+.bubble {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #f5f7fa;
+  background: rgba(30, 24, 44, 0.92);
+  border: 1px solid rgba(151, 117, 250, 0.55);
+  border-radius: 14px 14px 4px 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  transform-origin: bottom right;
+
+  &.empty { visibility: hidden; }
 }
 
 section { position: relative; }

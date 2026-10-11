@@ -75,13 +75,7 @@ const TIPS: Record<string, PageTip> = {
       'O parola lunga e mai sigura decat una complicata.'
     ]
   },
-  about: {
-    mood: 'happy',
-    tips: [
-      'El e omul care m-a desenat!',
-      'Stiai ca axolotlii isi pot regenera aproape orice parte a corpului?'
-    ]
-  }
+  // No tips on 'about': there Ax is the guide of the scroll story itself.
 };
 
 /**
