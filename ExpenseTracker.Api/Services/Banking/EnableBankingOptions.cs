@@ -17,8 +17,14 @@ public class EnableBankingOptions
     /// <summary>Path to the private key (.pem) downloaded when the application was registered.</summary>
     public string? PrivateKeyPath { get; set; }
 
-    /// <summary>Where the bank sends the user back. Must be whitelisted in the Control Panel.</summary>
-    public string RedirectUrl { get; set; } = "http://localhost:4200/bank/callback";
+    /// <summary>
+    /// Where the bank sends the user back. Must be whitelisted in the Control Panel and use https,
+    /// so it points to this API, which forwards the user to <see cref="FrontendCallbackUrl"/>.
+    /// </summary>
+    public string RedirectUrl { get; set; } = "https://localhost:7007/api/bank/return";
+
+    /// <summary>The Angular page that finishes the connection (it has the user's login token).</summary>
+    public string FrontendCallbackUrl { get; set; } = "http://localhost:4200/bank/callback";
 
     /// <summary>How long we ask the bank to keep the consent (the bank may allow less).</summary>
     public int ConsentDays { get; set; } = 90;

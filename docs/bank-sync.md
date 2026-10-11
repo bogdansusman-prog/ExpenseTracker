@@ -12,7 +12,9 @@ For your own accounts Enable Banking is free ("restricted mode": only the accoun
 1. Create an account on [enablebanking.com](https://enablebanking.com) and open the **Control Panel**.
 2. Go to **API applications** → register a new application:
    - Environment: **Production**
-   - Redirect URL: `http://localhost:4200/bank/callback`
+   - Redirect URL: `https://localhost:7007/api/bank/return`
+     (Enable Banking only accepts https, so the bank returns to the API, which forwards you to
+     `http://localhost:4200/bank/callback`)
    - Your browser downloads a private key named `<application id>.pem`.
 3. Move the `.pem` file to a folder **outside the repository** (for example `C:\Users\<you>\keys\`).
    `*.pem` is in `.gitignore`, but it is safer to keep it out of the project entirely.
@@ -33,18 +35,13 @@ For your own accounts Enable Banking is free ("restricted mode": only the accoun
    dotnet run --launch-profile https
    ```
 
-If the Control Panel does not accept an `http://localhost` redirect URL, run the frontend with HTTPS
-(`npx ng serve --ssl`), whitelist `https://localhost:4200/bank/callback` and set it in user secrets too:
-`dotnet user-secrets set "EnableBanking:RedirectUrl" "https://localhost:4200/bank/callback"`
-(and add `https://localhost:4200` to the CORS policy in `Program.cs`).
-
 ## How it works
 
 ```text
 Bank page ── POST /api/bank/connect ──▶ API ── POST /auth ──▶ Enable Banking
     ◀──────── bank login URL ─────────
 User approves read-only access in George
-George ──▶ http://localhost:4200/bank/callback?code=…&state=…
+George ──▶ https://localhost:7007/api/bank/return?code=…&state=… ──▶ http://localhost:4200/bank/callback?code=…&state=…
 Callback page ── POST /api/bank/callback ──▶ API ── POST /sessions ──▶ accounts saved
 Bank page ── GET /api/bank/connections/{id}/preview ──▶ transactions, deduplicated and categorized
 User reviews ── POST /api/bank/connections/{id}/import ──▶ transactions saved
@@ -67,6 +64,7 @@ User reviews ── POST /api/bank/connections/{id}/import ──▶ transaction
 | GET | `/api/bank/status` | Is Enable Banking configured, connected banks and accounts |
 | GET | `/api/bank/banks?country=RO` | Banks available in a country |
 | POST | `/api/bank/connect` | `{ "aspspName": "...", "country": "RO" }` → `{ "url": "<bank login>" }` |
+| GET | `/api/bank/return` | Where the bank redirects (https); forwards to the Angular callback page |
 | POST | `/api/bank/callback` | `{ "code": "...", "state": "..." }` → the new connection |
 | GET | `/api/bank/connections/{id}/preview?days=90` | Bank transactions as drafts (not saved) |
 | POST | `/api/bank/connections/{id}/import` | `{ "items": [...] }` → `{ "imported": n, "skipped": n }` |
