@@ -80,7 +80,7 @@ public static class AdvisorChatEngine
         };
     }
 
-    private static string OverviewAnswer(AdvisorReport report, Texts t)
+    internal static string OverviewAnswer(AdvisorReport report, Texts t)
     {
         var builder = new StringBuilder();
         builder.AppendLine(t.T($"Scorul tau financiar este {report.Score}/100. {report.Headline}",
@@ -94,7 +94,7 @@ public static class AdvisorChatEngine
         return builder.ToString().TrimEnd();
     }
 
-    private static string SavingsAnswer(AdvisorReport report, Texts t)
+    internal static string SavingsAnswer(AdvisorReport report, Texts t)
     {
         var builder = new StringBuilder(t.T("Iata unde poti economisi, in ordinea impactului:\n", "Here is where you can save, by impact:\n"));
 
@@ -116,7 +116,7 @@ public static class AdvisorChatEngine
         return builder.ToString().TrimEnd();
     }
 
-    private static string SubscriptionsAnswer(FinancialSnapshot snapshot, Texts t)
+    internal static string SubscriptionsAnswer(FinancialSnapshot snapshot, Texts t)
     {
         var subscriptions = snapshot.Subscriptions;
 
@@ -146,7 +146,7 @@ public static class AdvisorChatEngine
         return builder.ToString();
     }
 
-    private static string WorkHoursAnswer(FinancialSnapshot snapshot, Texts t)
+    internal static string WorkHoursAnswer(FinancialSnapshot snapshot, Texts t)
     {
         if (snapshot.HourlyRate is not > 0m)
         {
@@ -168,7 +168,7 @@ public static class AdvisorChatEngine
         return builder.ToString().TrimEnd();
     }
 
-    private static string ForecastAnswer(FinancialSnapshot snapshot, Texts t)
+    internal static string ForecastAnswer(FinancialSnapshot snapshot, Texts t)
     {
         var forecast = snapshot.Forecast;
         var risk = forecast.ProbabilityNegative * 100;
@@ -186,7 +186,7 @@ public static class AdvisorChatEngine
             $"(pessimistic {t.Money(forecast.EndPessimistic)}, optimistic {t.Money(forecast.EndOptimistic)}). Chance of a negative balance: {t.Percent(risk)}. {advice}");
     }
 
-    private static string RegretAnswer(FinancialSnapshot snapshot, Texts t)
+    internal static string RegretAnswer(FinancialSnapshot snapshot, Texts t)
     {
         var regret = snapshot.Regret;
 

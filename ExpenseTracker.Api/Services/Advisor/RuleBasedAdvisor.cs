@@ -10,7 +10,7 @@ namespace ExpenseTracker.Api.Services.Advisor;
 /// </summary>
 public static class RuleBasedAdvisor
 {
-    public const string EngineName = "Ax rules engine v1";
+    public const string EngineName = "Ax brain v2 (Naive Bayes, built from scratch)";
 
     private sealed record Candidate(AdvisorAction Action, int Priority);
 

@@ -133,6 +133,14 @@
     @for (message of messages(); track $index) {
       <!-- kept on one line: the bubble uses white-space: pre-wrap -->
       <div class="bubble" [class.user]="message.role === 'user'">@if ($index === typingIndex()) {<span>{{ typedText() }}</span><span class="caret"></span>} @else {<span>{{ message.content }}</span>}</div>
+      @if (message.understood?.length && $index !== typingIndex()) {
+        <div class="understood" [attr.aria-label]="'Ce a inteles Ax' | t">
+          <span class="understood-label">{{ 'Am inteles:' | t }}</span>
+          @for (chip of message.understood; track $index) {
+            <span class="understood-chip">{{ chip }}</span>
+          }
+        </div>
+      }
     }
 
     @if (sending()) {

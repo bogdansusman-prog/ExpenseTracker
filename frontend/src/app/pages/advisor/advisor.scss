@@ -285,3 +285,40 @@
   .chat-layout { grid-template-columns: 1fr; }
   .ax-corner { position: static; }
 }
+
+/* What Ax understood from the question, shown under his answer. */
+.understood {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  max-width: 80%;
+  margin: -4px 0 4px 4px;
+  animation: understood-in 0.3s ease both;
+}
+
+.understood-label {
+  font-size: 0.7rem;
+  color: #8a919e;
+  margin-right: 2px;
+}
+
+.understood-chip {
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #a5b4fc;
+  background: rgba(116, 143, 252, 0.1);
+  border: 1px solid rgba(116, 143, 252, 0.3);
+}
+
+@keyframes understood-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .understood { animation: none; }
+}

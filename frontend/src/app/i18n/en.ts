@@ -11,6 +11,8 @@ export const EN: Record<string, string> = {
   "Comparator": "Comparator",
   "Insights": "Insights",
   "Intreaba-l pe Ax": "Ask Ax",
+  "Ce a inteles Ax": "What Ax understood",
+  "Am inteles:": "Understood:",
   "Intreaba-l pe Ax →": "Ask Ax →",
   "Setari": "Settings",
   "Despre": "About",

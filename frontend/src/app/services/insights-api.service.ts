@@ -8,6 +8,7 @@ import {
   AppLanguage,
   AppSettings,
   BalanceForecast,
+  ChatResponse,
   ChatTurn,
   DetectedSubscription,
   PendingRegret,
@@ -70,7 +71,8 @@ export class InsightsApiService {
     return this.http.get<AdvisorReport>(`${this.apiUrl}/advisor/report`, { params });
   }
 
-  chat(messages: ChatTurn[], language: AppLanguage): Observable<{ reply: string }> {
-    return this.http.post<{ reply: string }>(`${this.apiUrl}/advisor/chat`, { messages, language });
+  chat(messages: ChatTurn[], language: AppLanguage): Observable<ChatResponse> {
+    const turns = messages.map(({ role, content }) => ({ role, content }));
+    return this.http.post<ChatResponse>(`${this.apiUrl}/advisor/chat`, { messages: turns, language });
   }
 }

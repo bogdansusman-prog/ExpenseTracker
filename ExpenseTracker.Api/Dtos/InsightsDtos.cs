@@ -34,6 +34,7 @@ public class AdvisorChatRequestDto
     public string? Language { get; set; }
 }
 
-public record AdvisorChatResponseDto(string Reply);
+/// <summary>Ax's answer plus what he understood (intent, period, category...), shown as chips.</summary>
+public record AdvisorChatResponseDto(string Reply, IReadOnlyList<string> Understood);
 
 public record AdvisorStatusDto(bool Configured, string Engine);

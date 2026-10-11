@@ -134,4 +134,11 @@ export interface AdvisorStatus {
 export interface ChatTurn {
   role: 'user' | 'assistant';
   content: string;
+  /** What Ax understood (intent, period, category...), only on his answers. */
+  understood?: string[];
+}
+
+export interface ChatResponse {
+  reply: string;
+  understood: string[];
 }
