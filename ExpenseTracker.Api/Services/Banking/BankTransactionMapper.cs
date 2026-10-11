@@ -63,7 +63,10 @@ public static partial class BankTransactionMapper
         var remittance = Readable(Clean(string.Join(' ', transaction.RemittanceInformation ?? new List<string>())));
 
         var description = counterparty ?? remittance ?? (isCredit ? "Incasare" : "Plata card");
-        if (counterparty is not null && remittance is not null && !Fold(remittance).Contains(Fold(counterparty)))
+        // Add the bank text only when it says something the name doesn't ("SPOTIFY" next to "Spotify AB" adds nothing).
+        if (counterparty is not null && remittance is not null
+            && !Fold(remittance).Contains(Fold(counterparty))
+            && !Fold(counterparty).Contains(Fold(remittance)))
         {
             description = $"{counterparty} – {remittance}";
         }
