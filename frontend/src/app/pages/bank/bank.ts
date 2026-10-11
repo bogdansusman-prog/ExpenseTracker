@@ -55,7 +55,7 @@ export class Bank implements OnInit {
   readonly newRows = computed(() => this.rows().filter(row => !row.alreadyImported));
   readonly selectedRows = computed(() => this.rows().filter(row => row.selected));
   readonly missingCategory = computed(() => this.selectedRows().filter(row => row.categoryId === null).length);
-  readonly canImport = computed(() => this.selectedRows().length > 0 && this.missingCategory() === 0 && !this.importing());
+  readonly canImport = computed(() => this.selectedRows().length > 0 && !this.importing());
 
   ngOnInit(): void {
     this.expenseApi.getCategories().subscribe({ next: categories => this.categories.set(categories) });
@@ -150,6 +150,15 @@ export class Bank implements OnInit {
     this.updateRow(row, { categoryId: value ? Number(value) : null });
   }
 
+  /** Gives one category to every ticked transaction that has none yet. */
+  setCategoryForMissing(value: string): void {
+    if (!value) {
+      return;
+    }
+    const categoryId = Number(value);
+    this.rows.update(rows => rows.map(row => (row.selected && row.categoryId === null ? { ...row, categoryId } : row)));
+  }
+
   toggleAll(selected: boolean): void {
     this.rows.update(rows => rows.map(row => (row.alreadyImported ? row : { ...row, selected })));
   }
@@ -174,7 +183,7 @@ export class Bank implements OnInit {
       amount: row.amount,
       type: row.type,
       description: row.description,
-      categoryId: row.categoryId as number
+      categoryId: row.categoryId
     }));
 
     this.api.import(connection.id, items).subscribe({

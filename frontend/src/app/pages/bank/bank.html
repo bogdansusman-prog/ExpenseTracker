@@ -166,7 +166,15 @@
 
         <div class="preview-actions">
           @if (missingCategory() > 0) {
-            <span class="ui-warning">{{ 'Alege o categorie pentru {n} tranzactii bifate.' | t: { n: missingCategory() } }}</span>
+            <div class="missing-note">
+              <span class="ui-warning">{{ '{n} tranzactii fara categorie vor merge in „Necategorizat”. Le poti muta oricand.' | t: { n: missingCategory() } }}</span>
+              <select class="ui-input bulk-category" (change)="setCategoryForMissing($any($event.target).value); $any($event.target).value = ''">
+                <option value="">{{ 'Sau pune-le pe toate in...' | t }}</option>
+                @for (category of categories(); track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            </div>
           }
           <button class="ui-btn ghost" type="button" (click)="cancelPreview()">{{ 'Renunta' | t }}</button>
           <button class="ui-btn" type="button" (click)="importSelected()" [disabled]="!canImport()">

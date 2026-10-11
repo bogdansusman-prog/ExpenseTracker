@@ -238,6 +238,7 @@ public class BankSyncService(
             .ToList();
 
         var categoryIds = (await context.Categories.Select(category => category.Id).ToListAsync(cancellationToken)).ToHashSet();
+        Category? uncategorized = null;
 
         var ids = items.Select(item => item.ExternalId).ToList();
         var existing = (await context.Transactions
@@ -253,7 +254,7 @@ public class BankSyncService(
         {
             var valid = item.Amount > 0
                         && Enum.IsDefined(item.Type)
-                        && categoryIds.Contains(item.CategoryId)
+                        && (item.CategoryId is null || categoryIds.Contains(item.CategoryId.Value))
                         && prefixes.Any(prefix => item.ExternalId.StartsWith(prefix, StringComparison.Ordinal));
 
             if (!valid || !existing.Add(item.ExternalId))
@@ -262,12 +263,20 @@ public class BankSyncService(
                 continue;
             }
 
+            Category? category = null;
+            if (item.CategoryId is null)
+            {
+                uncategorized ??= await GetOrCreateUncategorizedAsync(cancellationToken);
+                category = uncategorized;
+            }
+
             context.Transactions.Add(new FinancialTransaction
             {
                 Amount = Math.Round(item.Amount, 2),
                 Date = clock.LocalDayToUtc(item.Date),
                 Type = item.Type,
-                CategoryId = item.CategoryId,
+                CategoryId = item.CategoryId ?? 0,
+                Category = category!,
                 Description = string.IsNullOrWhiteSpace(item.Description) ? null : item.Description.Trim(),
                 ExternalId = item.ExternalId
             });
@@ -298,6 +307,23 @@ public class BankSyncService(
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public const string UncategorizedName = "Necategorizat";
+
+    private async Task<Category> GetOrCreateUncategorizedAsync(CancellationToken cancellationToken)
+    {
+        var existing = await context.Categories.FirstOrDefaultAsync(category => category.Name == UncategorizedName, cancellationToken);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        var created = new Category { Name = UncategorizedName };
+        context.Categories.Add(created);
+        return created;
+    }
+
+    private static readonly string[] IncomeHints = ["salar", "venit", "income", "salary", "bursa"];
+
     private static int? Suggest(BankDraft draft, IReadOnlyList<CategoryOption> categories, Dictionary<string, int> learned)
     {
         var key = TextNormalizer.GroupingKey(draft.Description);
@@ -306,8 +332,15 @@ public class BankSyncService(
             return categoryId;
         }
 
-        var text = draft.Type == TransactionType.Income ? $"{draft.Description} venit" : draft.Description;
-        return NaturalLanguageParser.SuggestCategory(text, categories)?.Id;
+        var suggested = NaturalLanguageParser.SuggestCategory(draft.Description, categories)?.Id;
+        if (suggested is not null || draft.Type != TransactionType.Income)
+        {
+            return suggested;
+        }
+
+        // Money in with no better match: your income category (e.g. "Salar", "Venituri").
+        return categories.FirstOrDefault(category =>
+            IncomeHints.Any(hint => TextNormalizer.Fold(category.Name).Contains(hint)))?.Id;
     }
 
     private async Task<BankConnection> FindConnectionAsync(int id, CancellationToken cancellationToken) =>

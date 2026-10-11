@@ -27,6 +27,10 @@ public static partial class BankTransactionMapper
     [GeneratedRegex(@"\s+")]
     private static partial Regex Spaces();
 
+    // BCR card payments: "... Locatie: 21309850 RO CARREFOUR MK CLUJ GARA" (sometimes followed by ". Data ...").
+    [GeneratedRegex(@"Locatie:\s*\S+\s+[A-Z]{2}\s+(?<merchant>.+?)(?:\.\s*Dat\w*\b.*)?$", RegexOptions.IgnoreCase)]
+    private static partial Regex CardMerchant();
+
     /// <summary>Returns null for pending transactions or ones without a usable amount/date.</summary>
     public static BankDraft? Map(EbTransaction transaction, string accountUid)
     {
@@ -56,7 +60,7 @@ public static partial class BankTransactionMapper
 
         // Money in: who paid us (debtor). Money out: who we paid (creditor).
         var counterparty = Clean(isCredit ? transaction.Debtor?.Name : transaction.Creditor?.Name);
-        var remittance = Clean(string.Join(' ', transaction.RemittanceInformation ?? new List<string>()));
+        var remittance = Readable(Clean(string.Join(' ', transaction.RemittanceInformation ?? new List<string>())));
 
         var description = counterparty ?? remittance ?? (isCredit ? "Incasare" : "Plata card");
         if (counterparty is not null && remittance is not null && !Fold(remittance).Contains(Fold(counterparty)))
@@ -114,6 +118,31 @@ public static partial class BankTransactionMapper
         DateOnly.TryParseExact(text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
             ? date
             : null;
+
+    /// <summary>
+    /// Long bank texts become the merchant name:
+    /// "Apple Pay, Tranzactie comerciant - Tranz: Nr card 4493..., Locatie: 21309850 RO CARREFOUR MK CLUJ GARA"
+    /// → "CARREFOUR MK CLUJ GARA". Card numbers, tokens and references are dropped.
+    /// </summary>
+    public static string? Readable(string? remittance)
+    {
+        if (remittance is null)
+        {
+            return null;
+        }
+
+        var match = CardMerchant().Match(remittance);
+        if (match.Success)
+        {
+            var merchant = match.Groups["merchant"].Value.Trim().TrimEnd('.', ',');
+            if (merchant.Length > 0)
+            {
+                return merchant;
+            }
+        }
+
+        return remittance;
+    }
 
     private static string? Clean(string? text)
     {

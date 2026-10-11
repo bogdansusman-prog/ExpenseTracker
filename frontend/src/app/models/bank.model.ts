@@ -54,7 +54,8 @@ export interface BankImportItem {
   amount: number;
   type: TransactionType;
   description: string | null;
-  categoryId: number;
+  /** null = "Necategorizat", created by the API; can be changed later. */
+  categoryId: number | null;
 }
 
 export interface BankImportResult {

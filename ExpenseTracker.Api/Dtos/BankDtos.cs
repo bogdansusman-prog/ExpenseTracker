@@ -66,7 +66,8 @@ public class BankImportItemDto
     [MaxLength(500)]
     public string? Description { get; set; }
 
-    public int CategoryId { get; set; }
+    /// <summary>Null = "Necategorizat" (created automatically); can be changed later.</summary>
+    public int? CategoryId { get; set; }
 }
 
 public class BankImportRequestDto

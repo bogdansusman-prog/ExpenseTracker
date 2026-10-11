@@ -87,6 +87,15 @@ public class BankTransactionMapperTests
     }
 
     [Theory]
+    [InlineData("Apple Pay, Tranzactie comerciant - Tranz: Nr card 4493XXXXXX0000, token XX0000, device iPhone, Ref 904147469446, Suma platita 12.43 RON. Comision: 0 RON. Locatie: 21309850 RO CARREFOUR MK CLUJ GARA", "CARREFOUR MK CLUJ GARA")]
+    [InlineData("Apple Pay, Tranzactie comerciant - Tranz: Nr card 4493XXXXXX0000, Suma platita 2.99 RON. Comision: 0 RON. Locatie: 05504560 IE APPLE.COM/BILL CORK. Dat", "APPLE.COM/BILL CORK")]
+    [InlineData("Transfer intre conturi proprii", "Transfer intre conturi proprii")]
+    public void Turns_card_payment_text_into_merchant(string remittance, string expected)
+    {
+        Assert.Equal(expected, BankTransactionMapper.Readable(remittance));
+    }
+
+    [Theory]
     [InlineData("RO49RNCB0082004567890123", "RO49 •••• 0123")]
     [InlineData("RO49 RNCB 0082 0045 6789 0123", "RO49 •••• 0123")]
     [InlineData(null, null)]
