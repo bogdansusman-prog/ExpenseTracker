@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { AxMascot } from '../../components/ax-mascot/ax-mascot';
+import { CubeButton } from '../../components/cube-button/cube-button';
 import { I18n } from '../../i18n/i18n.service';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 
@@ -41,7 +42,7 @@ interface TextPart {
  */
 @Component({
   selector: 'app-about',
-  imports: [AxMascot, TranslatePipe],
+  imports: [AxMascot, CubeButton, TranslatePipe],
   templateUrl: './about.html',
   styleUrl: './about.scss'
 })

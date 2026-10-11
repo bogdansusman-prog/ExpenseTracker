@@ -31,8 +31,8 @@
     @for (word of leadWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>
   <div class="links">
-    <a class="ui-btn" [href]="githubUrl" target="_blank" rel="noopener">GitHub</a>
-    <a class="ui-btn ghost" [href]="linkedinUrl" target="_blank" rel="noopener">LinkedIn</a>
+    <app-cube-button [href]="githubUrl" label="GitHub" [hoverLabel]="'Vezi codul' | t" icon="code" />
+    <app-cube-button [href]="linkedinUrl" label="LinkedIn" [hoverLabel]="'Hai să vorbim' | t" icon="briefcase" />
   </div>
 </section>
 
@@ -133,8 +133,8 @@
     @for (word of finaleWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>
   <div class="actions">
-    <a class="ui-btn" [href]="githubUrl" target="_blank" rel="noopener">{{ 'Vezi tot pe GitHub' | t }}</a>
-    <a class="ui-btn ghost" [href]="linkedinUrl" target="_blank" rel="noopener">LinkedIn</a>
+    <app-cube-button [href]="githubUrl" label="GitHub" [hoverLabel]="'Vezi tot pe GitHub' | t" icon="code" />
+    <app-cube-button [href]="linkedinUrl" label="LinkedIn" [hoverLabel]="'Hai să vorbim' | t" icon="briefcase" />
   </div>
   <p class="footer">{{ 'Ax Tracker · făcut de Bogdan Șușman ·' | t }} {{ year }}</p>
 </section>

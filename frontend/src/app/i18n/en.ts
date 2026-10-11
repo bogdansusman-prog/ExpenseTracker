@@ -423,5 +423,7 @@ export const EN: Record<string, string> = {
   "Daca schimbi o categorie, data viitoare o tin minte pentru acelasi comerciant.": "If you change a category, I remember it for the same merchant next time.",
   "Eroare pe server. Ai rulat migratia BankSync (dotnet ef database update)? Uita-te in terminalul API-ului.": "Server error. Did you run the BankSync migration (dotnet ef database update)? Check the API terminal.",
   "{n} tranzactii fara categorie vor merge in „Necategorizat”. Le poti muta oricand.": "{n} transactions without a category will go to “Necategorizat” (uncategorized). You can move them anytime.",
-  "Sau pune-le pe toate in...": "Or put them all in..."
+  "Sau pune-le pe toate in...": "Or put them all in...",
+  "Vezi codul": "See the code",
+  "Hai să vorbim": "Let's talk"
 };
