@@ -420,5 +420,6 @@ export const EN: Record<string, string> = {
   "Banca nu a putut fi conectata. Incearca din nou.": "The bank could not be connected. Please try again.",
   "Sincronizeaza o data pe saptamana si nu mai scrii nimic de mana.": "Sync once a week and you never have to type anything by hand.",
   "Accesul e doar pentru citire: eu vad tranzactiile, dar nu pot face plati.": "Access is read-only: I can see transactions, but I can never make payments.",
-  "Daca schimbi o categorie, data viitoare o tin minte pentru acelasi comerciant.": "If you change a category, I remember it for the same merchant next time."
+  "Daca schimbi o categorie, data viitoare o tin minte pentru acelasi comerciant.": "If you change a category, I remember it for the same merchant next time.",
+  "Eroare pe server. Ai rulat migratia BankSync (dotnet ef database update)? Uita-te in terminalul API-ului.": "Server error. Did you run the BankSync migration (dotnet ef database update)? Check the API terminal."
 };

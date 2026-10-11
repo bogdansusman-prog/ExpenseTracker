@@ -62,7 +62,7 @@ export class BankCallback implements OnInit {
       next: connection => this.router.navigate(['/bank'], { queryParams: { connected: connection.id }, replaceUrl: true }),
       error: error => this.error.set(error.status === 0
         ? 'API-ul nu raspunde. Porneste backend-ul (dotnet run --launch-profile https).'
-        : typeof error.error === 'string' && /authorization/i.test(error.error)
+        : error.status === 400 && typeof error.error === 'string' && /authorization/i.test(error.error)
           ? 'Autorizarea la banca a expirat sau a fost deja folosita. Incearca din nou.'
           : 'Banca nu a putut fi conectata. Incearca din nou.')
     });
