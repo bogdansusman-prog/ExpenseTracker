@@ -243,7 +243,7 @@ export class Bank implements OnInit {
     }
 
     // Only short plain-text messages come from our own checks; a 500 returns a whole error page.
-    const text = typeof error.error === 'string' && error.status === 400 ? error.error : '';
+    const text = typeof error.error === 'string' && (error.status === 400 || error.status === 502) ? error.error : '';
 
     if (error.status >= 500 && error.status !== 502) {
       return 'Eroare pe server. Ai rulat migratia BankSync (dotnet ef database update)? Uita-te in terminalul API-ului.';

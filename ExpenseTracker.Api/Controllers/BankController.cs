@@ -13,7 +13,11 @@ namespace ExpenseTracker.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/bank")]
-public class BankController(BankSyncService bank, InsightsService insights, IOptions<EnableBankingOptions> options) : ControllerBase
+public class BankController(
+    BankSyncService bank,
+    InsightsService insights,
+    IOptions<EnableBankingOptions> options,
+    ILogger<BankController> logger) : ControllerBase
 {
     [HttpGet("status")]
     public async Task<ActionResult<BankStatusDto>> Status(CancellationToken cancellationToken) =>
@@ -86,6 +90,7 @@ public class BankController(BankSyncService bank, InsightsService insights, IOpt
         }
         catch (EnableBankingException exception)
         {
+            logger.LogWarning("Enable Banking call failed: {Message}", exception.Message);
             return StatusCode(StatusCodes.Status502BadGateway, exception.Message);
         }
     }
