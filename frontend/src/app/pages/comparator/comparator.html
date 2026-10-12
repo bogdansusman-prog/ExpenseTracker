@@ -36,11 +36,13 @@
 
 } @else {
 
+  <div class="page-body" axReveal=".summary-card, :scope > section.card">
+
   <!-- SUMMARY -->
 
   <section class="summary-grid">
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Total venituri' | t }}
@@ -54,7 +56,7 @@
     </article>
 
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Total cheltuieli' | t }}
@@ -68,7 +70,7 @@
     </article>
 
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Diferenta' | t }}
@@ -165,5 +167,8 @@
     </section>
 
   }
+
+
+  </div>
 
 }

@@ -17,10 +17,11 @@ import { formatHours } from '../../shared/format';
 import { FinancialTransaction } from '../../models/financial-transaction.model';
 import { I18n } from '../../i18n/i18n.service';
 import { TranslatePipe } from '../../i18n/translate.pipe';
+import { CountUp, Magnetic, Reveal, Tilt } from '../../shared/motion';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [QuickAdd, RouterLink, AxMascot, TranslatePipe],
+  imports: [QuickAdd, RouterLink, AxMascot, TranslatePipe, CountUp, Magnetic, Reveal, Tilt],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -89,6 +90,9 @@ export class Dashboard implements OnInit {
         )
         .length
   );
+
+  /** Used by the count-up numbers. */
+  readonly money = (value: number) => this.formatMoney(value);
 
   ngOnInit(): void {
     this.settings.load();

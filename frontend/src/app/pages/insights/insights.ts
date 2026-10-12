@@ -22,6 +22,7 @@ import { SettingsStore } from '../../services/settings.store';
 import { formatHours, formatMoney, FREQUENCY_RO, WEEK_DAYS_RO } from '../../shared/format';
 import { I18n } from '../../i18n/i18n.service';
 import { TranslatePipe } from '../../i18n/translate.pipe';
+import { Reveal } from '../../shared/motion';
 
 interface HeatmapRow {
   category: string;
@@ -30,7 +31,7 @@ interface HeatmapRow {
 
 @Component({
   selector: 'app-insights',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, Reveal],
   templateUrl: './insights.html',
   styleUrl: './insights.scss'
 })

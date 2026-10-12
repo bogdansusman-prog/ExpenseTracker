@@ -8,6 +8,7 @@
 
   <button
     class="reload-button"
+    axMagnetic
     type="button"
     (click)="loadData()"
   >
@@ -47,16 +48,19 @@
 
 } @else {
 
+  <!-- cards rise out of a blur one after another, numbers count up -->
+  <div class="dash-body" axReveal=".summary-card, :scope > .card, .transaction-item">
+
   <section class="summary-grid">
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Venituri' | t }}
       </span>
 
       <strong class="income">
-        {{ formatMoney(totalIncome()) }}
+        <span [axCountUp]="totalIncome()" [countFormat]="money"></span>
         {{ 'lei' | t }}
       </strong>
 
@@ -68,14 +72,14 @@
     </article>
 
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Cheltuieli' | t }}
       </span>
 
       <strong class="expense">
-        {{ formatMoney(totalExpenses()) }}
+        <span [axCountUp]="totalExpenses()" [countFormat]="money"></span>
         {{ 'lei' | t }}
       </strong>
 
@@ -87,7 +91,7 @@
     </article>
 
 
-    <article class="summary-card">
+    <article class="summary-card" axTilt>
 
       <span>
         {{ 'Sold' | t }}
@@ -97,7 +101,7 @@
         [class.income]="balance() >= 0"
         [class.expense]="balance() < 0"
       >
-        {{ formatMoney(balance()) }}
+        <span [axCountUp]="balance()" [countFormat]="money"></span>
         {{ 'lei' | t }}
       </strong>
 
@@ -121,9 +125,7 @@
         </p>
       </div>
 
-      <strong class="transaction-count">
-        {{ transactionCount() }}
-      </strong>
+      <strong class="transaction-count" [axCountUp]="transactionCount()"></strong>
     </div>
 
   </section>
@@ -199,5 +201,7 @@
     }
 
   </section>
+
+  </div>
 
 }

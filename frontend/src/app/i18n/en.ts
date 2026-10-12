@@ -11,6 +11,8 @@ export const EN: Record<string, string> = {
   "Comparator": "Comparator",
   "Insights": "Insights",
   "Intreaba-l pe Ax": "Ask Ax",
+  "tranzactii noi au ajuns in Ax Tracker!": "new transactions just landed in Ax Tracker!",
+  "Le gasesti in Tranzactii si in toate calculele.": "You'll find them in Transactions and in every calculation.",
   "Ce a inteles Ax": "What Ax understood",
   "Am inteles:": "Understood:",
   "Intreaba-l pe Ax →": "Ask Ax →",

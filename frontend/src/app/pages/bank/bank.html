@@ -3,11 +3,28 @@
     <h2>{{ 'Contul bancar' | t }}</h2>
     <p>{{ 'Conecteaza-ti banca si adu tranzactiile automat, fara sa le mai scrii de mana' | t }}</p>
   </div>
-  <button class="ui-btn secondary" type="button" (click)="load()">{{ 'Reincarca' | t }}</button>
+  <button class="ui-btn secondary" axMagnetic type="button" (click)="load()">{{ 'Reincarca' | t }}</button>
 </div>
 
-@if (message()) { <div class="ui-alert success">{{ message() | t }}</div> }
-@if (error()) { <div class="ui-alert error">{{ error() | t }}</div> }
+@if (celebration(); as party) {
+  <section class="ui-card celebrate" animate.enter="celebrate-enter" animate.leave="pop-leave" (click)="celebration.set(null)">
+    <div class="confetti" aria-hidden="true">
+      @for (piece of confetti; track $index) {
+        <i [style.--x]="piece.x + 'px'" [style.--y]="piece.y + 'px'" [style.--r]="piece.rotate + 'deg'"
+           [style.--d]="piece.delay + 's'" [style.background]="piece.color"></i>
+      }
+    </div>
+    <app-ax mood="happy" [size]="86" />
+    <div class="celebrate-text">
+      <strong><span [axCountUp]="party.imported"></span></strong>
+      <span>{{ 'tranzactii noi au ajuns in Ax Tracker!' | t }}</span>
+      <small class="ui-muted">{{ 'Le gasesti in Tranzactii si in toate calculele.' | t }}</small>
+    </div>
+  </section>
+}
+
+@if (message()) { <div class="ui-alert success" animate.enter="pop-enter" animate.leave="pop-leave">{{ message() | t }}</div> }
+@if (error()) { <div class="ui-alert error" animate.enter="pop-enter" animate.leave="pop-leave">{{ error() | t }}</div> }
 
 @if (loading()) {
   <p class="ui-muted">{{ 'Se incarca datele...' | t }}</p>
@@ -32,6 +49,8 @@
     </section>
   } @else {
 
+    <div class="bank-body" axReveal=":scope > .ui-card">
+
     <section class="ui-card connect">
       <div>
         <h3>{{ 'Conecteaza o banca' | t }}</h3>
@@ -52,7 +71,7 @@
     </section>
 
     @for (connection of s.connections; track connection.id) {
-      <section class="ui-card connection" [class.expired]="connection.expired">
+      <section class="ui-card connection" axTilt [tiltMax]="2.5" [class.expired]="connection.expired">
         <div class="connection-head">
           <div class="bank-icon">{{ connection.aspspName.slice(0, 1) }}</div>
           <div class="connection-info">
@@ -95,7 +114,7 @@
     }
 
     @if (previewConnection(); as connection) {
-      <section class="ui-card preview">
+      <section class="ui-card preview" animate.enter="preview-enter" animate.leave="pop-leave">
         <div class="preview-head">
           <div>
             <h3>{{ 'Verifica tranzactiile de la' | t }} {{ connection.aspspName }}</h3>
@@ -129,7 +148,7 @@
               </thead>
               <tbody>
                 @for (row of rows(); track row.externalId) {
-                  <tr [class.done]="row.alreadyImported" [class.off]="!row.selected && !row.alreadyImported">
+                  <tr animate.enter="row-enter" [style.--i]="$index" [class.done]="row.alreadyImported" [class.off]="!row.selected && !row.alreadyImported">
                     <td>
                       <input type="checkbox" [checked]="row.selected" [disabled]="row.alreadyImported"
                              (change)="toggle(row, $any($event.target).checked)" />
@@ -183,6 +202,8 @@
         </div>
       </section>
     }
+
+    </div>
 
     @if (s.connections.length === 0) {
       <p class="hint ui-muted">{{ 'Nicio banca conectata inca.' | t }} <a routerLink="/transactions">{{ 'Sau adauga tranzactiile de mana' | t }}</a>.</p>

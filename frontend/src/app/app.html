@@ -10,7 +10,8 @@
   </a>
 
   @if (auth.isLoggedIn()) {
-  <nav class="navigation">
+  <nav class="navigation" #nav>
+    <span class="nav-indicator" #indicator aria-hidden="true"></span>
     <a routerLink="/dashboard" routerLinkActive="active">{{ 'Dashboard' | t }}</a>
     <a routerLink="/transactions" routerLinkActive="active">{{ 'Tranzactii' | t }}</a>
     <a routerLink="/categories" routerLinkActive="active">{{ 'Categorii' | t }}</a>
@@ -39,6 +40,8 @@
 
 </header>
 }
+
+<div class="route-sweep" #sweep aria-hidden="true"></div>
 
 <main class="page-container" [class.auth-layout]="isAuthPage()">
   <router-outlet />

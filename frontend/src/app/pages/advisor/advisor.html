@@ -125,19 +125,19 @@
     @if (messages().length === 0) {
       <div class="suggestions">
         @for (suggestion of suggestions[language()]; track suggestion) {
-          <button type="button" class="chip" (click)="ask(suggestion)">{{ suggestion }}</button>
+          <button type="button" class="chip" animate.enter="chip-enter" [style.--i]="$index" (click)="ask(suggestion)">{{ suggestion }}</button>
         }
       </div>
     }
 
     @for (message of messages(); track $index) {
       <!-- kept on one line: the bubble uses white-space: pre-wrap -->
-      <div class="bubble" [class.user]="message.role === 'user'">@if ($index === typingIndex()) {<span>{{ typedText() }}</span><span class="caret"></span>} @else {<span>{{ message.content }}</span>}</div>
+      <div class="bubble" animate.enter="bubble-enter" [class.user]="message.role === 'user'">@if ($index === typingIndex()) {<span>{{ typedText() }}</span><span class="caret"></span>} @else {<span>{{ message.content }}</span>}</div>
       @if (message.understood?.length && $index !== typingIndex()) {
         <div class="understood" [attr.aria-label]="'Ce a inteles Ax' | t">
           <span class="understood-label">{{ 'Am inteles:' | t }}</span>
           @for (chip of message.understood; track $index) {
-            <span class="understood-chip">{{ chip }}</span>
+            <span class="understood-chip" [style.--i]="$index">{{ chip }}</span>
           }
         </div>
       }

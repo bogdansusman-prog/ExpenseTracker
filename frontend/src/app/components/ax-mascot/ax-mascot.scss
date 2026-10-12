@@ -93,3 +93,5 @@
 @media (prefers-reduced-motion: reduce) {
   .ax * { animation: none !important; transition: none !important; }
 }
+
+:host { cursor: pointer; -webkit-tap-highlight-color: transparent; }

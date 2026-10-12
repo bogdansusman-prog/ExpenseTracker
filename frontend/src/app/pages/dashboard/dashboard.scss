@@ -60,6 +60,9 @@
 
   strong {
     font-size: 27px;
+    font-variant-numeric: tabular-nums; // digits keep their width while counting up
+
+    span { color: inherit; }
   }
 
   small {
@@ -187,5 +190,15 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 15px;
+  }
+}
+.transaction-count { font-variant-numeric: tabular-nums; }
+
+.summary-card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: #3b4a7a;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(116, 143, 252, 0.15);
   }
 }
