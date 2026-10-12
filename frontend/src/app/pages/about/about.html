@@ -1,99 +1,158 @@
-<section class="hero">
-  <img class="logo" src="ax-logo.png" [alt]="'Ax, mascota Ax Tracker' | t" width="220" height="220" />
-  <div>
+<!-- Living background: light blobs that drift, one follows the mouse -->
+<div class="ambient" aria-hidden="true">
+  <span class="blob drift b1"></span>
+  <span class="blob drift b2"></span>
+  <span class="blob drift b3"></span>
+  <span class="blob follow"></span>
+</div>
+
+<!-- Custom cursor (only with a mouse) -->
+<span class="cursor-dot" aria-hidden="true"></span>
+<span class="cursor-ring" aria-hidden="true"></span>
+
+<!-- Ax, the guide: swims down the side and reacts to each chapter -->
+<aside class="guide" aria-hidden="true">
+  <p class="bubble" [class.empty]="!guideLine()">{{ guideLine() | t }}</p>
+  <div class="swim"><app-ax [mood]="guideMood()" [size]="110" /></div>
+</aside>
+
+<!-- Intro: the name, letter by letter -->
+<section class="intro">
+  <div class="intro-inner">
+    <img class="logo" src="ax-logo.png" [alt]="'Ax, mascota Ax Tracker' | t" width="150" height="150" (load)="refresh()" />
     <span class="eyebrow">{{ 'Despre Ax Tracker' | t }}</span>
-    <h2>{{ 'Salut, sunt' | t }} <span class="name">Bogdan Șușman</span></h2>
+    <h2 class="name" [attr.aria-label]="'Bogdan Șușman'">
+      <span class="hello">{{ 'Salut, sunt' | t }}</span>
+      <span class="letters" aria-hidden="true">
+        @for (letter of nameLetters; track $index) {
+          <span class="mask"><span class="letter">{{ letter }}</span></span>
+        }
+      </span>
+    </h2>
     <p class="pronounce">{{ 'Se pronunță' | t }} <em>Shush-man</em>.</p>
-    <p class="motto">{{ '„Învăț construind: de la tranzistor până la aplicație.”' | t }}</p>    <p class="lead">
-      {{ 'Student la Calculatoare la Universitatea Tehnică din Cluj-Napoca și full-stack developer din Oradea. Scriu aplicații web și mobile cu Angular, Flutter și ASP.NET Core, iar când codul nu-mi ajunge, cobor în hardware și proiectez procesoare în VHDL.' | t }}
-    </p>
-    <div class="links">
-      <a class="ui-btn" [href]="githubUrl" target="_blank" rel="noopener">GitHub</a>
-      <a class="ui-btn ghost" [href]="linkedinUrl" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">
+    <span>scroll</span>
+    <i></i>
   </div>
 </section>
 
-<section class="ui-card story">
-  <h3>{{ 'De ce am făcut Ax Tracker' | t }}</h3>
-  <p>
-    {{ 'Ca student, banii se duc repede și pe lucruri mărunte: o cafea aici, un Bolt acolo, un abonament uitat. Voiam o aplicație care să nu-mi arate doar' | t }} <em>{{ 'cât' | t }}</em> {{ 'am cheltuit, ci și' | t }} <em>{{ 'de ce' | t }}</em>{{ ': ce am regretat, ce s-a scumpit fără să observ și unde voi fi la sfârșitul lunii.' | t }}
-  </p>
-  <p>
-    {{ 'Dar motivul mai mare a fost să mă testez. Am vrut un proiect pe care să-l construiesc cap-coadă, singur: bază de date, API, securitate, interfață, algoritmi, teste. Să iau decizii ca într-un produs real și să învăț din ele. A pornit ca un simplu tabel cu tranzacții și a crescut pas cu pas: statistici, prognoze Monte Carlo, detectarea abonamentelor, conturi separate și, la final, Ax.' | t }}
-  </p>
-  <p>
-    {{ 'Ax Tracker e felul meu de a arăta ce pot face și, sper, pasul care mă duce mai departe, spre primul meu internship și spre o carieră în software.' | t }}
+<!-- The motto, pinned while it lights up -->
+<section class="statement reveal pin" data-mood="thinking" data-line="Ăsta e motto-ul lui. Și-l ia în serios.">
+  <p class="big motto">
+    @for (word of mottoWords(); track $index) { <span class="w">{{ word.text }}</span> }
   </p>
 </section>
 
-<section class="ui-card">
-  <h3>{{ 'Ce face aplicația' | t }}</h3>
-  <div class="highlights">
-    @for (item of highlights; track item.title) {
-      <article>
-        <strong>{{ item.title | t }}</strong>
-        <p>{{ item.text | t }}</p>
+<section class="statement reveal" data-mood="nodding" data-line="Calculatoare la Cluj: și cod, și hardware.">
+  <p class="medium">
+    @for (word of leadWords(); track $index) { <span class="w">{{ word.text }}</span> }
+  </p>
+  <div class="links">
+    <app-cube-button [href]="githubUrl" label="GitHub" [hoverLabel]="'Vezi codul' | t" icon="code" />
+    <app-cube-button [href]="linkedinUrl" label="LinkedIn" [hoverLabel]="'Hai să vorbim' | t" icon="briefcase" />
+  </div>
+</section>
+
+<!-- 01 Why -->
+<section class="chapter" data-mood="worried" data-line="O cafea aici, un Bolt acolo... știu, doare.">
+  <span class="chapter-label"><b>01</b> {{ 'De ce am făcut Ax Tracker' | t }}</span>
+  <p class="medium reveal">
+    @for (word of whyWords(); track $index) { <span class="w" [class.em]="word.em">{{ word.text }}</span> }
+  </p>
+  <p class="medium reveal">
+    @for (word of reasonWords(); track $index) { <span class="w">{{ word.text }}</span> }
+  </p>
+</section>
+
+<!-- 02 What it does -->
+<section class="chapter" data-mood="happy" data-line="Partea mea preferată: cifrele!">
+  <span class="chapter-label"><b>02</b> {{ 'Ce face aplicația' | t }}</span>
+  <div class="features">
+    @for (item of highlights; track item.title; let i = $index) {
+      <article class="feature">
+        <span class="index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+        <div>
+          <h3>{{ item.title | t }}</h3>
+          <p>{{ item.text | t }}</p>
+        </div>
       </article>
     }
   </div>
-
-  <h4>{{ 'Construit cu' | t }}</h4>
-  <div class="chips">
-    @for (tech of stack; track tech) {
-      <span class="chip">{{ tech }}</span>
-    }
-  </div>
 </section>
 
-<section class="ui-card meet-ax">
-  <app-ax mood="happy" [size]="170" />
-  <div>
-    <h3>{{ 'Și cine e Ax?' | t }}</h3>
-    <p>
-      {{ 'Ax e un axolotl cu ochelari rotunzi și papion, consilierul financiar al aplicației. Axolotlii pot să-și regenereze aproape orice parte a corpului, iar asta mi s-a părut potrivit pentru o aplicație care te ajută să-ți refaci finanțele după o lună mai grea.' | t }}
-    </p>
-    <p>
-      {{ 'E desenat de la zero în SVG și animat doar cu CSS: se gândește cât calculează, dă din cap când îți răspunde, se bucură când stai bine și se îngrijorează când riști să ajungi pe minus. Nu folosește niciun AI extern: totul e calculat local, din datele tale.' | t }}
-    </p>
-  </div>
-</section>
-
-<section class="ui-card">
-  <h3>{{ 'Drumul meu' | t }}</h3>
-  <ol class="timeline">
-    @for (step of milestones; track step.period) {
-      <li>
-        <span class="period">{{ step.period | t }}</span>
-        <strong>{{ step.title | t }}</strong>
-        <p>{{ step.detail | t }}</p>
-      </li>
-    }
-  </ol>
-</section>
-
-<section class="ui-card">
-  <div class="projects-header">
-    <div>
-      <h3>{{ 'Alte proiecte de-ale mele' | t }}</h3>
-      <p class="ui-muted">{{ 'Software și hardware: tot codul e pe GitHub.' | t }}</p>
+<!-- Built with: two rows drifting in opposite directions -->
+<section class="marquee" data-mood="thinking" data-line="Toate astea au intrat în aplicație." [attr.aria-label]="'Construit cu' | t">
+  <span class="chapter-label small"><b>·</b> {{ 'Construit cu' | t }}</span>
+  <div class="rows" aria-hidden="true">
+    <div class="row row-a">
+      @for (tech of stack.concat(stack); track $index) { <span class="tech">{{ tech }}</span> }
     </div>
-    <a class="ui-btn ghost" [href]="githubUrl" target="_blank" rel="noopener">{{ 'Vezi tot pe GitHub' | t }}</a>
+    <div class="row row-b">
+      @for (tech of stack.slice().reverse().concat(stack); track $index) { <span class="tech outline">{{ tech }}</span> }
+    </div>
   </div>
+</section>
 
-  <div class="projects">
-    @for (project of projects; track project.name) {
-      <a class="project" [class]="project.kind" [href]="project.url" target="_blank" rel="noopener">
-        <strong>{{ project.name | t }}</strong>
-        <p>{{ project.description | t }}</p>
-        <div class="chips small">
-          @for (tech of project.stack; track tech) {
-            <span class="chip">{{ tech }}</span>
-          }
-        </div>
-      </a>
+<!-- 03 Ax -->
+<section class="chapter meet" data-mood="alert" data-line="Ăsta sunt eu!">
+  <span class="chapter-label"><b>03</b> {{ 'Și cine e Ax?' | t }}</span>
+  <div class="meet-grid">
+    <div class="ax-wrap"><app-ax mood="happy" [size]="220" /></div>
+    <div class="meet-text">
+      <p>{{ 'Ax e un axolotl cu ochelari rotunzi și papion, consilierul financiar al aplicației. Axolotlii pot să-și regenereze aproape orice parte a corpului, iar asta mi s-a părut potrivit pentru o aplicație care te ajută să-ți refaci finanțele după o lună mai grea.' | t }}</p>
+      <p class="muted">{{ 'E desenat de la zero în SVG și animat doar cu CSS: se gândește cât calculează, dă din cap când îți răspunde, se bucură când stai bine și se îngrijorează când riști să ajungi pe minus. Nu folosește niciun AI extern: totul e calculat local, din datele tale.' | t }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 Journey -->
+<section class="chapter journey" data-mood="nodding" data-line="Pas cu pas, ca într-un pipeline.">
+  <span class="chapter-label"><b>04</b> {{ 'Drumul meu' | t }}</span>
+  <div class="steps">
+    <div class="line"><div class="line-fill"></div></div>
+    @for (step of milestones; track step.period; let last = $last) {
+      <div class="step" [class.next]="last">
+        <span class="dot"></span>
+        <span class="period">{{ step.period | t }}</span>
+        <h3>{{ step.title | t }}</h3>
+        <p>{{ step.detail | t }}</p>
+      </div>
     }
   </div>
 </section>
 
-<p class="footer">{{ 'Ax Tracker · făcut de Bogdan Șușman ·' | t }} {{ year }}</p>
+<!-- 05 Projects: horizontal gallery -->
+<section class="projects" data-mood="happy" data-line="Și software, și hardware.">
+  <div class="projects-head">
+    <span class="chapter-label"><b>05</b> {{ 'Alte proiecte de-ale mele' | t }}</span>
+    <p class="muted">{{ 'Software și hardware: tot codul e pe GitHub.' | t }}</p>
+  </div>
+  <div class="projects-viewport">
+    <div class="projects-track">
+      @for (project of projects; track project.name; let i = $index) {
+        <a class="project" [class]="project.kind" [href]="project.url" target="_blank" rel="noopener">
+          <span class="index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+          <h3>{{ project.name | t }}</h3>
+          <p>{{ project.description | t }}</p>
+          <div class="chips">
+            @for (tech of project.stack; track tech) { <span class="chip">{{ tech }}</span> }
+          </div>
+          <span class="open">GitHub →</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Finale -->
+<section class="finale" data-mood="happy" data-line="Hai să lucrăm împreună!">
+  <p class="big reveal">
+    @for (word of finaleWords(); track $index) { <span class="w">{{ word.text }}</span> }
+  </p>
+  <div class="actions">
+    <app-cube-button [href]="githubUrl" label="GitHub" [hoverLabel]="'Vezi tot pe GitHub' | t" icon="code" />
+    <app-cube-button [href]="linkedinUrl" label="LinkedIn" [hoverLabel]="'Hai să vorbim' | t" icon="briefcase" />
+  </div>
+  <p class="footer">{{ 'Ax Tracker · făcut de Bogdan Șușman ·' | t }} {{ year }}</p>
+</section>

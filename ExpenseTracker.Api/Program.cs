@@ -4,6 +4,7 @@ using ExpenseTracker.Api.Models;
 using ExpenseTracker.Api.Services;
 using ExpenseTracker.Api.Services.Auth;
 using ExpenseTracker.Api.Services.Advisor;
+using ExpenseTracker.Api.Services.Banking;
 using ExpenseTracker.Api.Services.QuickAdd;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -98,6 +99,11 @@ builder.Services.AddSingleton<AppClock>();
 builder.Services.AddScoped<InsightsService>();
 builder.Services.AddScoped<QuickAddService>();
 builder.Services.AddScoped<AdvisorService>();
+
+// Bank sync through Enable Banking (PSD2). Configure it with user secrets, see docs/bank-sync.md.
+builder.Services.Configure<EnableBankingOptions>(builder.Configuration.GetSection(EnableBankingOptions.SectionName));
+builder.Services.AddHttpClient<EnableBankingClient>(http => http.Timeout = TimeSpan.FromSeconds(60));
+builder.Services.AddScoped<BankSyncService>();
 
 var app = builder.Build();
 

@@ -34,4 +34,11 @@ public class FinancialTransaction : IUserOwned
 
     public DateTime? RegretRatedAt { get; set; }
 
+    /// <summary>
+    /// Id of the bank transaction this was imported from ("eb:{accountUid}:{bankId}").
+    /// Null for transactions added by hand. Unique per user, so a bank sync never imports twice.
+    /// </summary>
+    [MaxLength(200)]
+    public string? ExternalId { get; set; }
+
 }

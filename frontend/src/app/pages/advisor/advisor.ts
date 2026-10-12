@@ -85,19 +85,23 @@ export class Advisor implements OnInit, OnDestroy {
   readonly suggestions: Record<AppLanguage, string[]> = {
     ro: [
       'Cum stau?',
-      'Unde pot sa economisesc?',
+      'Pe ce am cheltuit cel mai mult luna asta?',
+      'Cat am dat pe mancare in septembrie?',
+      'Compara luna asta cu luna trecuta',
+      'Care au fost cele mai mari 3 cheltuieli?',
+      'Cat cheltui in medie pe zi?',
       'Ce abonamente am?',
-      'Cati bani o sa am la sfarsitul lunii?',
-      'Cum stau fata de luna trecuta?',
-      'Cate ore de munca m-au costat cheltuielile?'
+      'Ce poti sa faci?'
     ],
     en: [
       'How am I doing?',
-      'Where can I save?',
+      'What did I spend the most on this month?',
+      'How much did I spend on food in September?',
+      'Compare this month with last month',
+      'What were my 3 biggest expenses?',
+      'How much do I spend per day on average?',
       'What subscriptions do I have?',
-      'How much will I have at the end of the month?',
-      'Am I doing better than last month?',
-      'How many work hours did my spending cost?'
+      'What can you do?'
     ]
   };
 
@@ -157,7 +161,7 @@ export class Advisor implements OnInit, OnDestroy {
 
     this.api.chat(history, this.language()).subscribe({
       next: response => {
-        this.messages.update(list => [...list, { role: 'assistant', content: response.reply }]);
+        this.messages.update(list => [...list, { role: 'assistant', content: response.reply, understood: response.understood ?? [] }]);
         this.sending.set(false);
         this.typeOut(this.messages().length - 1, response.reply);
       },

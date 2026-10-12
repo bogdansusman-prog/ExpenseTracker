@@ -28,7 +28,7 @@ public class AdvisorController(AdvisorService advisor, InsightsService insights)
         {
             var lang = dto.Language ?? (await insights.GetSettingsAsync(cancellationToken)).Language;
             var reply = await advisor.ChatAsync(dto.Messages, lang, cancellationToken);
-            return Ok(new AdvisorChatResponseDto(reply));
+            return Ok(new AdvisorChatResponseDto(reply.Text, reply.Understood));
         }
         catch (ArgumentException exception)
         {

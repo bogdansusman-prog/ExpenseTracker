@@ -1,0 +1,191 @@
+<div class="ui-page-header">
+  <div>
+    <h2>{{ 'Contul bancar' | t }}</h2>
+    <p>{{ 'Conecteaza-ti banca si adu tranzactiile automat, fara sa le mai scrii de mana' | t }}</p>
+  </div>
+  <button class="ui-btn secondary" type="button" (click)="load()">{{ 'Reincarca' | t }}</button>
+</div>
+
+@if (message()) { <div class="ui-alert success">{{ message() | t }}</div> }
+@if (error()) { <div class="ui-alert error">{{ error() | t }}</div> }
+
+@if (loading()) {
+  <p class="ui-muted">{{ 'Se incarca datele...' | t }}</p>
+} @else if (status(); as s) {
+
+  @if (!s.configured) {
+    <section class="ui-card setup">
+      <div class="setup-head">
+        <app-ax mood="thinking" [size]="78" />
+        <div>
+          <h3>{{ 'Mai e un pas: configureaza Enable Banking' | t }}</h3>
+          <p class="ui-muted">{{ 'Enable Banking e un serviciu autorizat PSD2 prin care aplicatia citeste tranzactiile direct de la banca. Pentru conturile tale e gratuit.' | t }}</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li>{{ 'Fa-ti cont pe enablebanking.com si intra in Control Panel.' | t }}</li>
+        <li>{{ 'La API applications, inregistreaza o aplicatie de tip Production. Ca redirect URL pune:' | t }} <code>{{ s.redirectUrl }}</code></li>
+        <li>{{ 'Browserul descarca o cheie privata .pem. Mut-o intr-un folder din afara proiectului (nu o pune pe GitHub).' | t }}</li>
+        <li>{{ 'Activeaza aplicatia prin "Link accounts": te autentifici in George si legi contul tau BCR.' | t }}</li>
+        <li>{{ 'Spune-i API-ului unde e cheia (vezi docs/bank-sync.md), apoi reporneste-l.' | t }}</li>
+      </ol>
+    </section>
+  } @else {
+
+    <section class="ui-card connect">
+      <div>
+        <h3>{{ 'Conecteaza o banca' | t }}</h3>
+        <p class="ui-muted">
+          {{ 'Vei fi trimis in aplicatia bancii (de exemplu George) ca sa aprobi accesul doar pentru citire. Ax nu poate face plati si nu iti vede parola.' | t }}
+        </p>
+      </div>
+      <div class="connect-row">
+        <select class="ui-input" [ngModel]="selectedBank()" (ngModelChange)="selectedBank.set($event)" name="bank">
+          @for (bank of banks(); track bank.name) {
+            <option [value]="bank.name">{{ bank.name }}</option>
+          }
+        </select>
+        <button class="ui-btn" type="button" (click)="connect()" [disabled]="connecting() || !selectedBank()">
+          @if (connecting()) { {{ 'Te trimit la banca...' | t }} } @else { {{ 'Conecteaza' | t }} }
+        </button>
+      </div>
+    </section>
+
+    @for (connection of s.connections; track connection.id) {
+      <section class="ui-card connection" [class.expired]="connection.expired">
+        <div class="connection-head">
+          <div class="bank-icon">{{ connection.aspspName.slice(0, 1) }}</div>
+          <div class="connection-info">
+            <h3>{{ connection.aspspName }}</h3>
+            <div class="meta">
+              @if (connection.expired) {
+                <span class="ui-badge danger">{{ 'Acces expirat' | t }}</span>
+              } @else {
+                <span class="ui-badge success">{{ 'Conectat' | t }}</span>
+                <span>{{ 'inca {n} zile' | t: { n: daysLeft(connection) } }}</span>
+              }
+              @if (connection.lastSyncedAt) {
+                <span>· {{ 'ultima sincronizare' | t }} {{ formatDate(connection.lastSyncedAt) }}</span>
+              }
+            </div>
+            <div class="accounts">
+              @for (account of connection.accounts; track account.id) {
+                <span class="account">{{ account.iban || account.name }} <small>{{ account.currency }}</small></span>
+              }
+            </div>
+          </div>
+          <div class="connection-actions">
+            @if (!connection.expired) {
+              <select class="ui-input period" [ngModel]="periodDays()" (ngModelChange)="periodDays.set($event)" name="period-{{ connection.id }}">
+                <option [ngValue]="null">{{ 'De la ultima sincronizare' | t }}</option>
+                <option [ngValue]="30">{{ 'Ultimele 30 de zile' | t }}</option>
+                <option [ngValue]="90">{{ 'Ultimele 90 de zile' | t }}</option>
+                <option [ngValue]="365">{{ 'Ultimul an' | t }}</option>
+              </select>
+              <button class="ui-btn" type="button" (click)="sync(connection)" [disabled]="busyConnectionId() === connection.id">
+                @if (busyConnectionId() === connection.id) { {{ 'Citesc tranzactiile...' | t }} } @else { {{ 'Sincronizeaza' | t }} }
+              </button>
+            }
+            <button class="ui-btn ghost" type="button" (click)="disconnect(connection)" [disabled]="busyConnectionId() === connection.id">
+              {{ 'Deconecteaza' | t }}
+            </button>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (previewConnection(); as connection) {
+      <section class="ui-card preview">
+        <div class="preview-head">
+          <div>
+            <h3>{{ 'Verifica tranzactiile de la' | t }} {{ connection.aspspName }}</h3>
+            <p class="ui-muted">
+              @if (previewRange(); as range) { {{ formatDate(range.from) }} – {{ formatDate(range.to) }} · }
+              {{ '{n} noi' | t: { n: newRows().length } }}
+              @if (rows().length - newRows().length > 0) { · {{ '{n} deja importate' | t: { n: rows().length - newRows().length } }} }
+            </p>
+          </div>
+          @if (newRows().length > 0) {
+            <div class="bulk">
+              <button class="ui-btn ghost" type="button" (click)="toggleAll(true)">{{ 'Bifeaza tot' | t }}</button>
+              <button class="ui-btn ghost" type="button" (click)="toggleAll(false)">{{ 'Debifeaza tot' | t }}</button>
+            </div>
+          }
+        </div>
+
+        @if (rows().length === 0) {
+          <p class="empty">{{ 'Nu am gasit tranzactii noi in perioada asta.' | t }}</p>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>{{ 'Data' | t }}</th>
+                  <th>{{ 'Descriere' | t }}</th>
+                  <th>{{ 'Categorie' | t }}</th>
+                  <th class="right">{{ 'Suma' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row.externalId) {
+                  <tr [class.done]="row.alreadyImported" [class.off]="!row.selected && !row.alreadyImported">
+                    <td>
+                      <input type="checkbox" [checked]="row.selected" [disabled]="row.alreadyImported"
+                             (change)="toggle(row, $any($event.target).checked)" />
+                    </td>
+                    <td class="date">{{ formatDate(row.date) }}</td>
+                    <td class="desc">
+                      <span>{{ row.description }}</span>
+                      <small>
+                        {{ row.accountLabel }}
+                        @if (row.alreadyImported) { · <span class="ui-badge">{{ 'deja importata' | t }}</span> }
+                        @if (row.currency !== 'RON') { · <span class="ui-badge danger">{{ row.currency }}</span> }
+                      </small>
+                    </td>
+                    <td>
+                      @if (!row.alreadyImported) {
+                        <select class="ui-input category" [class.missing]="row.selected && row.categoryId === null"
+                                [value]="row.categoryId ?? ''" (change)="setCategory(row, $any($event.target).value)">
+                          <option value="">{{ 'Alege categoria' | t }}</option>
+                          @for (category of categories(); track category.id) {
+                            <option [value]="category.id" [selected]="category.id === row.categoryId">{{ category.name }}</option>
+                          }
+                        </select>
+                      }
+                    </td>
+                    <td class="right amount" [class.ui-income]="row.type === 1" [class.ui-expense]="row.type === 2">
+                      {{ row.type === 1 ? '+' : '−' }}{{ formatMoney(row.amount) }} {{ row.currency === 'RON' ? ('lei' | t) : row.currency }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <div class="preview-actions">
+          @if (missingCategory() > 0) {
+            <div class="missing-note">
+              <span class="ui-warning">{{ '{n} tranzactii fara categorie vor merge in „Necategorizat”. Le poti muta oricand.' | t: { n: missingCategory() } }}</span>
+              <select class="ui-input bulk-category" (change)="setCategoryForMissing($any($event.target).value); $any($event.target).value = ''">
+                <option value="">{{ 'Sau pune-le pe toate in...' | t }}</option>
+                @for (category of categories(); track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            </div>
+          }
+          <button class="ui-btn ghost" type="button" (click)="cancelPreview()">{{ 'Renunta' | t }}</button>
+          <button class="ui-btn" type="button" (click)="importSelected()" [disabled]="!canImport()">
+            @if (importing()) { {{ 'Se importa...' | t }} } @else { {{ 'Importa {n} tranzactii' | t: { n: selectedRows().length } }} }
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (s.connections.length === 0) {
+      <p class="hint ui-muted">{{ 'Nicio banca conectata inca.' | t }} <a routerLink="/transactions">{{ 'Sau adauga tranzactiile de mana' | t }}</a>.</p>
+    }
+  }
+}
