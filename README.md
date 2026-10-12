@@ -6,7 +6,9 @@
 
 <p align="center">
   <b>Your money, made simple.</b><br />
-  A full-stack personal finance app with ASP.NET Core, Angular and PostgreSQL. It has an animated axolotl advisor that explains your spending with real numbers and uses no external AI.
+  A full-stack personal finance app with ASP.NET Core, Angular and PostgreSQL. It reads your bank account,
+  answers questions about your money with a chatbot built from scratch, and has an animated axolotl advisor.
+  No external AI: every number is computed from your own data.
 </p>
 
 <p align="center">
@@ -18,12 +20,15 @@
 ## Highlights
 
 - **Accounts.** Register and log in with ASP.NET Core Identity and JWT. Every user sees only their own data, enforced by global query filters in EF Core.
-- **Ax, the financial advisor.** You get a 0–100 financial health score with a full breakdown, strengths, concerns and 3 concrete steps with estimated savings. There is also a chat that answers questions about your own data. Everything is rule-based and computed locally.
+- **Bank sync (PSD2).** Connect your bank (tested with BCR / George) through [Enable Banking](https://enablebanking.com), preview the new transactions with suggested categories, then import them. Access is read-only and the app never sees your bank password.
+- **Ax, the financial advisor.** You get a 0–100 financial health score with a full breakdown, strengths, concerns and 3 concrete steps with estimated savings.
+- **Ask Ax anything.** A chatbot made from scratch (no external AI): a Naive Bayes classifier understands free questions in Romanian or English, typos included, and follow-ups like *"and last month?"*. Every answer is calculated from your transactions, and Ax shows what he understood (intent, period, category, how sure he is).
 - **"Was it worth it?"** Seven days after an expense, you rate it from 1 to 5. A heatmap shows where and when you regret spending.
 - **Subscription detective.** It finds recurring payments on its own and flags quiet price increases.
 - **Monte Carlo forecast.** It runs 2,000 simulations on your real cash flow and shows a pessimistic, expected and optimistic balance for the next 30–90 days.
 - **Quick add in natural language.** For example, `yesterday 45 lei pizza with Andrei` becomes a ready-to-confirm transaction, offline, in Romanian or English.
 - **Prices in hours of work.** Set your hourly income and every expense also shows how many hours of your life it cost.
+- **Cinematic animations.** Pages cross-fade, cards rise out of a blur and tilt towards the mouse, totals count up, imported transactions fly into the app, and Ax watches your cursor (click him a few times). Everything respects *reduce motion*.
 - **Romanian / English.** The whole interface, Ax and quick add switch language instantly from Settings.
 - **Profile.** You can change your profile picture, display name and password.
 - The basics are covered too: dashboard, transactions with filters and bulk delete, categories, and charts comparing income and expenses.
@@ -36,6 +41,8 @@
 |---|---|
 | ![Login](docs/images/login.png) | ![Welcome animation](docs/images/welcome.png) |
 | **Login** with an RO / EN switch | **Welcome animation** after logging in |
+| ![Bank sync](docs/images/bank.png) | ![Chat with Ax](docs/images/chat.png) |
+| **Bank sync**: review the new transactions, then import | **Chat with Ax**: free questions, follow-ups, what he understood |
 | ![Ask Ax](docs/images/advisor.png) | ![Insights](docs/images/insights.png) |
 | **Ask Ax**: score, breakdown, steps and chat | **Insights**: regret map, subscriptions, forecast |
 | ![Transactions](docs/images/transactions.png) | ![Categories](docs/images/categories.png) |
@@ -43,7 +50,7 @@
 | ![Comparator](docs/images/comparator.png) | ![Settings](docs/images/settings.png) |
 | **Comparator** charts | **Settings**: language and hourly income |
 | ![About](docs/images/about.png) | ![Swagger](docs/images/swagger.png) |
-| **About** the project and its author | **Swagger UI** for the REST API |
+| **About**: the story told on scroll (GSAP) | **Swagger UI** for the REST API |
 
 > The screenshots use demo data.
 
@@ -66,15 +73,29 @@ His score is the sum of six transparent components:
 
 More details: [docs/smart-insights.md](docs/smart-insights.md).
 
+### Ax's brain
+
+The chat in *Ask Ax* is a small language pipeline written from scratch in C#:
+
+1. **Text cleanup:** lowercase, no diacritics, tokens, and a crude RO/EN stemmer (*abonamentele* → *abonament*).
+2. **Intent:** a multinomial **Naive Bayes** classifier trained at startup on ~250 example questions (word stems + pairs of stems, Laplace smoothing, softmax confidence). Unknown words are matched to the closest known one with the **Damerau-Levenshtein** distance, so typos still count.
+3. **Details (slots):** period (*today*, *last month*, *in September*, *last 10 days*), category and shop (fuzzy-matched against your own data), income or expense, top N.
+4. **Memory:** the conversation is replayed, so *"how much at Lidl this month?"* → *"and last month?"* → *"what about Carrefour?"* keeps the context.
+5. **Answer:** a query engine computes totals, counts, rankings, averages, comparisons (with the same days of the previous month) and work hours from your transactions.
+
+To teach Ax a new way of asking, add a sentence to `Services/Advisor/Brain/TrainingData.cs`.
+
 ---
 
 ## Tech stack
 
 **Backend:** C#, ASP.NET Core 10, Entity Framework Core 10, PostgreSQL (Npgsql), ASP.NET Core Identity, JWT bearer authentication, OpenAPI and Swagger UI, xUnit.
 
-**Frontend:** Angular 22 (standalone components, signals, zoneless, new control flow), TypeScript, SCSS, RxJS, Chart.js, and a small custom i18n layer (a `t` pipe with Romanian text as the key).
+**Frontend:** Angular 22 (standalone components, signals, zoneless, new control flow, native `animate.enter` / `animate.leave`, View Transitions), TypeScript, SCSS, RxJS, Chart.js, GSAP + ScrollTrigger, and a small custom i18n layer (a `t` pipe with Romanian text as the key).
 
-**Algorithms:** bootstrap Monte Carlo simulation, recurring-payment detection (normalized descriptions plus median interval), a regret heatmap, a keyword- and regex-based natural language parser, and a rule-based scoring model.
+**Integrations:** Enable Banking API (PSD2 account information, JWT signed with RS256).
+
+**Algorithms:** Naive Bayes intent classification, Damerau-Levenshtein typo matching, bootstrap Monte Carlo simulation, recurring-payment detection (normalized descriptions plus median interval), a regret heatmap, a keyword- and regex-based natural language parser, and a rule-based scoring model.
 
 ---
 
@@ -82,30 +103,35 @@ More details: [docs/smart-insights.md](docs/smart-insights.md).
 
 ```text
 Angular frontend  ──HTTP + JWT──▶  ASP.NET Core Web API  ──EF Core──▶  PostgreSQL
- (signals, i18n,                    (Identity, controllers,
-  Chart.js, Ax SVG)                  Insights / Advisor / QuickAdd services)
+ (signals, i18n, GSAP,              (Identity, controllers,
+  Chart.js, Ax SVG)                  Insights / Advisor / Bank services)
+                                              │
+                                              └──HTTPS (PSD2)──▶  Enable Banking  ──▶  your bank
 ```
 
 ```text
 ExpenseTracker.Api/
 ├── ExpenseTracker.Api/           ASP.NET Core Web API
-│   ├── Controllers/              Auth, Transactions, Categories, Insights, Advisor, QuickAdd, Settings
+│   ├── Controllers/              Auth, Transactions, Categories, Insights, Advisor, QuickAdd, Settings, Bank
 │   ├── Data/AppDbContext.cs      Identity + per-user global query filters
 │   ├── Models/  Dtos/  Migrations/
 │   └── Services/
-│       ├── Advisor/              RuleBasedAdvisor, AdvisorChatEngine, RO/EN texts
+│       ├── Advisor/              RuleBasedAdvisor, RO/EN texts
+│       │   └── Brain/            Ax's chatbot: classifier, training data, slots, query engine
+│       ├── Banking/              Enable Banking client, transaction mapper, sync service
 │       ├── Analytics/            BalanceForecaster, SubscriptionDetector, RegretAnalyzer
 │       ├── QuickAdd/             NaturalLanguageParser
 │       └── Auth/                 JWT token service
-├── ExpenseTracker.Tests/         xUnit tests for the analytics, parser and advisor
+├── ExpenseTracker.Tests/         xUnit tests for the analytics, parser, advisor, Ax's brain and bank mapper
 ├── frontend/                     Angular app
 │   └── src/app/
 │       ├── auth/                 AuthService, interceptor, guards
 │       ├── components/           ax-mascot, ax-companion, quick-add, welcome-splash, language-switch
 │       ├── i18n/                 I18n service, t pipe, English dictionary
-│       ├── pages/                dashboard, transactions, categories, comparator, insights,
+│       ├── pages/                dashboard, transactions, categories, comparator, insights, bank,
 │       │                         advisor, settings, profile, about, login, register
-│       └── services/  shared/  models/
+│       ├── shared/motion/        reveal, count-up, tilt and magnetic directives (GSAP)
+│       └── services/  models/
 └── docs/                         feature docs and screenshots
 ```
 
@@ -121,7 +147,8 @@ All endpoints except register and login require a `Bearer` token.
 | Transactions | `GET/POST /api/transactions`, `GET/PUT/DELETE /api/transactions/{id}` |
 | Categories | `GET/POST /api/categories`, `GET/PUT/DELETE /api/categories/{id}` (a category that still has transactions cannot be deleted) |
 | Insights | `GET /api/insights/regret/pending`, `POST /api/insights/regret/{id}`, `GET /api/insights/regret/summary`, `GET /api/insights/subscriptions`, `GET /api/insights/forecast?days=30` |
-| Ax | `GET /api/advisor/report?language=en`, `POST /api/advisor/chat` |
+| Ax | `GET /api/advisor/report?language=en`, `POST /api/advisor/chat` (returns `reply` and `understood`) |
+| Bank | `GET /api/bank/status`, `GET /api/bank/banks`, `POST /api/bank/connect`, `GET /api/bank/connections/{id}/preview`, `POST /api/bank/connections/{id}/import`, `DELETE /api/bank/connections/{id}` |
 | Quick add | `POST /api/quickadd/parse` |
 | Settings | `GET/PUT /api/settings` (hourly rate, language) |
 
@@ -157,6 +184,8 @@ dotnet user-secrets set "Jwt:Key" "YOUR_LONG_RANDOM_SECRET"
 
 If `Jwt:Key` is missing, Development falls back to a temporary key, so you have to log in again after every restart.
 
+Bank sync is optional. To turn it on, follow [docs/bank-sync.md](docs/bank-sync.md): it needs an Enable Banking application id and the path to its private key (kept outside the repository).
+
 ### 3. Create the database and run the API
 
 ```bash
@@ -186,14 +215,16 @@ dotnet test
 
 - Passwords are hashed by ASP.NET Core Identity, and sessions use JWTs that expire after 12 hours.
 - Every query is filtered by the current user, and new records are assigned to their owner automatically.
-- The connection string and JWT key live in .NET User Secrets, not in the repository.
+- The connection string, JWT key and Enable Banking settings live in .NET User Secrets, not in the repository. The bank's private key stays outside the project.
+- Bank access is read-only (PSD2 account information) and expires after the period you approve in your bank's app.
 - Profile pictures are validated (type and size) and resized in the browser to 256×256.
 
 ---
 
 ## Roadmap
 
-- Import bank statements (CSV), starting with BCR
+- Detect transfers between your own accounts
+- CSV statement import for history older than the bank allows
 - Monthly budgets and alerts
 - CSV and Excel export
 - Docker and cloud deployment
@@ -204,7 +235,7 @@ dotnet test
 
 Built by **Bogdan Șușman**, a Computer Science student at the Technical University of Cluj-Napoca.
 
-*„I learn by building: from the transistor all the way up to the app.”*
+*„I don't know yet, but I'll find out: between bits or between pixels!”*
 
 [GitHub](https://github.com/bogdansusman-prog) · [LinkedIn](https://www.linkedin.com/in/bogdan-susman/)
 
