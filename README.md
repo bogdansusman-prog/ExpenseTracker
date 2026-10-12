@@ -41,6 +41,8 @@
 |---|---|
 | ![Login](docs/images/login.png) | ![Welcome animation](docs/images/welcome.png) |
 | **Login** with an RO / EN switch | **Welcome animation** after logging in |
+| ![Bank sync](docs/images/bank.png) | ![Chat with Ax](docs/images/chat.png) |
+| **Bank sync**: review the new transactions, then import | **Chat with Ax**: free questions, follow-ups, what he understood |
 | ![Ask Ax](docs/images/advisor.png) | ![Insights](docs/images/insights.png) |
 | **Ask Ax**: score, breakdown, steps and chat | **Insights**: regret map, subscriptions, forecast |
 | ![Transactions](docs/images/transactions.png) | ![Categories](docs/images/categories.png) |
