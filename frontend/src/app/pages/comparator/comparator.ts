@@ -19,10 +19,11 @@ import {
 } from '../../services/expense-api.service';
 import { I18n } from '../../i18n/i18n.service';
 import { TranslatePipe } from '../../i18n/translate.pipe';
+import { Reveal, Tilt } from '../../shared/motion';
 
 @Component({
   selector: 'app-comparator',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, Reveal, Tilt],
   templateUrl: './comparator.html',
   styleUrl: './comparator.scss'
 })

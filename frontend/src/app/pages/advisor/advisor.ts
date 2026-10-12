@@ -44,6 +44,10 @@ export class Advisor implements OnInit, OnDestroy {
   private typingTimer?: ReturnType<typeof setInterval>;
   private nodTimeout?: ReturnType<typeof setTimeout>;
 
+  /** Ax reacts to his own answer for a few seconds: happy when it's good news, worried when it's not. */
+  readonly reaction = signal<AxMood | null>(null);
+  private reactionTimeout?: ReturnType<typeof setTimeout>;
+
   /** Ax's mood follows what is happening on the page. */
   readonly mood = computed<AxMood>(() => {
     if (this.sending() || this.loadingReport()) {
@@ -51,6 +55,10 @@ export class Advisor implements OnInit, OnDestroy {
     }
     if (this.typingIndex() !== null) {
       return 'nodding';
+    }
+    const reaction = this.reaction();
+    if (reaction) {
+      return reaction;
     }
     if (this.chatError() || this.reportError()) {
       return 'worried';
@@ -113,6 +121,7 @@ export class Advisor implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.typingTimer);
     clearTimeout(this.nodTimeout);
+    clearTimeout(this.reactionTimeout);
   }
 
   language(): AppLanguage {
@@ -208,6 +217,7 @@ export class Advisor implements OnInit, OnDestroy {
     if (reduceMotion) {
       this.typingIndex.set(null);
       this.scrollChat();
+      this.react(text);
       return;
     }
 
@@ -225,9 +235,24 @@ export class Advisor implements OnInit, OnDestroy {
       if (position >= text.length) {
         clearInterval(this.typingTimer);
         // keep nodding a moment after the last word
-        this.nodTimeout = setTimeout(() => this.typingIndex.set(null), 700);
+        this.nodTimeout = setTimeout(() => {
+          this.typingIndex.set(null);
+          this.react(text);
+        }, 700);
       }
     }, 22);
+  }
+
+  private react(text: string): void {
+    const good = /bravo|nice|directia buna|right direction|stai foarte bine|doing great|cu placere|welcome|salut|hi!|hey/i;
+    const bad = /atentie|careful|minus|negative|ai crescut|went up/i;
+    const mood: AxMood | null = bad.test(text) ? 'worried' : good.test(text) ? 'happy' : null;
+
+    clearTimeout(this.reactionTimeout);
+    this.reaction.set(mood);
+    if (mood) {
+      this.reactionTimeout = setTimeout(() => this.reaction.set(null), 3500);
+    }
   }
 
   private scrollChat(): void {

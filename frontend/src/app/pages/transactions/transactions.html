@@ -11,6 +11,7 @@
 
   <button
     class="secondary-button"
+    axMagnetic
     type="button"
     (click)="loadData()"
   >
@@ -22,7 +23,7 @@
 
 @if (errorMessage()) {
 
-  <div class="alert error-alert">
+  <div class="alert error-alert" animate.enter="pop-enter" animate.leave="pop-leave">
     {{ errorMessage() | t }}
   </div>
 
@@ -31,7 +32,7 @@
 
 @if (successMessage()) {
 
-  <div class="alert success-alert">
+  <div class="alert success-alert" animate.enter="pop-enter" animate.leave="pop-leave">
     {{ successMessage() | t }}
   </div>
 
@@ -45,6 +46,8 @@
   </section>
 
 } @else {
+
+  <div class="tx-body" axReveal=":scope > .card">
 
   <!-- ADD TRANSACTION -->
 
@@ -464,7 +467,7 @@
               track transaction.id
             ) {
 
-              <tr>
+              <tr animate.enter="row-enter" animate.leave="row-leave" [style.--i]="$index">
 
                 <!-- CHECKBOX -->
 
@@ -613,5 +616,7 @@
     }
 
   </section>
+
+  </div>
 
 }

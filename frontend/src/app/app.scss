@@ -50,6 +50,7 @@
 }
 
 .navigation {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -78,6 +79,23 @@
   a.active {
     color: white;
     background: #4c6ef5;
+  }
+
+  a { position: relative; z-index: 1; }
+
+  // The sliding pill (see App.moveIndicator) replaces the per-link background once it is placed.
+  &.has-indicator a.active { background: transparent; }
+
+  .nav-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    visibility: hidden;
+    background: linear-gradient(135deg, #4c6ef5, #5c7cfa);
+    border-radius: 8px;
+    box-shadow: 0 6px 22px rgba(76, 110, 245, 0.45);
+    pointer-events: none;
   }
 
   a.ai-link:not(.active) {
@@ -181,3 +199,19 @@
     border-left: 0;
   }
 }
+/* A line of light that sweeps the top of the screen on every page change. */
+.route-sweep {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 2px;
+  visibility: hidden;
+  background: linear-gradient(90deg, transparent, #748ffc 30%, #e599f7 70%, transparent);
+  box-shadow: 0 0 12px rgba(116, 143, 252, 0.8);
+  pointer-events: none;
+}
+
+/* Name used by the page cross-fade in styles.scss. */
+.page-container { view-transition-name: page; }

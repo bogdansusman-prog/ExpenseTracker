@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,6 +11,18 @@ import { ExpenseApiService } from '../../services/expense-api.service';
 import { Category } from '../../models/category.model';
 import { BankConnection, BankOption, BankPreviewItem, BankStatus } from '../../models/bank.model';
 import { formatMoney } from '../../shared/format';
+import { CountUp, gsap, Magnetic, reducedMotion, Reveal, Tilt } from '../../shared/motion';
+
+/** One piece of the import confetti: where it flies, how it spins, which colour. */
+interface ConfettiPiece {
+  x: number;
+  y: number;
+  rotate: number;
+  delay: number;
+  color: string;
+}
+
+const CONFETTI_COLORS = ['#748ffc', '#e599f7', '#ffd43b', '#69db7c', '#ff8787', '#ffc3d8'];
 
 /** One preview row with what the user decided for it. */
 interface PreviewRow extends BankPreviewItem {
@@ -20,16 +32,17 @@ interface PreviewRow extends BankPreviewItem {
 
 @Component({
   selector: 'app-bank',
-  imports: [FormsModule, RouterLink, TranslatePipe, AxMascot],
+  imports: [FormsModule, RouterLink, TranslatePipe, AxMascot, CountUp, Magnetic, Reveal, Tilt],
   templateUrl: './bank.html',
   styleUrl: './bank.scss'
 })
-export class Bank implements OnInit {
+export class Bank implements OnInit, OnDestroy {
   private readonly api = inject(BankApiService);
   private readonly expenseApi = inject(ExpenseApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly i18n = inject(I18n);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly formatMoney = formatMoney;
 
@@ -56,6 +69,22 @@ export class Bank implements OnInit {
   readonly selectedRows = computed(() => this.rows().filter(row => row.selected));
   readonly missingCategory = computed(() => this.selectedRows().filter(row => row.categoryId === null).length);
   readonly canImport = computed(() => this.selectedRows().length > 0 && !this.importing());
+
+  /** After an import: Ax celebrates with the number of new transactions and a burst of confetti. */
+  readonly celebration = signal<{ imported: number } | null>(null);
+  readonly confetti: ConfettiPiece[] = Array.from({ length: 28 }, (_, i) => {
+    const angle = (i / 28) * Math.PI * 2 + (i % 3) * 0.3;
+    const distance = 90 + ((i * 37) % 70);
+    return {
+      x: Math.round(Math.cos(angle) * distance * 1.6),
+      y: Math.round(Math.sin(angle) * distance - 40),
+      rotate: (i * 67) % 360,
+      delay: (i % 7) * 0.03,
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length]
+    };
+  });
+  private celebrationTimer?: ReturnType<typeof setTimeout>;
+  private flyOut?: gsap.core.Tween;
 
   ngOnInit(): void {
     this.expenseApi.getCategories().subscribe({ next: categories => this.categories.set(categories) });
@@ -186,16 +215,36 @@ export class Bank implements OnInit {
       categoryId: row.categoryId
     }));
 
+    // The chosen rows fly out of the table, as if they were going into the app, while the API saves them.
+    const leaving = this.host.nativeElement.querySelectorAll('.preview tbody tr:not(.done):not(.off)');
+    this.flyOut = reducedMotion() || leaving.length === 0 ? undefined : gsap.to(leaving, {
+      x: 140,
+      autoAlpha: 0,
+      rotation: 1.5,
+      filter: 'blur(6px)',
+      duration: 0.55,
+      ease: 'power3.in',
+      stagger: { each: 0.035, from: 'start' }
+    });
+
     this.api.import(connection.id, items).subscribe({
       next: result => {
         this.importing.set(false);
         this.cancelPreview();
-        this.message.set(this.i18n.t('Am importat {n} tranzactii.', { n: result.imported })
-          + (result.skipped > 0 ? ' ' + this.i18n.t('{n} erau deja importate.', { n: result.skipped }) : ''));
+        if (result.imported > 0) {
+          this.celebrate(result.imported);
+          if (result.skipped > 0) {
+            this.message.set(this.i18n.t('{n} erau deja importate.', { n: result.skipped }));
+          }
+        } else {
+          this.message.set(this.i18n.t('Am importat {n} tranzactii.', { n: result.imported })
+            + (result.skipped > 0 ? ' ' + this.i18n.t('{n} erau deja importate.', { n: result.skipped }) : ''));
+        }
         this.load();
       },
       error: error => {
         this.importing.set(false);
+        this.flyOut?.revert(); // bring the rows back so nothing looks lost
         this.error.set(this.describe(error));
       }
     });
@@ -272,5 +321,16 @@ export class Bank implements OnInit {
     }
 
     return text || 'Ceva n-a mers. Incearca din nou.';
+  }
+
+  private celebrate(imported: number): void {
+    clearTimeout(this.celebrationTimer);
+    this.celebration.set({ imported });
+    this.celebrationTimer = setTimeout(() => this.celebration.set(null), 6000);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.celebrationTimer);
+    this.flyOut?.kill();
   }
 }

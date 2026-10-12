@@ -1,6 +1,6 @@
 <svg
   class="ax"
-  [class]="mood()"
+  [class]="override() ?? mood()"
   [attr.width]="size()"
   [attr.height]="size()"
   viewBox="0 0 220 220"
@@ -71,6 +71,8 @@
 
         <!-- eyes -->
         <g class="eyes part">
+          <!-- .look follows the mouse (GSAP), .pupils keeps the mood offsets from CSS -->
+          <g class="look" #look>
           <g class="pupils">
             <circle cx="88" cy="92" r="8" fill="#2a1b2e"/>
             <circle cx="132" cy="92" r="8" fill="#2a1b2e"/>
@@ -78,6 +80,7 @@
             <circle cx="135" cy="89" r="2.8" fill="#fff"/>
             <circle cx="85.5" cy="95.5" r="1.2" fill="#fff" opacity=".8"/>
             <circle cx="129.5" cy="95.5" r="1.2" fill="#fff" opacity=".8"/>
+          </g>
           </g>
         </g>
         <!-- happy eyes ^^ -->
@@ -140,6 +143,13 @@
       <path d="M28 30 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"/>
       <path d="M190 24 l2.4 6 6 2.4 -6 2.4 -2.4 6 -2.4 -6 -6 -2.4 6 -2.4 Z"/>
       <path d="M200 150 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z"/>
+    </g>
+
+    <!-- hearts for the easter egg (click Ax 5 times quickly) -->
+    <g class="hearts" #hearts fill="#ff6b9d">
+      @for (heart of heartSlots; track $index) {
+        <path d="M-6 -2 C-6 -7 0 -7 0 -2 C0 -7 6 -7 6 -2 C6 3 0 6 0 8 C0 6 -6 3 -6 -2 Z" opacity="0"/>
+      }
     </g>
 
     <!-- alert mark -->

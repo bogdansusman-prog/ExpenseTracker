@@ -25,10 +25,11 @@ import {
 import { ExpenseApiService } from '../../services/expense-api.service';
 import { I18n } from '../../i18n/i18n.service';
 import { TranslatePipe } from '../../i18n/translate.pipe';
+import { Magnetic, Reveal } from '../../shared/motion';
 
 @Component({
   selector: 'app-transactions',
-  imports: [ReactiveFormsModule, TranslatePipe],
+  imports: [ReactiveFormsModule, TranslatePipe, Magnetic, Reveal],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss'
 })
